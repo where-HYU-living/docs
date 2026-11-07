@@ -7,7 +7,9 @@
 - Phase 0: 원장 생성 (2026-11-08)
 - Phase 1: complete — docs `spec-v0.5.md` 4-S 구현 상태 표(전 기능 ID·프론트/백엔드 상태·개선점). 테스트: 문서 단계라 없음(코드 대조로 확인)
 - Phase 2-1: complete — backend `27c14ef`(신규 API 8묶음+알림 잡, `CommunityApiTest` 5건). 테스트: backend `gradlew test` 293/293 통과, 로컬 서버 스모크(검색·후기 201·내 집·리포트·알림) 통과
-- Phase 2-2: 프론트 개선 — 진행 중
+- Phase 2-2: complete — frontend `efed957` + I19 커밋(관리비 필터·양도 글 고치기·내 집 달 선택·지난 기록·전환율 4.6%·외형 문구·내 집 대비). 테스트: vitest 343/343, tsc 0
+- Phase 2-3: complete — backend 초대 `expiresAt`. 테스트: WorldSocketIT 통과. K2 외부 저장소는 보류(범위 밖)
+- Phase 3-1: QA 버그(A 라벨, B 캠퍼스 투어) — 진행 중
 
 ### 2-1 프론트↔백엔드 어긋남 표
 | # | 항목 | 프론트 | 백엔드(이전) | 판단 기준 | 결과 |
@@ -28,6 +30,7 @@
 
 
 ## Findings
+- 프론트 환산 월세 미리보기(`forms/calc.ts`)가 전환율 6% 로 서버(4.6%)와 달랐음 → 2-2 에서 맞춤.
 - 프로덕션 API = `https://api-production-8811.up.railway.app` (Vercel 번들에서 확인). 로컬 DB 는 청년안심주택 0건(수집 잡 꺼짐)·실거래 없음 → 등급 전부 PENDING. 프로덕션은 단지 5·기숙사 5·등급 계산됨.
 - 로컬 QA 토큰: 메일 로그 모드 → `scratchpad/token.sh <메일>`.
 - 백엔드에 없는 API(프론트는 호출): `/search`, `/reviews`, `/me/home`, `/me/payments`, `/me/utilities`, `/me/report`, `/me/home/alerts`, `/me/notifications`. 실서버에선 해당 화면이 항상 오류.
@@ -43,3 +46,4 @@
 - Ruling: 남이 남긴 미커밋 `api-contract.md`·`backend-request-world-look.md` 를 함께 커밋. 이유: 백엔드 코드와 대조해 내용이 맞음. 틀리면 비용: revert 1회.
 - Ruling: 백엔드에 없는 8개 API 는 계약 문서(기준 문서)에 이미 정의돼 있으므로 백엔드를 계약대로 구현(프론트를 바꾸지 않음). 틀리면 비용: 백엔드 담당과 필드 협의 1회.
 - Ruling: 새 테이블은 JPA 엔티티 없이 JdbcTemplate(기존 DormService 방식). 이유: ddl validate 부담·코드량 감소. 틀리면 비용: 엔티티 전환 시 리팩터 1회.
+- Ruling: 양도 사진 외부 저장소(S3 등) 전환은 외부 서비스 설정이라 하지 않고 보류로 기록. 틀리면 비용: 재배포 때 데모 사진 재업로드.

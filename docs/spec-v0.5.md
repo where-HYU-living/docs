@@ -240,7 +240,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 |---|---|---|---|---|---|---|---|
 | A1 | 학교 메일 인증 | 상단 [로그인] → 메일 입력 → 코드 입력 | `app/LoginModal.tsx` · `POST /auth/email/send`, `/auth/email/verify` | 완료 | - | 완료 | - |
 | A2 | 전공·과 건물 등록 | [내 계정] → 학과 고르기 → 건물 추가/삭제 | `app/ProfileModal.tsx`, `DepartmentPicker`, `BuildingPicker` · `GET/PUT /me/profile`, `GET /departments`, `/buildings` | 완료 | - | 완료 | - |
-| A5 | 상단 통합 검색 + 탭 | 검색창 입력 → 결과(서버·카카오 장소·동네 12곳·랜드마크) 클릭 → 3D 이동 | `app/TopBar.tsx`, `features/search.ts`, `features/kakaoPlaces.ts`, `goTo.ts` · `GET /search` | 부분 | 서버 `/search` 가 없어 매물·단지·기숙사·양도 결과가 비어 있음. 지도 모드에서도 3D 로 튕김(3-3) | 미구현 | `/search` 엔드포인트 없음 → 매물·단지·기숙사·양도·건물 이름 검색 + 주소 보충 구현 |
+| A5 | 상단 통합 검색 + 탭 | 검색창 입력 → 결과(서버·카카오 장소·동네 12곳·랜드마크) 클릭 → 3D 이동 | `app/TopBar.tsx`, `features/search.ts`, `features/kakaoPlaces.ts`, `goTo.ts` · `GET /search` | 부분 | 서버 `/search` 연결됨(2-1). 지도 모드에서도 3D 로 튕김(3-3) | 완료 | - |
 | A6 | 예산 목표 설정 | [내 계정] → 월세·보증금 상한 | `ProfileModal.tsx` · `PUT /me/profile` `budget` | 완료 | - | 완료 | - |
 | A7 | **new** 구글 로그인 | 로그인 창 [Google 로 계속] | `app/auth/GoogleButton.tsx` · `POST /auth/google` | 완료 | - | 완료 | - |
 | A8 | **new** 로그아웃·만료 처리 | [로그아웃], 401 이면 자동 로그아웃 | `state/session.ts`, `api/client.ts` | 완료 | - | 해당없음 | - |
@@ -253,7 +253,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 | B3 | 건물 말풍선 | 매물·단지·기숙사·양도 가격 필, 클릭 → 상세 | `ListingMarkers.tsx`, `PlaceMarkers.tsx`, `TransferMarkers.tsx` · `buildWorld.js setMarkers` | 부분 | 거리 숨김이 CSS2DRenderer 에 덮여 먼 말풍선까지 전부 뜸(3-1 A). 겹침 처리·최대 개수 없음 | 해당없음 | - |
 | B4 | 순간이동 | 목록·지도·검색 선택 → 그 건물 앞 | `goTo.ts`, `state/area.ts`, `NeighborhoodHud` | 부분 | 동네 월드에서 캠퍼스 좌표로 가는 경로가 캠퍼스 투어에서 빠짐(3-1 B) | 해당없음 | - |
 | B5 | 캠퍼스 입구·과 건물 표시 | 정문·후문 아치, '내 과 건물' 말풍선 | `WorldEffects.tsx`, `world/campus.ts` | 완료 | 라벨 겹침은 B3 과 같이 처리 | 해당없음 | - |
-| B6 | 캐릭터 꾸미기 | 상단 [의상] → 잠바·머리·피부 | `app/avatar/AvatarPicker.tsx`, `world/avatar.ts` · WS `look` | 완료 | 안내 문구 "다른 접속자에게는 아직 보이지 않아요" 가 서버 구현 후에도 남아 있음 | 완료 | - |
+| B6 | 캐릭터 꾸미기 | 상단 [의상] → 잠바·머리·피부 | `app/avatar/AvatarPicker.tsx`, `world/avatar.ts` · WS `look` | 완료 | - | 완료 | - |
 | B7 | 멀티플레이 공유 월드 | 접속하면 다른 사람 캐릭터가 보임 | `net/*` · WS `/ws/world` (`world/WorldSocketHandler`, `WorldService`) | 부분 | 월드(캠퍼스↔동네) 바꿀 때마다 소켓을 끊고 다시 붙음(api 의존) → 상대에게 퇴장·입장으로 보임. 다른 월드에 있는 사람 처리 없음 | 완료 | - |
 | B8 | 초대 링크 | [초대] → 링크 복사 → 받은 사람은 옆에 스폰 | `InviteButton.tsx`, `net/useMultiplayer.ts` · `POST /invites` | 부분 | 초대한 사람이 동네 월드에 있으면 받은 사람은 캠퍼스 월드에서 그 좌표로 순간이동 → 월드 밖 | 완료 | - |
 | B9 | 이모트·채팅 | 하단 [같이 걷기] 이모트·40자 채팅 | `WorldChat.tsx` · WS `emote`, `chat` | 완료 | - | 완료 | - |
@@ -269,7 +269,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 |---|---|---|---|---|---|---|---|
 | C1 | 2D 지도 | [지도로 보기] → 핀 → 카드 → [3D로 가기] | `map/KakaoMap.tsx`, `map/geo.ts` | 부분 | 지도 안 검색 없음(상단 검색은 3D 로 튕김), 검색 결과 마커·정보 카드 없음, 단지·기숙사·양도 핀 없음, 서비스 밖 안내 없음(3-3) | 해당없음 | - |
 | C2 | 매물 목록 | [집 찾기] 카드 목록 → 클릭 → 상세 + 3D 이동 | `ListingsPanel.tsx`, `dossier/DossierCard.tsx` · `GET /listings` | 완료 | - | 완료 | - |
-| C3 | 필터 | [조건] 월세·보증금·도보·구조·등급·단지 표시 | `ListingsPanel.tsx`, `features/listings.ts` | 부분 | 관리비 상한(`maxMgmtFee`) 입력 없음 | 완료 | - |
+| C3 | 필터 | [조건] 월세·보증금·도보·구조·등급·단지 표시 | `ListingsPanel.tsx`, `features/listings.ts` | 완료 | - | 완료 | - |
 | C6 | 찜하기 | 하트(카드·상세·말풍선·지도 카드) | `HeartButton.tsx`, `features/favorites.ts` · `POST/DELETE /me/favorites` | 완료 | - | 완료 | - |
 | C7 | 찜 목록 | 상단 하트 → 종류별 목록 → 클릭 → 3D | `FavoritesPanel.tsx` · `GET /me/favorites` | 완료 | - | 완료 | - |
 | C8 | **new** 지도 모드 검색·정보 카드·3D로 가기 | 지도에서 검색 → 마커·정보 카드(서비스 안/밖, 가까운 집) → [3D로 가기] | `map/KakaoMap.tsx`, `TopBar.tsx`, `goTo.ts` | 미구현 | 3-3 에서 구현 | 해당없음 | - |
@@ -304,17 +304,17 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 ### G. 한양대생 후기
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
-| G1 | 건물 후기 작성·보기 | 상세 '한양대생 후기' → [후기 쓰기] | `ReviewSection.tsx` · `GET/POST /reviews` | 완료 | 서버가 없어 실서버에선 항상 '불러오지 못했어요' | 미구현 | `/reviews` 없음 |
-| G4 | 3D 실내 후기 핀 | 실내에서 바닥 클릭 → 핀 후기 | `interior/PinPanel.tsx`, `pins.ts`, `useIndoorReviews.ts` | 완료 | G1 과 같음 | 미구현 | `/reviews` 의 `pin` |
+| G1 | 건물 후기 작성·보기 | 상세 '한양대생 후기' → [후기 쓰기] | `ReviewSection.tsx` · `GET/POST /reviews` | 완료 | - | 완료 | - |
+| G4 | 3D 실내 후기 핀 | 실내에서 바닥 클릭 → 핀 후기 | `interior/PinPanel.tsx`, `pins.ts`, `useIndoorReviews.ts` | 완료 | - | 완료 | - |
 
 ### H. 내 집 기록
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
-| H1 | 내 집 등록 | [내 집 기록] → 주소·계약 정보 | `MyHomePanel.tsx` · `GET/PUT /me/home` | 완료 | 실서버에선 저장 실패 | 미구현 | `/me/home` 없음 |
-| H2 | 월세 납부 내역 | 월세 기록 추가 | `MyHomePanel.tsx` · `GET/POST /me/payments` | 완료 | 〃 | 미구현 | 〃 |
-| H3 | 공과금 기록 | 전기·가스·수도·인터넷 | `MyHomePanel.tsx` · `POST /me/utilities` | 완료 | 지난 기록 보기 없음(`GET /me/utilities` 안 씀) | 미구현 | 〃 |
-| H5 | 월간 리포트 | 월 고르기 → 총 주거비·지난달 대비·초과액 | `MyHomePanel.tsx` · `GET /me/report` | 완료 | 〃 | 미구현 | 〃 |
-| H6 | 계약 만료 알림 | 만료 N일 전 알림 추가·끄기·삭제 | `MyHomePanel.tsx` · `/me/home/alerts` | 완료 | 〃 | 미구현 | 알림 생성 스케줄러 없음 |
+| H1 | 내 집 등록 | [내 집 기록] → 주소·계약 정보 | `MyHomePanel.tsx` · `GET/PUT /me/home` | 완료 | - | 완료 | - |
+| H2 | 월세 납부 내역 | 월세 기록 추가 | `MyHomePanel.tsx` · `GET/POST /me/payments` | 완료 | - | 완료 | - |
+| H3 | 공과금 기록 | 전기·가스·수도·인터넷 | `MyHomePanel.tsx` · `POST /me/utilities` | 완료 | - | 완료 | - |
+| H5 | 월간 리포트 | 월 고르기 → 총 주거비·지난달 대비·초과액 | `MyHomePanel.tsx` · `GET /me/report` | 완료 | - | 완료 | - |
+| H6 | 계약 만료 알림 | 만료 N일 전 알림 추가·끄기·삭제 | `MyHomePanel.tsx` · `/me/home/alerts` | 완료 | - | 완료 | - |
 | H8 | 거주자 평면도 등록 (△) | - | - | 미구현 | 후순위 | 미구현 | 후순위 |
 
 ### I. 청년안심주택
@@ -325,9 +325,9 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 | I3 | 단지 상세 | 주택형·보증금·월세·연락처 | `HousingPanel.tsx` · `GET /housing/{id}` | 완료 | - | 완료 | - |
 | I5 | 과 건물까지 도보 | 단지 카드 '도보 N분' | `walkMin` | 완료 | - | 완료 | - |
 | I6 | 공고 캘린더 | [청년안심주택] → 공고 캘린더 | `HousingPanel.tsx`, `features/catalog.groupEventsByMonth` · `GET /housing/announcements` | 완료 | - | 완료 | - |
-| I7 | D-day 알림 | 단지 [알림 받기] | `useSubscribe` · `POST/DELETE /housing/{id}/subscribe` | 부분 | 알림함(Q1)이 서버 없음 | 부분 | 구독은 저장되지만 알림 생성(D-7·D-1·당일)·`/me/notifications` 없음 |
+| I7 | D-day 알림 | 단지 [알림 받기] | `useSubscribe` · `POST/DELETE /housing/{id}/subscribe` | 완료 | - | 완료 | - |
 | I8 | 진행 상태 배지 | 예정·접수 중·마감·발표·추가모집 | `STATUS_LABEL` · `AnnouncementStatusPolicy` | 완료 | - | 완료 | - |
-| I19 | 절약액 계산 | 판결 & 비교 '2년 ○○만 원 차이' | `CompareSection.tsx` · alternatives | 부분 | '내 집 대비' 비교 없음 | 완료 | - |
+| I19 | 절약액 계산 | 판결 & 비교 '2년 ○○만 원 차이' | `CompareSection.tsx` · alternatives | 완료 | - | 완료 | - |
 
 ### P. 기숙사 3D 투어
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
@@ -339,10 +339,10 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 ### K. 양도 게시판
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
-| K2 | 양도 글 올리기 | [양도] → [양도 글 올리기] → 주소·금액·기간·사진 | `TransferPanel.tsx`, `AddressPicker.tsx`, `forms/PhotoGrid.tsx` · `POST /transfers`, `POST /uploads` | 완료 | - | 완료 | 업로드가 로컬 디스크(`LocalDiskStorage`) → Railway 재배포 때 사진 사라짐 |
+| K2 | 양도 글 올리기 | [양도] → [양도 글 올리기] → 주소·금액·기간·사진 | `TransferPanel.tsx`, `AddressPicker.tsx`, `forms/PhotoGrid.tsx` · `POST /transfers`, `POST /uploads` | 완료 | - | 완료 | 업로드가 로컬 디스크(`LocalDiskStorage`) → Railway 재배포 때 사진 사라짐. 외부 저장소 설정은 범위 밖이라 보류 |
 | K3 | 양도 글 보기 | 목록 → 상세(자동 판정·도보) | `TransferPanel.tsx` · `GET /transfers`, `/transfers/{id}` | 완료 | - | 완료 | - |
 | K4 | 양도 집 3D로 보기 | 상세 [3D로 보기] | `TransferMarkers.tsx`, `goTo.ts` | 완료 | - | 해당없음 | - |
-| K5 | 글 관리 | 내 글 [양도 완료] | `TransferPanel.tsx` · `PATCH /transfers/{id}/status`, `PUT /transfers/{id}` | 부분 | 수정 화면 없음(마감만) | 완료 | - |
+| K5 | 글 관리 | 내 글 [양도 완료] | `TransferPanel.tsx` · `PATCH /transfers/{id}/status`, `PUT /transfers/{id}` | 완료 | - | 완료 | - |
 
 ### M. 3D 레이어
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
@@ -362,7 +362,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 ### Q. 알림·운영 (new)
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
-| Q1 | **new** 알림함 | 상단 종 → 목록, 안 읽은 개수 | `InboxPanel.tsx` · `GET /me/notifications`, `PATCH /me/notifications/{id}/read` | 완료 | 서버 없음 | 미구현 | 엔드포인트·생성 스케줄러 없음 |
+| Q1 | **new** 알림함 | 상단 종 → 목록, 안 읽은 개수 | `InboxPanel.tsx` · `GET /me/notifications`, `PATCH /me/notifications/{id}/read` | 완료 | - | 완료 | - |
 | Q2 | **new** 상단바 | 검색·탭·시간·지도·의상·초대·찜·알림·계정 | `TopBar.tsx` | 부분 | 한 줄에 요소 과다 → 3-2 정리 | 해당없음 | - |
 | Q3 | **new** 개발용 목 서버 | `?mock=1` | `mock/*` | 완료 | - | 해당없음 | - |
 | Q4 | **new** 개인정보처리방침·약관 | `/privacy.html`, `/terms.html` | `public/*.html` | 완료 | - | 해당없음 | - |
