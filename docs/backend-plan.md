@@ -39,13 +39,16 @@
 | 3 프로필·학과·건물·시더 | 구현 완료 + **실제 학과·건물 시드 있음** | `ProfileApiTest` 7, `CatalogApiTest` 4, `FixtureSeederTest` 5 | 학과 61개·건물 66곳(프론트 담당이 campus-data 에서 생성). 남은 문제: **입구(`GATE`) 1곳뿐**(계약 최소 2), 학과 건물이 **행정팀 기준**(공대 19개 학과가 모두 206 공업센터본관), 807 게스트하우스가 `DORM` |
 | 4 판정 엔진 | 구현 완료 | `PriceCalculatorTest` 11, `GradePolicyTest` 7 | |
 | 5 실거래 수집·표본 | 구현 완료 + **실제 수집 완료** | `RealDealNormalizerTest` 8, `MolitHttpClientTest` 3, `RealDealIngestJobTest` 5, `DongAdjacencyTest` 3, `FairRentEstimatorTest` 6 | 개발 DB에 27,718건 (2025-11 ~ 2026-10) |
-| 6 매물 API | 코드 완료 | `ListingApiTest` 16 | **실제 데모 매물 `listings.json` 20건 미작성** |
+| 6 매물 API | 구현 완료 + **데모 매물 20건** | `ListingApiTest` 16 | `fixtures/listings.json`: 사근동 9·행당동 8·마장동 3 (실제 지번 좌표), 서버 판정 결과 적정 10·조금 비쌈 4·비쌈 3·범인 2·보류 1. 1번 = "한양대 도보 1분 11㎡" 범인, 9번 = 사근동 8㎡ 표본 부족 보류 |
 | 7 도보·주변·주소 | 구현 완료 + **실서버 확인** | `TmapWalkAdapterTest` 4, `KakaoAdaptersTest` 6, `BusStopIndexTest` 3, `WalkServiceTest` 6, `GeoApiTest` 12 | 실제 TMAP 도보 시간 확인 (행당동 지점 → 공업센터본관 11분, IT/BT관 14분) |
 | (프론트 담당 추가) 구글 로그인·Docker | 구현 완료 | `GoogleAuthApiTest`, `GoogleJwtVerifierTest` | `POST /auth/google`(계약 v1.4), `Dockerfile`·`docker compose up --build`로 DB+서버 실행 |
 | 8 청년안심주택·공고·구독·기숙사·대안 | 구현 완료 + **실제 수집 확인** | `ScheduleParserTest` 5, `SocoParserTest` 6, `AnnouncementStatusPolicyTest` 4, `HousingIngestJobTest` 11, `HousingApiTest` 12, `DormApiTest` 3, `AlternativeApiTest` 4 | soco 실수집: 단지 5곳(퀸즈W·한영스테이·라봄성동·청아진·힐데스하임), 최근 12개월 공고 16건, 실패 0. 2026-11-07 기준 접수 중인 공고 없음. 평면도 연결표 27장 모두 작성(연결표 없는 이미지 0). 한영스테이는 이미지에 면적이 없어 이름 숫자(18·22)를 전용면적으로 사용 |
-| 9~16 | 대기 | | |
+| 9 찜 | 구현 완료 | `FavoriteApiTest` 12 | 매물·청년안심주택·기숙사·양도 글 목록·상세 `favorited` 실제 값 (청년안심주택·기숙사는 계약 v1.6 에서 추가) |
+| 10 양도 게시판·업로드 | 구현 완료 + **실서버 확인** | `TransferApiTest` 15 | 제목 필수(계약 v1.6), 남은 개월 기준 판정, 업로드는 전체 주소 응답·첫 바이트로 jpg/png 확인, 데모 양도 글 3건 |
+| 15 멀티플레이 | **구현 완료 (프론트 담당이 진행)** | `WorldServiceTest`·`SessionOutboxTest`·`WorldSocketIT`·`WorldLoadIT` | `/ws/world` 공유 월드(최대 30명, 10Hz), `POST /invites`. 계획과 다른 점은 아래 Task 15 참고 |
+| 11~14, 16 | 대기 | | |
 
-전체 테스트 204개 통과 (2026-11-07 기준).
+전체 테스트 262개 통과 (2026-11-08 기준, 프론트 담당의 멀티플레이 테스트 포함).
 
 **판정 기준값 (현재)** — 모두 `application.yml` 의 `pricing.*` 설정값, 테스트는 별도 고정값(전환율 0.06, 기준 관리비 71,000) 사용
 | 값 | 현재 | 출처·근거 |
@@ -86,14 +89,14 @@ backend/
     │   └── soco/    SocoClient(+SocoHttpClient), SocoParser, ScheduleParser, SocoHome·SocoUnit·SocoNotice
     ├── dorm/        Dorm, DormRoomType, DormController, DormService
     ├── compare/     AlternativeService (alternatives)
-    ├── favorite/    Favorite, FavoriteController, FavoriteService
-    ├── transfer/    Transfer, TransferController, TransferService, UploadController, StoragePort
+    ├── favorite/    Favorite, FavoriteType, FavoriteRepository, FavoriteController, FavoriteService
+    ├── transfer/    Transfer, TransferStatus, TransferDtos, TransferRepository, TransferController, TransferService, UploadController, StoragePort(+LocalDiskStorage), UploadConfig
     ├── review/      Review, ReviewController
     ├── home/        Home, Payment, Utility, ExpiryAlert, HomeController, ReportService
     ├── notification/ Notification, NotificationController, NotificationJob
     ├── search/      SearchController, SearchService
     ├── floorplan/   FloorPlan(jsonb 컬럼), FloorPlanController
-    └── world/       WorldSocketHandler, WorldState, Player, InviteService, InviteController, WebSocketConfig
+    └── world/       WorldService, WorldSocketHandler, WorldPlayer, SessionOutbox(+Outbox), InviteService, InviteController, WorldProperties, WorldConfig (프론트 담당 구현)
 ```
 
 ---
@@ -362,7 +365,11 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
     - **도보 시간 필터:** 기준 건물이 있으면 조건에 맞는 매물을 모두 가져와 메모리에서 거르고 페이지를 나눔(데모 매물 수십 건 규모라 충분). 도보 시간을 모르는 매물은 제외 → 지금은 `WalkService` 가 null 만 돌려줘서 기준 건물 + 도보 필터 조합의 결과가 0건 (Task 7에서 해결)
     - `guest_canBrowse` 의 `/listings` 를 200 검사로 변경
     - 테스트는 어떤 판정 기준값에서도 결과가 같은 매물(매우 비싼 집 → 범인, 표본 없는 동·면적 → 보류)로 구성, 판정 기준값은 테스트에서 별도로 고정
-  - **남은 일:** 실제 데모 매물 `contract/fixtures/listings.json` 20건 (등급 5종 모두, 보류 1건 이상). 대상 동은 모두 판정 가능하므로 **보류 매물은 표본이 없는 조건(예: 큰 면적)으로 따로 만들어야 함**. 스펙 데모의 "한양대 도보 1분 11㎡ 월 95만 원"은 범인 등급
+  - ~~남은 일: 데모 매물 20건~~ → 완료 (2026-11-08). `src/main/resources/fixtures/listings.json`
+    - 동: 학생 수요가 많은 사근동·행당동 위주 + 마장동 (도선동·홍익동은 학교 생활권에서 멀어 제외, 사용자 결정)
+    - 좌표: 카카오 주소 검색으로 찾은 실제 지번 (도로명 주소가 있는 곳만). 3D 월드가 캠퍼스 주변뿐이라 대부분 3D 범위 밖이지만, 매물은 말풍선·2D 지도로 표시되므로 문제없음
+    - 금액: 동·면적별 적정가(서버와 같은 규칙)에 맞춰 등급 경계에서 충분히 떨어지게 정함. 보류는 사근동 8㎡ (인접 동 포함 표본 6건)
+    - 실거래를 다시 수집하면 적정가가 바뀌어 등급이 달라질 수 있음
 - [x] **Step 4: 통과 확인** → PASS (실서버에서도 `/listings` 200, 잘못된 `bbox` 400, 없는 매물 404 확인)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(listing): search filters, detail, price-check"`
 
@@ -543,7 +550,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 
 **Interfaces:**
 - Consumes: Task 6 `ListingService.summaryOf`, Task 8 단지·기숙사 조회
-- Produces: `FavoriteService.isFavorited(Long userIdOrNull, FavoriteType type, long targetId): boolean`, `FavoriteService.favoritedIds(long userId, FavoriteType type): Set<Long>` (목록 N+1 방지)
+- Produces: `FavoriteRepository.existsByUserIdAndTypeAndTargetId(long userId, FavoriteType type, long targetId): boolean`, `FavoriteRepository.findTargetIds(long userId, FavoriteType type): Set<Long>` (목록 N+1 방지). 서비스가 아니라 저장소에 둔 이유: `FavoriteService` 가 매물·양도 서비스를 쓰므로 반대로 쓰면 순환 의존
 
 - [ ] **Step 1: 실패하는 테스트 작성**
 ```java
@@ -552,12 +559,19 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 @Test void delete_missing_204()
 @Test void unknownTarget_404()    // POST {LISTING,999999} → 404
 @Test void listingShowsFavorited()// 찜 후 GET /listings (토큰) → 해당 항목 favorited true
-@Test void dormFavorite_gradeNull() // POST {DORM,1} 후 GET → grade null, convertedRent == 가장 싼 호실 monthlyCost
+@Test void dormFavorite_gradeNull() // POST {DORM,107} 후 GET → grade null, convertedRent == 가장 싼 호실 monthlyCost (기숙사 id = 건물 번호, 테스트 기숙사 107)
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*FavoriteApiTest'` → FAIL
-- [ ] **Step 3: 구현** — 타입별 대상 조회를 `switch`로 분기
-- [ ] **Step 4: 통과 확인** → PASS
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*FavoriteApiTest'` → FAIL
+- [x] **Step 3: 구현** — 타입별 대상 조회를 `switch`로 분기
+- [x] **Step 4: 통과 확인** → PASS (12개)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(favorite): add, list, remove favorites across types"`
+- **구현하며 정한 것:**
+  - 추가 테스트: 비로그인 401, 잘못된 요청 400, `type` 필터·최신순, 청년안심주택 찜(가장 싼 주택형), 대상이 사라진 찜은 목록에서 빠짐, 도보 시간은 프로필 첫 번째 건물 기준
+  - `favorites` 테이블은 `(user_id, type, target_id)` unique, 사용자 삭제 시 함께 삭제. 대상 종류가 여러 개라 대상 외래키는 없음 → 대상이 없으면 목록에서 빼고 보여 줌
+  - `TRANSFER` 는 양도 글 테이블이 없어서 지금은 404. **Task 10 에서 `FavoriteService.target()` 의 `TRANSFER` 분기를 채울 것**
+  - 순환 의존 방지: `ListingService` 는 `FavoriteRepository` 를 직접 읽고, `FavoriteService` 가 `ListingService` 를 쓴다
+  - 목록 조회는 트랜잭션으로 묶지 않음 (대상 하나가 404 면 묶인 트랜잭션 전체가 실패로 표시되어 500 이 났음)
+  - 청년안심주택·기숙사 목록·상세에도 `favorited` 추가 (2026-11-08, 계약 v1.6). 스펙 C6 "모든 대상 찜"인데 계약 응답에 찜 여부 칸이 매물에만 있어서 프론트 하트가 `false` 로 고정돼 있었음. `HousingService`·`DormService` 가 `FavoriteRepository.findTargetIds` 로 채움 (순환 의존 없음)
 
 ### Task 10: 양도 게시판 · 업로드
 
@@ -567,8 +581,8 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 - Test: `transfer/TransferApiTest.java`
 
 **Interfaces:**
-- Consumes: Task 6 `PriceCheckService.check`, Task 9 `FavoriteService.isFavorited`
-- Produces: `interface StoragePort { String save(MultipartFile f); }` (로컬은 디스크 + 정적 경로 `/files/**`, 배포 시 S3 호환 구현으로 교체)
+- Consumes: Task 6 `PriceCheckService.check`, Task 9 `FavoriteRepository.existsByUserIdAndTypeAndTargetId`·`findTargetIds`
+- Produces: `interface StoragePort { String save(byte[] bytes, String ext); boolean owns(String url); }` (로컬은 디스크 + 정적 경로 `/files/**`, 배포 시 S3 호환 구현으로 교체), `TransferService.summaryOf(long id, Long userIdOrNull)` (찜 목록용)
 
 - [ ] **Step 1: 실패하는 테스트 작성**
 ```java
@@ -580,10 +594,20 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 @Test void upload_rejectsNonImage()     // text/plain → 400
 @Test void upload_rejectsOver5MB()      // 6MB → 400
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*TransferApiTest'` → FAIL
-- [ ] **Step 3: 구현** — 판정은 저장 시 계산해 캐시(Task 6과 같은 방식), 수정 시 재계산
-- [ ] **Step 4: 통과 확인** → PASS
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*TransferApiTest'` → FAIL (15개 중 12개)
+- [x] **Step 3: 구현** — 판정은 저장 시 계산해 캐시(Task 6과 같은 방식), 수정 시 재계산
+- [x] **Step 4: 통과 확인** → PASS (15개)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(transfer): transfer board with auto price-check and uploads"`
+- **구현하며 정한 것 (2026-11-08, 계약 v1.6):**
+  - **제목 필수** (1~50자, 사용자 결정): 원래 계약은 응답에만 `title`(ListingSummary 필드)이 있고 글쓰기 요청에는 없어서 앞뒤가 안 맞았음. 프론트 글쓰기 폼에 제목 칸 추가 필요
+  - 검증: 금액 0 이상, 면적 0 초과, `remainingMonths` 1~60, 설명 2000자, 사진 10장. `photoUrls` 는 **우리 `/uploads` 가 돌려준 주소만** (`StoragePort.owns`)
+  - 업로드: `StoragePort.save(byte[], ext)` 가 **전체 주소**를 돌려준다. 로컬은 `LocalDiskStorage`(디스크 `app.upload.dir` + `/files/**` 정적 제공), 앞부분은 `UPLOAD_PUBLIC_BASE_URL`(비우면 요청 주소). 배포에서 디스크가 지워지면 외부 저장소 구현만 추가 (Task 16). 파일 **첫 바이트**로 jpg·png 확인, 5MB 초과는 컨트롤러와 `spring.servlet.multipart` 둘 다 막음
+  - 상태 `OPEN`↔`DONE` 양방향, 삭제 없음. 수정·상태 변경은 작성자만(403)
+  - 목록 최신순, `thumbnailUrl` = 첫 사진, `favorited`·`walkMin`(프로필 첫 건물)·작성자 닉네임
+  - 판정 캐시는 서버 시작 시 매물과 함께 다시 계산 (`ListingGradeJob`)
+  - 찜: `FavoriteService` 의 `TRANSFER` 분기 연결 (이름 = 글 제목)
+  - 시드 `fixtures/transfers.json` 3건 (데모 작성자, 적정·비쌈·조금 비쌈)
+  - 추가 테스트: 비로그인 401, 제목 누락·51자, 목록 필드·bbox·찜·mine, 없는 글 404, 양도 글 찜, 업로드 후 실제로 받아 보기, 외부 사진 주소 거부, 최신순
 
 ### Task 11: 후기
 
@@ -722,6 +746,10 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - **구현 전 확인할 것:** 현재 `SecurityConfig`의 CORS는 `/api/**`만 등록되어 있으므로 `/ws/**`를 추가. websocket 의존성 추가(Task 1에서 미룸)
 - [ ] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(world): shared world websocket, invites with spawn next to inviter"`
+- **완료 (2026-11-08, 프론트 담당이 구현 `e72869b`):** `world/` 패키지 (`WorldService`, `WorldSocketHandler`, `SessionOutbox`, `InviteService`·`InviteController`, `WorldProperties`, `WorldConfig`), 테스트 4종(단위·전송 큐·소켓 통합·30명 부하)
+  - 계획과 다른 값: 최대 인원 **30**(계획 50), 무응답 정리 **60초**(계획 30초), 틱 100ms(같음), 초대 24시간(같음). `application.yml` 의 `world.*`
+  - 추가된 것: `look`(잠바·머리·피부) 공유, 접속자별 전송 큐(가상 스레드)로 느린 접속자가 틱을 막지 않게, 좌표 양자화·속도 제한
+  - 백엔드 담당 확인: 머지 후 전체 테스트 245개 통과 (2026-11-08)
 
 ### Task 16: 배포 · 프론트 연동 확인
 
@@ -730,7 +758,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 - Test: `src/test/java/com/chatatda/api/ContractSmokeTest.java`
 
 **Interfaces:**
-- Produces: 환경 변수 `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `MAIL_*`, `MOLIT_KEY`, `TMAP_KEY`, `KAKAO_REST_KEY`, `HOUSING_INGEST_ENABLED`, `CORS_ALLOWED_ORIGINS`, `FRONT_BASE_URL`
+- Produces: 환경 변수 `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `MAIL_*`, `MOLIT_KEY`, `TMAP_KEY`, `KAKAO_REST_KEY`, `HOUSING_INGEST_ENABLED`, `UPLOAD_DIR`, `UPLOAD_PUBLIC_BASE_URL`, `CORS_ALLOWED_ORIGINS`, `FRONT_BASE_URL`
 
 - [ ] **Step 1: 실패하는 테스트 작성** — 계약 5장의 모든 GET 엔드포인트를 픽스처 시드 상태에서 한 번씩 호출해 2xx(또는 `/me/*`는 토큰으로 2xx)인지 확인하는 표 기반 테스트 `allContractGetsRespond()`
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*ContractSmokeTest'` → 누락 엔드포인트가 있으면 FAIL
@@ -739,7 +767,8 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
     - `MAIL_MODE=smtp`와 `spring.mail.*` 설정 (기본값 `log`라 빠뜨리면 인증 코드가 메일 대신 로그로만 감), **SMTP 실제 발송 처음 확인**
     - 실제 메일 발송 전에 **IP 단위 발송 제한** 추가 (지금은 메일 주소별 60초만 있어서 여러 주소로 대량 발송 가능)
     - 배포용 `JWT_SECRET`은 로컬과 다른 값
-    - 무료 플랜의 잠들기(09:00 알림·WebSocket 중단), 업로드 파일이 재배포 때 사라지는지 확인
+    - 무료 플랜의 잠들기(09:00 알림·WebSocket 중단), 업로드 파일이 재배포 때 사라지는지 확인 → 사라지면 디스크 유지 볼륨을 붙이거나 `StoragePort` 외부 저장소(S3·R2 등) 구현 추가
+    - `UPLOAD_PUBLIC_BASE_URL` = 배포 서버 공개 주소 (프록시 뒤라 요청 주소로 만들면 http/도메인이 틀릴 수 있음)
     - `CORS_ALLOWED_ORIGINS`에 배포 프론트 주소 추가, `SEED_ENABLED` 결정
     - **청년안심주택 수집 켜기**: `HOUSING_INGEST_ENABLED=true` (단지가 비어 있으면 기동 시 1회 + 매일 06:00, 1~2분). 서버가 잠드는 무료 플랜이면 06:00 수집이 빠질 수 있음. 데모 날 접수 중인 공고가 없을 때 대책도 여기서 결정
     - **배포 DB에서 실거래 첫 수집** (`INGEST_ENABLED=true`로 1회 기동, 1~2분), `MOLIT_KEY` 환경 변수. 달이 바뀌면 최근 12개월이 유지되도록 **매달 재수집**할지 정할 것 (지금은 수동 실행만)

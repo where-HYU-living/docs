@@ -3,7 +3,7 @@
 > 백엔드(장시현)와 프론트·3D(김준형)가 **함께 보는 단 하나의 기준 문서**.
 > 프론트는 이 문서에 맞춰 개발하고, 백엔드는 이 문서대로 응답한다.
 > 기준 스펙: `docs/spec-v0.5.md`
-> 버전: contract v1.5 (2026-11-07)
+> 버전: contract v1.6 (2026-11-08)
 
 ---
 
@@ -113,6 +113,8 @@
 - `sample.scope`: `DONG`(같은 동) · `ADJACENT`(인접 동 포함) · `NONE`
 - `budget`: 비로그인이거나 예산 미설정이면 `null`. `overRent` = `max(0, convertedRent − rentCap)`
 - 계산식은 스펙 3-1 (초안). 환산 월세 = 월세 + 관리비 + 보증금 × `conversionRate` ÷ 12
+- **현재 `conversionRate` = 0.046** (한국부동산원 서울 단독+연립다세대, 2026-08). 위 예시의 0.06 은 예시 값이다. 화면에서 미리 계산할 때도 0.046 을 쓰고, 판정 응답이 있으면 응답의 `conversionRate` 를 쓴다
+- 적정 환산 월세에는 기준 관리비 71,000원이 더해진다 (실거래에는 관리비가 없어서)
 
 ### Alternative — 비교 대상 (N3, I19)
 ```json
@@ -228,7 +230,7 @@
 ### 5-4. 청년안심주택
 | 메서드 | 경로 | 요청 | 응답 |
 |---|---|---|---|
-| GET | `/housing` | `maxRent` `maxDeposit` `maxWalkMin` `buildingId` `bbox` (모두 선택) | `[{ "id", "name", "address", "lat", "lng", "recruiting": true, "nextEvent": { "type", "date" } \| null, "subscribed": false, "minConvertedRent", "walkMin" }]` |
+| GET | `/housing` | `maxRent` `maxDeposit` `maxWalkMin` `buildingId` `bbox` (모두 선택) | `[{ "id", "name", "address", "lat", "lng", "recruiting": true, "nextEvent": { "type", "date" } \| null, "subscribed": false, "favorited": false, "minConvertedRent", "walkMin" }]` |
 | GET | `/housing/{id}` | `buildingId`(선택) | 위 + `{ "unitTypes": [{ "id", "name", "exclusiveAreaM2", "deposit", "rent", "mgmtFee", "convertedRent", "floorplanId" }], "floorLayoutImageUrl", "contact", "walkMin" }` |
 | GET | `/housing/announcements` | `status` `housingId` | `[{ "id", "housingId", "title", "status", "events": [{ "type": EventType, "date" }] }]` |
 | POST 🔒 | `/housing/{id}/subscribe` | | `204` (이미 구독이면 그대로 204) |
@@ -245,12 +247,12 @@
   - 주택형 `name`은 soco 표기 그대로다 (`18타입(18.22)`, `19A`, `25A(20.00)` …). 이름 숫자가 전용면적과 다를 수 있으니 면적은 `exclusiveAreaM2`를 쓴다
   - `exclusiveAreaM2`는 **전용면적**(㎡)이다. 계약면적·공용면적은 없다
   - `floorLayoutImageUrl`은 지금 항상 `null`, 주택형 `floorplanId`는 Task 14(평면도) 전까지 `null`
-  - 청년안심주택·기숙사 응답에는 찜 여부(`favorited`)가 없다. 하트 상태는 `GET /me/favorites` 목록으로 판단한다
+  - `favorited` = 로그인 사용자가 찜했는지 (게스트는 항상 `false`). 상세(`/housing/{id}`)에도 들어 있다. 하트는 이 값으로 그린다 (스펙 C6: 매물·청년안심주택·기숙사·양도 글 모두 찜)
 
 ### 5-5. 기숙사
 | 메서드 | 경로 | 응답 |
 |---|---|---|
-| GET | `/dorms` | `[{ "id", "name", "lat", "lng", "roomTypes": [{ "id", "name", "capacity", "semesterFee", "semesterMonths", "mealIncluded", "monthlyCost", "floorplanId" }] }]` |
+| GET | `/dorms` | `[{ "id", "name", "lat", "lng", "favorited": false, "roomTypes": [{ "id", "name", "capacity", "semesterFee", "semesterMonths", "mealIncluded", "monthlyCost", "floorplanId" }] }]` |
 | GET | `/dorms/{id}` | 위 단건 + `walkMin`(`buildingId` 쿼리 선택) |
 
 - `monthlyCost` = `round(semesterFee ÷ semesterMonths)`
@@ -272,12 +274,16 @@
 |---|---|---|---|
 | GET | `/transfers` | `bbox` `status`(기본 `OPEN`) `page` `size` | Page<TransferSummary> = ListingSummary 필드 + `{ "remainingMonths", "availableFrom", "status", "authorNickname" }` |
 | GET | `/transfers/{id}` | | TransferSummary + `{ "description", "photos", "priceCheck": PriceCheck, "mine": false }` |
-| POST 🔒 | `/transfers` | `{ "address", "dong", "lat", "lng", "deposit", "rent", "mgmtFee", "areaM2", "roomType", "floor", "remainingMonths", "availableFrom", "description", "photoUrls": [] }` | `201` + 상세 (판정 자동 계산 포함) |
+| POST 🔒 | `/transfers` | `{ "title", "address", "dong", "lat", "lng", "deposit", "rent", "mgmtFee", "areaM2", "roomType", "floor", "remainingMonths", "availableFrom", "description", "photoUrls": [] }` | `201` + 상세 (판정 자동 계산 포함) |
 | PUT 🔒 | `/transfers/{id}` | POST와 같은 본문 | 상세 / 작성자 아니면 `403` |
-| PATCH 🔒 | `/transfers/{id}/status` | `{ "status": "DONE" }` | 상세 |
+| PATCH 🔒 | `/transfers/{id}/status` | `{ "status": "DONE" }` (`OPEN` 으로 되돌리기도 가능) | 상세 / 작성자 아니면 `403` |
 | POST 🔒 | `/uploads` | `multipart/form-data` `file` (jpg/png, 5MB 이하) | `{ "url" }` |
 
 - 양도 글 판정의 `contractMonths` = `remainingMonths`
+- 요청 검증 (어기면 `400 VALIDATION_FAILED`, `details`에 칸 이름): `title` **필수** 1~50자 · `address`·`dong`·`lat`·`lng`·`deposit`·`rent`·`areaM2`·`roomType`·`remainingMonths` 필수 · 금액 0 이상 · `areaM2` 0 초과 · `remainingMonths` 1~60 · `description` 2000자 이하 · `photoUrls` 10장 이하, **`/uploads` 가 돌려준 주소만**
+- 선택 항목: `mgmtFee`·`floor`·`availableFrom`(`YYYY-MM-DD`)·`description`·`photoUrls` (없으면 `null` 또는 생략). `address`·`dong`·`lat`·`lng` 는 **`GET /geo/address` 결과를 그대로** 넣는다 (`dong` 은 법정동, 판정 기준이라 손으로 고치지 않는다)
+- `/uploads` 의 `url` 은 **전체 주소**(예 `https://api.…/files/3f2a….jpg`)다. 그대로 `<img src>`·`photoUrls`에 쓴다. 파일 내용(첫 바이트)으로 jpg·png 를 확인한다
+- 목록 `thumbnailUrl` = 첫 번째 사진, 없으면 `null`. 양도 글은 삭제 없이 `DONE` 으로 마감한다
 
 ### 5-8. 후기
 | 메서드 | 경로 | 요청 | 응답 |
@@ -377,13 +383,13 @@
 | `dorms.json` | 기숙사 + 호실 유형 (id = 건물 id, 학기마다 모집요강 보고 갱신) | 1동 이상 |
 | `floorplans.json` | FloorPlan 배열 | 청아진 18·18A + 기숙사 1종 |
 | `departments.json`, `buildings.json` | 학과·캠퍼스 건물·입구·기숙사 | 데모 학과 5개 이상, 입구 2개 이상 |
-| `transfers.json` | 양도 글 | 3건 |
+| `transfers.json` | 양도 글 (`authorNickname` 으로 데모 작성자 생성, 판정은 서버 계산) | 3건 |
 | `reviews.json` | 후기 | 매물 5곳에 각 2건 |
 
 ## 8. 첫날 함께 정할 체크리스트
 - [x] ORIGIN 좌표 확정 (4장) — 사자상 `37.5561486, 127.044341`
-- [ ] 픽스처 파일 위치·첫 버전 커밋 (7장)
-- [ ] `listings.json` 샘플 20건 금액·좌표 채우기
+- [x] 픽스처 파일 위치·첫 버전 커밋 (7장) — 백엔드 `src/main/resources/fixtures`
+- [x] `listings.json` 샘플 20건 금액·좌표 채우기 — 사근동 9·행당동 8·마장동 3, 등급 5종
 - [ ] 청아진 18·18A 평면도 JSON 작성 (`floorplans.json`)
 - [ ] 백엔드 로컬 실행 주소·CORS 허용 오리진 (`http://localhost:5173`)
 - [ ] Swagger 주소 공유
@@ -397,3 +403,4 @@
 | 2026-11-07 | v1.3 | ORIGIN 확정: 임시값 → 사자상 `37.5561486, 127.044341` (프론트 3D 월드 기준). 서버 거리 계산·시드 좌표는 위경도라 영향 없음, 3D 미터 좌표 해석하는 곳만 확인 |
 | 2026-11-07 | v1.4 | 구글 로그인 `POST /auth/google` 확정(백엔드 구현·테스트 완료) + `hd` 검사·502 경우 추가 · 픽스처 위치를 실제 방식으로 정정(`src/main/resources/fixtures`, 학과·건물은 campus-data → 프론트 스크립트로 생성), 건물 id 규칙 |
 | 2026-11-07 | v1.5 | `GET /housing` 필터(`maxRent`·`maxDeposit`·`maxWalkMin`·`buildingId`·`bbox`)와 `minConvertedRent`·`walkMin` 추가(스펙 C3) · `nextEvent`에 오늘 포함 · 공고 `status`를 일정 날짜로 계산 · 청년안심주택은 soco 매일 수집(대상 동, 일반공급·청년) · 기숙사 id = 건물 id · 대안 비교는 더 싼 대상만 · 픽스처 `housing.json`·`announcements.json` 삭제(수집으로 대체) · 화면 참고(주택형 이름 표기, 전용면적, 비어 있는 필드, 기숙사 5동) |
+| 2026-11-08 | v1.6 | 양도 글 요청에 **`title` 필수** 추가(프론트 글쓰기 폼에 제목 칸 필요) · 양도 글 검증 규칙 · `/uploads` 는 전체 주소 응답, `photoUrls` 는 업로드 주소만 · 상태 `OPEN` 되돌리기 허용 · 현재 전환율 0.046·기준 관리비 71,000원 명시 (예시의 0.06 과 구분) · 청년안심주택·기숙사 목록·상세에 `favorited` 추가 (하트 상태, v1.5 의 "/me/favorites 로 판단" 대체) |
