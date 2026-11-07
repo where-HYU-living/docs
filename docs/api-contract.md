@@ -3,7 +3,7 @@
 > 백엔드(장시현)와 프론트·3D(김준형)가 **함께 보는 단 하나의 기준 문서**.
 > 프론트는 이 문서에 맞춰 개발하고, 백엔드는 이 문서대로 응답한다.
 > 기준 스펙: `docs/spec-v0.5.md`
-> 버전: contract v1.0 (2026-11-07)
+> 버전: contract v1.1 (2026-11-07)
 
 ---
 
@@ -47,8 +47,10 @@
 | 401 | `UNAUTHORIZED` | 토큰 없음·만료 |
 | 403 | `FORBIDDEN` | 남의 양도 글 수정 등 |
 | 404 | `NOT_FOUND` | 대상 없음 |
+| 405 | `METHOD_NOT_ALLOWED` | 지원하지 않는 HTTP 메서드 |
 | 409 | `ALREADY_EXISTS` | 같은 찜 중복 등 |
 | 429 | `TOO_MANY_REQUESTS` | 인증 메일 재발송 60초 이내, 코드 5회 오류 |
+| 500 | `INTERNAL_ERROR` | 서버 내부 오류 (상세 내용은 응답에 싣지 않음) |
 | 502 | `UPSTREAM_FAILED` | 외부 API 실패 (단, 아래 「외부 실패 시 응답」 규칙 우선) |
 
 **외부 API 실패 시 응답:** 도보 시간·주변 시설·주소 검색이 외부 API 실패로 안 될 때, 그 값을 포함하는 상위 응답은 **200으로 주고 해당 필드만 `null`/`[]`**. 단독 엔드포인트(`/walk`, `/geo/address`)만 502.
@@ -115,7 +117,8 @@
 ```json
 { "type": "HOUSING", "id": 3, "name": "왕십리역 청아진 18타입", "convertedRent": 488000, "monthlyDiff": 224000, "twoYearDiff": 5376000, "walkMin": 11 }
 ```
-`monthlyDiff` = 보고 있는 집 환산 월세 − 이 대상 환산 월세 (양수면 이 대상이 더 쌈)
+- `id` = `type`에 해당하는 **단지·기숙사 ID** (`/housing/{id}`, `/dorms/{id}`, 찜 `targetId`에 그대로 사용). `name`에 든 주택형·호실 유형은 표시용
+- `monthlyDiff` = 보고 있는 집 환산 월세 − 이 대상 환산 월세 (양수면 이 대상이 더 쌈)
 
 ### ListingSummary
 ```json
@@ -177,7 +180,18 @@
 | GET | `/buildings?type=` | `type` 생략 시 전체 | `[{ "id", "name", "type", "lat", "lng" }]` |
 
 - 인증 코드: 숫자 6자리, 10분 유효, 재발송 60초 제한, 5회 틀리면 해당 코드 폐기
+  - 1~4번째 오류 → `400 CODE_MISMATCH` / 5번째 오류 → `429 TOO_MANY_REQUESTS` + 코드 폐기 (이후 verify도 `429`, 재발송 필요)
+  - 코드를 요청한 적 없는 메일로 verify → `400 CODE_MISMATCH`
+  - 메일 발송 실패 → `502 UPSTREAM_FAILED` (재발송 60초 제한이 걸리지 않음, 바로 다시 요청 가능)
 - 첫 인증 시 계정 자동 생성, 닉네임 기본값 `한양{4자리 숫자}`
+- 토큰은 유효한데 계정이 없으면 → `401 UNAUTHORIZED`
+- `PUT /me/profile` 규칙
+  - 바꿀 수 있는 필드: `departmentId`, `buildingIds`, `budget` (`email`, `nickname` 등은 보내도 무시)
+  - 보내지 않았거나 `null`인 필드는 **변경 안 함**
+  - `departmentId`만 보내고 `buildingIds`를 생략하면 → `buildingIds`를 그 학과의 `defaultBuildingIds`로 채움
+  - `buildingIds`는 보낸 순서대로 저장 (첫 번째가 도보 시간 기준 건물), `[]`이면 모두 해제
+  - `budget`은 **두 값을 통째로 교체**. `{ "rentCap": null, "depositCap": null }`이면 예산 삭제 → 응답 `budget: null`
+  - 없는 학과·건물 id → `400 VALIDATION_FAILED` (`details`에 `departmentId` 또는 `buildingIds`)
 
 ### 5-2. 자취방 매물 · 판정
 | 메서드 | 경로 | 요청 | 응답 |
@@ -292,6 +306,7 @@
 - 서버 1대, **공유 월드 1개**. 방·인스턴스 없음
 - 메시지는 JSON 텍스트, 모든 메시지에 `t`(타입) 필드
 - 좌표 `p`: 3D 미터 `[x, y, z]` (4장 기준), `r`: y축 회전(라디안), `a`: 애니메이션 `"idle" | "walk" | "run"`
+- `p`는 항상 4장의 월드 좌표다. 실내 3D(FloorPlan 좌표)에 있는 동안 클라이언트는 `move`를 보내지 않는다 (다른 사람에게는 입장 직전 위치에 서 있는 것으로 보임)
 
 **클라이언트 → 서버**
 | t | 필드 | 설명 |
@@ -321,7 +336,8 @@
 
 ## 7. 공유 픽스처 (목 데이터)
 
-- 위치: 두 저장소가 같은 파일을 쓴다 → `contract/fixtures/*.json` (백엔드 저장소에 두고 프론트가 복사, 또는 별도 공유 폴더)
+- 위치: **백엔드 저장소 `contract/fixtures/*.json`이 정본**, 프론트는 이를 복사해 쓴다
+- 픽스처의 `id`는 서버 DB에도 **그대로** 들어간다 (픽스처끼리 `floorplanId`, `housingId`, `defaultBuildingIds` 등으로 서로 참조하므로)
 - 프론트는 MSW 목 응답으로, 백엔드는 데모 시드 데이터로 **같은 파일**을 사용
 
 | 파일 | 내용 | 최소 수량 |
@@ -348,3 +364,4 @@
 | 날짜 | 버전 | 내용 |
 |---|---|---|
 | 2026-11-07 | v1.0 | 최초 작성 (스펙 v0.5 기준) |
+| 2026-11-07 | v1.1 | 인증 5회 오류 응답 명시(429) · `Alternative.id` 의미 명시 · WS 실내 중 `move` 미전송 명시 · 픽스처 위치 확정, id 보존 · 에러 코드 `METHOD_NOT_ALLOWED`·`INTERNAL_ERROR` 추가 · 인증 세부 응답(코드 미요청, 메일 발송 실패, 계정 없음) · `PUT /me/profile` 수정 규칙 |

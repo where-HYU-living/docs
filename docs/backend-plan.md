@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 공통 계약 문서 v1.0의 REST API와 멀티플레이 WebSocket을 그대로 제공하는 Spring Boot 서버를 만든다.
+**Goal:** 공통 계약 문서 v1.1의 REST API와 멀티플레이 WebSocket을 그대로 제공하는 Spring Boot 서버를 만든다.
 
 **Architecture:** 기능별 패키지(인증, 판정, 매물, 청년안심주택, 기숙사, 찜, 양도, 후기, 내 집, 알림, 월드)로 나눈 단일 Spring Boot 애플리케이션. 초과액 판정은 스프링에 의존하지 않는 순수 도메인 클래스로 두고 서비스가 감싼다. 외부 API(국토부·TMAP·카카오)는 인터페이스 뒤에 두어 테스트에서 가짜로 바꾼다.
 
@@ -15,7 +15,7 @@
 - 모든 경로 접두사 `/api/v1`, JSON camelCase, 금액 원 단위 `long`, 비율 소수 셋째 자리 반올림, 값 없음은 `null`
 - 게스트 허용: `/me/*`와 쓰기 요청(`/auth/*`, `/invites` 제외)만 인증 필요
 - 학교 메일 도메인 `@hanyang.ac.kr`만 허용, 코드 6자리·10분 유효·재발송 60초·5회 오류 시 폐기, JWT 7일
-- 등급 경계: `PENDING`(표본 부족) / `≤0.05 FAIR` / `≤0.15 SLIGHTLY_HIGH` / `≤0.30 HIGH` / `>0.30 CULPRIT`, 기준값은 설정 `pricing.grade.*`
+- 등급 경계: `PENDING`(표본 부족) / `≤0.05 FAIR` / `≤0.15 SLIGHTLY_HIGH` / `≤0.30 HIGH` / `>0.30 CULPRIT`, 기준값은 설정 `pricing.grade-fair` · `pricing.grade-slight` · `pricing.grade-high`. 등급은 **셋째 자리로 반올림한 `excessRate`** 로 매긴다 (응답 값과 등급이 항상 일치)
 - 적정가 표본: 같은 동·면적 ±30%·최근 12개월, 10건 미만이면 인접 동 포함, 그래도 10건 미만이면 `PENDING`
 - 계약 기간 기본 24개월, 양도 글은 `remainingMonths`
 - 외부 API 실패 시 상위 응답은 200 + 해당 필드 `null`/`[]`, 단독 엔드포인트(`/walk`, `/geo/address`)만 502 `UPSTREAM_FAILED`
@@ -31,21 +31,36 @@
 - **초대 토큰 만료·초대자 오프라인:** 에러 없이 기본 스폰 → Task 15 테스트
 - **TMAP·카카오 실패·한도 초과:** 매물 목록이 깨지지 않고 `walkMin: null`, 주변 `[]` → Task 7 테스트
 
+## 진행 현황
+| Task | 상태 | 테스트 | 비고 |
+|---|---|---|---|
+| 1 골격·에러·CORS·Swagger | 구현 완료 (커밋 전) | `CommonApiTest` 10 | |
+| 2 메일 인증·JWT·보안 | 구현 완료 (커밋 전) | `AuthApiTest` 16, `SecurityRulesTest` 10, `JwtProviderTest` 7 | 실제 서버로 로그인 흐름 확인 |
+| 3 프로필·학과·건물·시더 | 구현 완료 (커밋 전) | `ProfileApiTest` 7, `CatalogApiTest` 4, `FixtureSeederTest` 5 | **실제 학과·건물 픽스처는 Task 6 전까지 작성** |
+| 4 판정 엔진 | 구현 완료 (커밋 전) | `PriceCalculatorTest` 11, `GradePolicyTest` 7 | |
+| 5~16 | 대기 | | |
+
+**공통 테스트 기반:** `support/IntegrationTest`(PostgreSQL 컨테이너 공유, 매 테스트 전 `users`·`email_codes` 비움, 시드는 `classpath:test-fixtures/`), `MutableClock`(시간 이동), `FakeMailPort`, `TestSupportConfig`, 테스트 전용 `common/ErrorProbeController`
+
+**로컬 실행:** `docker compose up -d`(개발 DB) → `config/application-local.yml`(gitignore, 양식은 `application-local.example.yml`)에 `jwt.secret`(32자 이상)과 외부 키 → `./gradlew bootRun`
+
 ---
 
 ## 파일 구조
 ```
 backend/
-├── build.gradle.kts, settings.gradle.kts
+├── build.gradle.kts, settings.gradle.kts, docker-compose.yml(개발 DB)
+├── config/application-local.example.yml  # 로컬 비밀값 양식 (실제 파일 application-local.yml 은 gitignore)
+├── contract/fixtures/*.json            # 공유 픽스처 정본 (계약 7장)
 ├── src/main/resources/
-│   ├── application.yml                 # pricing.*, world.*, cors.*, external.* 설정
+│   ├── application.yml                 # pricing.*, world.*, cors.*, external.*, app.* 설정
 │   ├── db/migration/V1__init.sql …     # Flyway
-│   └── fixtures/ → contract/fixtures   # 공유 픽스처 (계약 7장)
+│   └── fixtures/ ← contract/fixtures   # 빌드 시 processResources 가 복사
 └── src/main/java/com/chatatda/api/
-    ├── common/      ApiError, ErrorCode, ApiException, GlobalExceptionHandler, PageResponse, SecurityConfig, JwtProvider, JwtFilter, CurrentUser
-    ├── auth/        AuthController, EmailCodeService, MailPort(+SmtpMailAdapter), EmailCode
-    ├── user/        User, UserRepository, ProfileController, ProfileService
-    ├── catalog/     Department, Building, CatalogController, FixtureSeeder
+    ├── common/      ApiError, ErrorCode, ApiException, GlobalExceptionHandler, PageResponse, HealthController, ClockConfig, WebConfig, SecurityConfig, JwtProvider, JwtFilter, CurrentUser(+CurrentUserArgumentResolver)
+    ├── auth/        AuthController, EmailCodeService, MailPort(+SmtpMailAdapter, LoggingMailAdapter), EmailCode(+Repository)
+    ├── user/        User, UserRepository, Budget, ProfileController, ProfileService
+    ├── catalog/     Department, Building, BuildingType, (Department|Building)Repository, CatalogController, FixtureSeeder
     ├── pricing/     PricingProperties, PriceInput, PriceResult, Sample, Grade, PriceCalculator, GradePolicy, FairRentEstimator, PriceCheckService
     ├── realdeal/    RealDeal, RealDealRepository, MolitClient, RealDealNormalizer, RealDealIngestJob, DongAdjacency
     ├── listing/     Listing, ListingRepository, ListingQuery, ListingController, ListingService
@@ -72,9 +87,9 @@ backend/
 - Test: `src/test/java/com/chatatda/api/common/CommonApiTest.java`, `src/test/java/com/chatatda/api/support/IntegrationTest.java` (Testcontainers PostgreSQL 베이스 클래스)
 
 **Interfaces:**
-- Produces: `record ApiError(String code, String message, Object details)`, `enum ErrorCode { VALIDATION_FAILED(400), INVALID_EMAIL_DOMAIN(400), CODE_MISMATCH(400), CODE_EXPIRED(400), UNAUTHORIZED(401), FORBIDDEN(403), NOT_FOUND(404), ALREADY_EXISTS(409), TOO_MANY_REQUESTS(429), UPSTREAM_FAILED(502), WORLD_FULL(503) }`, `class ApiException extends RuntimeException { ApiException(ErrorCode, String message) }`, `record PageResponse<T>(List<T> items, int page, int size, long total)`, 추상 클래스 `IntegrationTest`
+- Produces: `record ApiError(String code, String message, Object details)`, `enum ErrorCode { VALIDATION_FAILED(400), INVALID_EMAIL_DOMAIN(400), CODE_MISMATCH(400), CODE_EXPIRED(400), UNAUTHORIZED(401), FORBIDDEN(403), NOT_FOUND(404), ALREADY_EXISTS(409), TOO_MANY_REQUESTS(429), UPSTREAM_FAILED(502), WORLD_FULL(503), METHOD_NOT_ALLOWED(405), INTERNAL_ERROR(500) }` (뒤의 두 개는 구현 중 추가, 계약 v1.1 반영), `class ApiException extends RuntimeException { ApiException(ErrorCode, String message) }`, `record PageResponse<T>(List<T> items, int page, int size, long total)`, 추상 클래스 `IntegrationTest`
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 ```java
 @Test void health_ok() { mvc.perform(get("/api/v1/health")).andExpect(status().isOk()); }
 @Test void notFound_usesErrorFormat() {
@@ -86,9 +101,16 @@ backend/
      .andExpect(header().string("Access-Control-Allow-Origin","http://localhost:5173"));
 }
 ```
-- [ ] **Step 2: 실행해서 실패 확인** — `./gradlew test --tests '*CommonApiTest'` → FAIL (프로젝트·핸들러 없음)
-- [ ] **Step 3: 구현** — Spring Initializr 의존성: web, validation, data-jpa, security, mail, websocket, postgresql, flyway, springdoc-openapi-starter-webmvc-ui, jjwt, testcontainers-postgresql. `GlobalExceptionHandler`는 `ApiException`·`MethodArgumentNotValidException`(→ `VALIDATION_FAILED`, `details`=필드별 메시지)·`NoResourceFoundException`(→ `NOT_FOUND`)를 `ApiError`로 변환. CORS 오리진은 `cors.allowed-origins` 설정값
-- [ ] **Step 4: 통과 확인** — 같은 명령 → PASS. `./gradlew bootRun` 후 `http://localhost:8080/swagger-ui.html` 열림
+- [x] **Step 2: 실행해서 실패 확인** — `./gradlew test --tests '*CommonApiTest'` → FAIL (프로젝트·핸들러 없음)
+- [x] **Step 3: 구현** — Spring Initializr 의존성: web, validation, data-jpa, security, mail, websocket, postgresql, flyway, springdoc-openapi-starter-webmvc-ui, jjwt, testcontainers-postgresql. `GlobalExceptionHandler`는 `ApiException`·`MethodArgumentNotValidException`(→ `VALIDATION_FAILED`, `details`=필드별 메시지)·`NoResourceFoundException`(→ `NOT_FOUND`)를 `ApiError`로 변환. CORS 오리진은 `cors.allowed-origins` 설정값
+  - **구현 반영:**
+    - security·mail·jjwt는 Task 2, websocket은 Task 15에서 추가 (Security가 있으면 설정 전까지 모든 경로가 401이라 Task 1 테스트가 통과할 수 없음)
+    - Flyway 10 이후 PostgreSQL 지원이 분리되어 `flyway-database-postgresql` 추가
+    - Docker Engine 29가 구버전 클라이언트를 거부해서 Testcontainers를 `1.21.4`로 고정 (Spring Boot 3.5.0 기본값 1.21.0은 연결 불가)
+    - 계약 형식을 지키려고 핸들러 추가: 깨진 JSON·잘못된 enum/타입·필수 파라미터 누락 → `400 VALIDATION_FAILED`, 잘못된 메서드 → `405 METHOD_NOT_ALLOWED`, 처리 못 한 예외 → `500 INTERNAL_ERROR`(상세 내용은 로그에만)
+    - `ClockConfig`(`Asia/Seoul` 시계 빈) 추가, `spring.jpa.open-in-view: false`
+    - 테스트는 계획 3개 + 위 핸들러 확인 6개 + 시계 1개
+- [x] **Step 4: 통과 확인** — 같은 명령 → PASS. `./gradlew bootRun` 후 `http://localhost:8080/swagger-ui.html` 열림
 - [ ] **Step 5: 커밋** — `git commit -m "chore: bootstrap spring server with error format, cors, swagger"`
 
 ### Task 2: 학교 메일 인증 · JWT · 게스트 허용 보안
@@ -101,23 +123,33 @@ backend/
 - Consumes: Task 1 `ApiException`, `ErrorCode`
 - Produces: `interface MailPort { void send(String to, String subject, String body); }`, `JwtProvider.issue(long userId): String`, `JwtProvider.parse(String token): Optional<Long>`, 컨트롤러 파라미터 `@CurrentUser Long userId`(필수), `@CurrentUser(required=false) Long userIdOrNull`, `EmailCodeService` 내부 시계 `Clock` 주입(테스트 시간 이동용)
 
-- [ ] **Step 1: 실패하는 테스트 작성** (`MailPort`는 테스트에서 받은 코드를 저장하는 가짜 빈)
+- [x] **Step 1: 실패하는 테스트 작성** (`MailPort`는 테스트에서 받은 코드를 저장하는 가짜 빈)
 ```java
 @Test void send_rejectsOtherDomain()  // POST /auth/email/send {email:"a@gmail.com"} → 400, code INVALID_EMAIL_DOMAIN
 @Test void send_then_verify_issuesToken() // send → 204, fakeMail.lastCode() 6자리 숫자, verify → 200, $.accessToken 존재, $.user.nickname 이 "한양"으로 시작
 @Test void verify_wrongCode_400()      // code CODE_MISMATCH
 @Test void verify_after10min_expired() // clock +601초 → CODE_EXPIRED
 @Test void resend_within60s_429()      // TOO_MANY_REQUESTS
-@Test void fiveWrongAttempts_discardsCode() // 5회 틀린 뒤 맞는 코드 → CODE_MISMATCH
+@Test void fiveWrongAttempts_discardsCode() // 1~4회 오류 → 400 CODE_MISMATCH, 5번째 오류 → 429 TOO_MANY_REQUESTS, 그 뒤 맞는 코드도 429 (계약 5-1)
 // SecurityRulesTest
 @Test void guest_canBrowse()   // 토큰 없이 GET /api/v1/listings, /api/v1/housing, /api/v1/search?q=행당 → 200
 @Test void guest_meIs401()     // 토큰 없이 GET /api/v1/me/profile → 401, code UNAUTHORIZED
 @Test void guest_writeIs401()  // 토큰 없이 POST /api/v1/me/favorites → 401
 @Test void guest_canCreateInvite() // 토큰 없이 POST /api/v1/invites → 401 아님
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*AuthApiTest' --tests '*SecurityRulesTest'` → FAIL
-- [ ] **Step 3: 구현** — 코드 생성 `SecureRandom` 6자리(앞자리 0 허용), 저장은 DB `email_codes`(email, code_hash, expires_at, attempts, sent_at). 첫 인증 시 `User` 생성(닉네임 `한양` + 4자리 난수, 중복 시 재생성). `SecurityConfig`: `/api/v1/me/**` 인증, `HttpMethod.GET` 전부 허용, `/api/v1/auth/**`·`/api/v1/invites` 허용, 그 외 쓰기는 인증. 인증 실패 응답도 `ApiError` 형식. `SmtpMailAdapter`는 `spring.mail.*` 설정 사용 (로컬은 로그 출력 어댑터로 대체 가능)
-- [ ] **Step 4: 통과 확인** — 같은 명령 → PASS
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*AuthApiTest' --tests '*SecurityRulesTest'` → FAIL
+- [x] **Step 3: 구현** — 코드 생성 `SecureRandom` 6자리(앞자리 0 허용), 저장은 DB `email_codes`(email, code_hash, expires_at, attempts, sent_at). 첫 인증 시 `User` 생성(닉네임 `한양` + 4자리 난수, 중복 시 재생성). `SecurityConfig`: `/api/v1/me/**` 인증, `HttpMethod.GET` 전부 허용, `/api/v1/auth/**`·`/api/v1/invites` 허용, 그 외 쓰기는 인증. 인증 실패 응답도 `ApiError` 형식. `SmtpMailAdapter`는 `spring.mail.*` 설정 사용 (로컬은 로그 출력 어댑터로 대체 가능)
+  - **구현 반영:**
+    - `guest_canBrowse`는 대상 엔드포인트(Task 6·8·14)가 아직 없어서 "401·403이 아님"으로 검사. **각 Task에서 200 검사로 바꿀 것**
+    - 메일 어댑터 선택: `app.mail.mode: log | smtp` (기본 `log`, 로컬은 인증 코드를 로그에 출력)
+    - `jwt.secret`(환경 변수 `JWT_SECRET`)이 비었거나 32자 미만이면 시작 시 실패
+    - 틀린 코드의 `attempts + 1`이 예외와 함께 롤백되지 않도록 `verify`는 `noRollbackFor = ApiException`
+    - 코드 미요청 메일로 verify → `CODE_MISMATCH`, 메일 발송 실패 → `502 UPSTREAM_FAILED`(재발송 제한 안 걸림), 코드 형식 오류는 횟수에 미포함 (계약 v1.1 반영)
+    - JWT 필터는 빈으로 등록하지 않음(두 번 실행 방지). 만료·위조 토큰은 에러 대신 게스트로 처리 → 공개 GET은 200, `/me`는 401
+    - CORS를 `SecurityConfig`로 이동(인증 경로 preflight가 401이 되는 문제 방지). `WebConfig`는 `@CurrentUser` 리졸버 등록용으로 남김
+    - 스프링 기본 계정 자동 생성(`UserDetailsServiceAutoConfiguration`) 제외
+    - 403 처리기는 아직 없음 (보안 계층에서 403이 나는 규칙이 생기면 추가)
+- [x] **Step 4: 통과 확인** — 같은 명령 → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(auth): hanyang email code login, jwt, guest-friendly security"`
 
 ### Task 3: 프로필 · 학과 · 건물 · 공유 픽스처 시더
@@ -128,19 +160,31 @@ backend/
 
 **Interfaces:**
 - Produces: `FixtureSeeder.seedIfEmpty()` — `fixtures/*.json`(계약 7장)을 읽어 비어 있는 테이블에만 넣음, `app.seed.enabled=true`일 때 시작 시 실행. 다른 Task들의 엔티티 시드는 각 Task가 이 클래스에 메서드를 추가(`seedListings()`, `seedHousing()` …)
+  - **픽스처 `id`를 그대로 저장**하고, 테이블마다 넣은 뒤 `select setval('<seq>', (select max(id) from <table>))`로 시퀀스를 맞춤 (이후 새로 만드는 행과 ID 충돌 방지)
+  - `FixtureSeeder.demoUser(String nickname): long` — 후기·양도 글 픽스처의 `authorNickname`마다 데모 사용자를 만들어 ID 반환(이미 있으면 재사용). Task 10·11 시드에서 사용
 - Produces: `ProfileService.firstBuildingId(long userId): Optional<Long>` (Task 6, 8에서 도보 기준 건물로 사용), `ProfileService.budget(long userId): Optional<Budget>`, `record Budget(Long rentCap, Long depositCap)`
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 ```java
 @Test void departments_listed()        // GET /departments → 길이 ≥ 5, $[0].defaultBuildingIds 배열
 @Test void buildings_filterByType()    // GET /buildings?type=GATE → 전부 type=="GATE", 길이 ≥ 2
 @Test void profile_updatePartial()     // PUT /me/profile {budget:{rentCap:600000,depositCap:10000000}} → 200, departmentId 그대로, budget.rentCap==600000
 @Test void profile_settingDepartment_fillsDefaultBuildings() // PUT {departmentId: X} (buildingIds 생략) → buildingIds == 학과 defaultBuildingIds
 @Test void seeder_isIdempotent()       // seedIfEmpty() 두 번 → 학과 수 변화 없음
+@Test void seeder_keepsFixtureIds()    // 픽스처 학과 id 그대로 조회됨 / 시드 후 새로 저장한 행의 id > 픽스처 max id
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*ProfileApiTest' --tests '*CatalogApiTest' --tests '*FixtureSeederTest'` → FAIL
-- [ ] **Step 3: 구현** — PUT은 null 필드를 "변경 안 함"으로 처리. Jackson으로 픽스처 파싱
-- [ ] **Step 4: 통과 확인** → PASS
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*ProfileApiTest' --tests '*CatalogApiTest' --tests '*FixtureSeederTest'` → FAIL
+- [x] **Step 3: 구현** — PUT은 null 필드를 "변경 안 함"으로 처리. Jackson으로 픽스처 파싱
+  - **구현 반영:**
+    - 시더가 읽는 위치를 설정 `app.seed.location`(기본 `classpath:fixtures/`)으로 둠. 테스트는 가짜 데이터 `src/test/resources/test-fixtures/` 사용 (실제 학과·건물 데이터는 Task 6 전까지 작성)
+    - 시드는 JPA 대신 SQL로 id를 지정해 넣고 `pg_get_serial_sequence`로 시퀀스를 맞춤. 건물 → 학과 순서, 한 트랜잭션
+    - 픽스처 검증: 필수 필드(건물 `lat`·`lng` 포함) 누락, 없는 건물 id 참조 → 시작 시 어느 항목인지 알려 주며 실패
+    - `demoUser` 이메일은 로그인할 수 없는 `demo-<임의값>@demo.invalid`
+    - `PUT /me/profile`: "null이면 변경 안 함"은 최상위 필드에만 적용, `budget`은 통째로 교체(두 값 모두 null이면 삭제 → `budget: null`), 없는 학과·건물 id → `400 VALIDATION_FAILED`, 닉네임 수정 불가, 토큰은 유효한데 계정이 없으면 401 (계약 v1.1 반영)
+    - `buildingIds`·학과 기본 건물은 순서 저장 (`@OrderColumn`), 위경도 컬럼은 `double precision`
+    - 시드 실행 여부 `app.seed.enabled`(환경 변수 `SEED_ENABLED`, 기본 true)
+    - 시더는 **비어 있는 테이블에만** 넣으므로, 개발 DB에 들어간 뒤 픽스처를 고치면 `docker compose down -v`로 비우고 다시 실행
+- [x] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(catalog): departments, buildings, profile, fixture seeder"`
 
 ### Task 4: 초과액 판정 엔진 (순수 도메인)
@@ -151,7 +195,7 @@ backend/
 
 **Interfaces:**
 - Produces:
-  - `@ConfigurationProperties("pricing") record PricingProperties(double conversionRate /*기본 0.06*/, double gradeFair /*0.05*/, double gradeSlight /*0.15*/, double gradeHigh /*0.30*/, int minSample /*10*/, double areaTolerance /*0.30*/, int periodMonths /*12*/, int defaultContractMonths /*24*/)`
+  - `@ConfigurationProperties("pricing") record PricingProperties(double conversionRate /*기본 0.06*/, double gradeFair /*0.05*/, double gradeSlight /*0.15*/, double gradeHigh /*0.30*/, int minSample /*10*/, double areaTolerance /*0.30*/, int periodMonths /*12*/, int defaultContractMonths /*24*/, long baselineMgmtFee /*0, 구현 중 추가*/)`
   - `record PriceInput(long deposit, long rent, Long mgmtFee /*null 허용*/, double areaM2, String dong, int contractMonths)`
   - `record Sample(int count, String scope /*DONG|ADJACENT|NONE*/, List<String> dongs, Double areaMinM2, Double areaMaxM2, YearMonth from, YearMonth to, Double medianPerM2 /*㎡당 환산월세*/)`
   - `enum Grade { FAIR, SLIGHTLY_HIGH, HIGH, CULPRIT, PENDING }`
@@ -160,7 +204,7 @@ backend/
   - `record PriceResult(long convertedRent, Long fairRent, Long monthlyExcess, int contractMonths, Long totalExcess, Double excessRate, Grade grade, double conversionRate, Sample sample)`
   - `GradePolicy.of(Double excessRate, boolean pending): Grade`
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 ```java
 @Test void convertedRent_includesDepositAndMgmt() {
   assertThat(calc.convertedRent(10_000_000, 550_000, 80_000L, 0.06)).isEqualTo(680_000); // 550000+80000+50000
@@ -183,9 +227,17 @@ backend/
 @ParameterizedTest @CsvSource({"-0.2,FAIR","0.05,FAIR","0.0501,SLIGHTLY_HIGH","0.15,SLIGHTLY_HIGH","0.3,HIGH","0.3001,CULPRIT"})
 void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,false)).isEqualTo(expected); }
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*PriceCalculatorTest' --tests '*GradePolicyTest'` → FAIL
-- [ ] **Step 3: 구현** — 금액은 `Math.round`(원 단위), `excessRate`는 `BigDecimal` HALF_UP 셋째 자리. 스프링 의존 없음
-- [ ] **Step 4: 통과 확인** → PASS
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*PriceCalculatorTest' --tests '*GradePolicyTest'` → FAIL
+- [x] **Step 3: 구현** — 금액은 `Math.round`(원 단위), `excessRate`는 `BigDecimal` HALF_UP 셋째 자리. 스프링 의존 없음
+  - **구현 반영:**
+    - **기준 관리비 `pricing.baseline-mgmt-fee`**: 적정 월세 = ㎡당 중앙값 × 면적 + 기준 관리비. 매물은 관리비를 포함하는데 실거래에는 관리비가 없어서 모든 매물이 관리비만큼 비싸게 판정되는 편향을 보정. **기본값 0**(지금은 계획 식과 동일), 실제 값은 Task 5에서 정함
+    - 등급은 반올림한 `excessRate`로 판정 (Global Constraints 참고)
+    - 보류 조건: 표본 없음, 중앙값 없음, 건수 < `minSample`, 적정 월세 ≤ 0
+    - 시세보다 싼 집의 음수 초과액은 0으로 자르지 않음
+    - 금액은 실수 오차를 피하려고 `BigDecimal` HALF_UP으로 계산 (`Math.round`와 결과 같음)
+    - `PricingProperties`는 생성 시 값 검증(전환율 0~1, 등급 기준 오름차순 등) → 설정 키 오타로 0이 들어가면 시작 시 실패. 메인 클래스에 `@ConfigurationPropertiesScan`
+    - 테스트: 계획 5개 + 관리비 0·보증금 0(Review Focus), 최소 표본 미달, 음수 초과액, 반올림 등급, 계약 개월 수, 기준 관리비, 설정값 검증, 보류 처리
+- [x] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(pricing): converted rent, fair rent, excess and grade domain"`
 
 ### Task 5: 실거래 수집 · 정제 · 적정가 표본 조회
@@ -218,6 +270,12 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*RealDealNormalizerTest' --tests '*FairRentEstimatorTest'` → FAIL
 - [ ] **Step 3: 구현** — 표본의 ㎡당 환산 월세 = `convertedRent(deposit, rent, null, rate) / areaM2` (실거래에는 관리비 없음), 중앙값은 정렬 후 가운데(짝수면 두 값 평균). 국토부 API 데이터셋 이름·파라미터는 공공데이터포털 상세 페이지 기준으로 확인 후 `MolitClient`에 상수로 기록
+  - **구현 전 확인할 것 (Task 1~4 진행 중 정리):**
+    - 전월세 응답에 **취소(해제) 필드가 실제로 있는지** (매매에는 있으나 전월세는 확인 필요) → 없으면 `normalizer_dropsCanceled` 테스트를 실제 필드에 맞게 수정
+    - **신규·갱신 계약 구분** 필드가 있으면 신규만 사용 (갱신은 인상 상한 때문에 시세보다 낮음)
+    - **전세(월세 0) 거래**는 월세 판정 표본에서 제외할지
+    - 동 이름은 **법정동**(`umdNm`) 기준. `DongAdjacency`, 픽스처의 `dong`도 법정동으로 (예: "왕십리"가 아니라 "상왕십리동"·"하왕십리동")
+    - 실제 수집 후 동별 표본 건수를 보고 **전환율(현재 0.06 임시) 출처, 기준 관리비(`baseline-mgmt-fee`, 현재 0), 등급 기준값**을 정함
 - [ ] **Step 4: 통과 확인** → PASS. 실제 키로 `./gradlew bootRun --args='--app.ingest.enabled=true'` 1회 실행 후 `select dong, count(*) from real_deals group by dong` 결과를 PR 설명에 기록 (OKR 안 2의 표본 수 근거)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(realdeal): molit ingest, normalization, fair-rent sample"`
 
@@ -249,6 +307,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*ListingApiTest'` → FAIL
 - [ ] **Step 3: 구현** — 목록은 JPA Specification으로 조건 조합. `favorited`는 Task 9 전까지 false
+  - **구현 전 확인할 것:** 실제 `departments.json`·`buildings.json`(과 건물 좌표)과 `listings.json`이 필요. 응답 `sample`에는 내부 값 `medianPerM2`를 싣지 않음(계약 PriceCheck 형식). Task 2의 `guest_canBrowse`에서 `/listings`를 200 검사로 바꿈
 - [ ] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(listing): search filters, detail, price-check"`
 
@@ -295,7 +354,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - `HousingService.recruiting(long housingId, LocalDate today): boolean`, `HousingService.nextEvent(long housingId, LocalDate today): Optional<EventDto>`
   - `HousingService.subscriberIds(long housingId): List<Long>`, `HousingService.eventsOn(LocalDate date): List<AnnouncementEvent>` (Task 13)
   - `DormRoomType.monthlyCost(): long` = `Math.round((double) semesterFee / semesterMonths)`
-  - `AlternativeService.forListing(long listingId, Long buildingId): AlternativesDto` — 청년안심주택 주택형·기숙사 호실을 환산 월세 낮은 순 최대 3개, `monthlyDiff = listing.convertedRent − alt.convertedRent`, `twoYearDiff = monthlyDiff × 24`
+  - `AlternativeService.forListing(long listingId, Long buildingId): AlternativesDto` — 청년안심주택 주택형·기숙사 호실을 환산 월세 낮은 순 최대 3개, `monthlyDiff = listing.convertedRent − alt.convertedRent`, `twoYearDiff = monthlyDiff × 24`. 응답 `id` = 단지·기숙사 ID (계약 3장 Alternative)
   - 테스트용 오늘 날짜는 `Clock` 빈 주입
 
 - [ ] **Step 1: 실패하는 테스트 작성**
@@ -418,7 +477,9 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 13: 알림 생성 스케줄러 · 알림함
 
 **Files:**
-- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V10__notifications.sql` (unique `(user_id, type, target_id, ref_date)` 로 중복 생성 방지)
+- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V10__notifications.sql` (unique `(user_id, type, source_id, ref_date, days_before)` 로 중복 생성 방지)
+  - `source_id` = 공고 일정(`announcement_events.id`) 또는 만료 알림 설정(`expiry_alerts.id`), `ref_date` = 그 일정 날짜 또는 `contractEnd`, `days_before` = 7·1·0 또는 설정값
+  - 기존 키 `(user_id, type, target_id, ref_date)`는 같은 일정의 D-7·D-1·당일이 같은 키가 되어 하나만 저장되므로 쓰지 않음
 - Test: `notification/NotificationJobTest.java`, `notification/NotificationApiTest.java`
 
 **Interfaces:**
@@ -431,6 +492,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 @Test void contractExpiry()       // contractEnd 2027-01-06, daysBefore 60 → run(2026-11-07) 1건 CONTRACT_EXPIRY
 @Test void disabledAlertSkipped() // enabled false → 0건
 @Test void runTwice_noDuplicate() // 같은 날 두 번 → 1건
+@Test void twoEventsSameDay_bothCreated() // 같은 단지 DOCS_DUE 11-08(D-1) + RESULT 11-14(D-7) → run(11-07) 2건
 @Test void list_and_read()        // GET → 최신순, PATCH read → read true
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*NotificationJobTest' --tests '*NotificationApiTest'` → FAIL
@@ -494,6 +556,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*WorldStateTest' --tests '*InviteApiTest' --tests '*WorldSocketIT'` → FAIL
 - [ ] **Step 3: 구현** — `TextWebSocketHandler` + Jackson. 방송은 `ScheduledExecutorService` 100ms 주기로 `drainDirty()` 결과 전송. `ping` 수신 시각을 기록하고 30초 넘으면 `leave`. 세션 전송은 `ConcurrentWebSocketSessionDecorator`로 감싸 동시 전송 충돌 방지. WS 경로 `/ws/world`, CORS 오리진은 REST와 같은 설정
+  - **구현 전 확인할 것:** 현재 `SecurityConfig`의 CORS는 `/api/**`만 등록되어 있으므로 `/ws/**`를 추가. websocket 의존성 추가(Task 1에서 미룸)
 - [ ] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(world): shared world websocket, invites with spawn next to inviter"`
 
@@ -509,6 +572,12 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 - [ ] **Step 1: 실패하는 테스트 작성** — 계약 5장의 모든 GET 엔드포인트를 픽스처 시드 상태에서 한 번씩 호출해 2xx(또는 `/me/*`는 토큰으로 2xx)인지 확인하는 표 기반 테스트 `allContractGetsRespond()`
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*ContractSmokeTest'` → 누락 엔드포인트가 있으면 FAIL
 - [ ] **Step 3: 구현** — 누락분 보완, Dockerfile(멀티 스테이지, `eclipse-temurin:21-jre`), Railway·Render 중 하나에 PostgreSQL과 함께 배포
+  - **배포 전 체크리스트 (Task 1~4 진행 중 정리):**
+    - `MAIL_MODE=smtp`와 `spring.mail.*` 설정 (기본값 `log`라 빠뜨리면 인증 코드가 메일 대신 로그로만 감), **SMTP 실제 발송 처음 확인**
+    - 실제 메일 발송 전에 **IP 단위 발송 제한** 추가 (지금은 메일 주소별 60초만 있어서 여러 주소로 대량 발송 가능)
+    - 배포용 `JWT_SECRET`은 로컬과 다른 값
+    - 무료 플랜의 잠들기(09:00 알림·WebSocket 중단), 업로드 파일이 재배포 때 사라지는지 확인
+    - `CORS_ALLOWED_ORIGINS`에 배포 프론트 주소 추가, `SEED_ENABLED` 결정
 - [ ] **Step 4: 통과 확인** — 전체 `./gradlew test` → PASS, 배포 주소의 `/api/v1/health` 200, `/swagger-ui.html` 열림, 프론트 담당에게 배포 주소 공유
 - [ ] **Step 5: 커밋** — `git commit -m "chore: dockerize and deploy, contract smoke test"`
 
