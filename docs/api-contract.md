@@ -164,6 +164,7 @@
 - `fixtures[]` (선택, 없으면 3D 가 방 이름·면적으로 예시 배치): `kind` = `toilet`·`sink`·`shower`·`bathtub`·`washer`·`kitchenSink`·`cooktop`·`fridge`·`kitchenCounter`·`upperCabinet`·`bed`·`desk`·`chair`·`wardrobe`·`builtinWardrobe`·`shoeRack`·`shelf`·`sofa`·`tv`·`table`·`acOutdoor`·`waterHeater`. `position` = 바닥 접지 면 중심, `facing` = 앞면 방향 `N`·`E`·`S`·`W`, `elevation`(선택, 공중에 놓인 것), `size` = `[폭, 깊이, 높이?]`(선택), `room`(선택, 검수용)
 - `glbUrl`이 있으면 프론트는 JSON 대신 GLB를 로드
 - 데이터는 사람이(평면도 이미지를 보고, AI 보조 가능) 작성한 JSON을 **백엔드 `src/main/resources/fixtures/floorplans/{id}.json`** (파일 하나에 도면 하나, 파일명 = `id`)에 두고, 서버가 그대로 제공한다. 프론트 `interior/planFiles.test.ts` 가 이 폴더 전체를 검수한다(벽을 파고드는 문·가구, 걸어서 갈 수 없는 방). 정본 타입은 프론트 `src/api/types.ts` 의 `FloorPlan`
+- id 구간: **1~99 청년안심주택 / 101~199 매물(데모) / 201~299 기숙사**. 주택형·매물·기숙사 호실의 `floorplanId` 가 이 id 를 가리킨다 (`null` 이면 실내 보기 없음)
 
 ## 4. 좌표 기준 (3D ↔ 위경도)
 - 기준점(원점) `ORIGIN = { lat: 37.5561486, lng: 127.044341 }` — **확정**: 3D 월드의 사자상(한양대 정문 앞) 위치. 프론트 `src/app/map/geo.ts`의 값과 같다

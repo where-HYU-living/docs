@@ -46,7 +46,8 @@
 | 9 찜 | 구현 완료 | `FavoriteApiTest` 12 | 매물·양도 글 `favorited` 실제 값. 하트는 프론트가 `GET /me/favorites` 한 곳에서 읽음 (계약 v1.7) |
 | 10 양도 게시판·업로드 | 구현 완료 + **실서버 확인** | `TransferApiTest` 15 | 제목 필수 2~40자(계약 v1.7, 프론트와 같음), 남은 개월 기준 판정, 업로드는 전체 주소 응답·첫 바이트로 jpg/png 확인, 데모 양도 글 3건 |
 | 15 멀티플레이 | **구현 완료 (프론트 담당이 진행)** | `WorldServiceTest`·`SessionOutboxTest`·`WorldSocketIT`·`WorldLoadIT` | `/ws/world` 공유 월드(최대 30명, 10Hz), `POST /invites`. 계획과 다른 점은 아래 Task 15 참고 |
-| 11~14, 16 | 대기 | | |
+| 14 통합 검색·평면도 | **평면도 완료 (프론트 담당이 구현)**, 통합 검색 대기 | `FloorPlanApiTest`·`FloorPlanSeederTest`·`FloorPlanValidatorTest`·`FloorPlanLinkerTest`·`FloorplanLabelTest` | `GET /floorplans/{id}`, 평면도 33개(청년안심주택 20·매물 7·기숙사 6), V8 |
+| 11~13, 16 | 대기 | | |
 
 전체 테스트 262개 통과 (2026-11-08 기준, 프론트 담당의 멀티플레이 테스트 포함).
 
@@ -576,7 +577,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 10: 양도 게시판 · 업로드
 
 **Files:**
-- Create: `transfer/Transfer.java`, `transfer/TransferService.java`, `transfer/TransferController.java`, `transfer/UploadController.java`, `transfer/StoragePort.java`, `transfer/LocalDiskStorage.java`, `db/migration/V8__transfers.sql`
+- Create: `transfer/Transfer.java`, `transfer/TransferService.java`, `transfer/TransferController.java`, `transfer/UploadController.java`, `transfer/StoragePort.java`, `transfer/LocalDiskStorage.java`, `db/migration/V9__transfers.sql` (V8 은 프론트 담당의 평면도가 먼저 씀)
 - Modify: `catalog/FixtureSeeder.java` (`seedTransfers()`)
 - Test: `transfer/TransferApiTest.java`
 
@@ -612,7 +613,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 11: 후기
 
 **Files:**
-- Create: `review/Review.java`, `review/ReviewController.java`, `db/migration/V9__reviews.sql`
+- Create: `review/Review.java`, `review/ReviewController.java`, `db/migration/V10__reviews.sql`
 - Test: `review/ReviewApiTest.java`
 
 **Interfaces:**
@@ -634,7 +635,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 12: 내 집 기록 · 월간 리포트 · 만료 알림 설정
 
 **Files:**
-- Create: `home/Home.java`, `home/Payment.java`, `home/Utility.java`, `home/ExpiryAlert.java`, `home/HomeController.java`, `home/ReportService.java`, `db/migration/V10__home.sql`
+- Create: `home/Home.java`, `home/Payment.java`, `home/Utility.java`, `home/ExpiryAlert.java`, `home/HomeController.java`, `home/ReportService.java`, `db/migration/V11__home.sql`
 - Test: `home/HomeApiTest.java`, `home/ReportServiceTest.java`
 
 **Interfaces:**
@@ -663,7 +664,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 13: 알림 생성 스케줄러 · 알림함
 
 **Files:**
-- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V11__notifications.sql` (unique `(user_id, type, source_id, ref_date, days_before)` 로 중복 생성 방지)
+- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V12__notifications.sql` (unique `(user_id, type, source_id, ref_date, days_before)` 로 중복 생성 방지)
   - `source_id` = 공고 일정(`announcement_events.id`) 또는 만료 알림 설정(`expiry_alerts.id`), `ref_date` = 그 일정 날짜 또는 `contractEnd`, `days_before` = 7·1·0 또는 설정값
   - 기존 키 `(user_id, type, target_id, ref_date)`는 같은 일정의 D-7·D-1·당일이 같은 키가 되어 하나만 저장되므로 쓰지 않음
 - Test: `notification/NotificationJobTest.java`, `notification/NotificationApiTest.java`
@@ -690,7 +691,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 14: 통합 검색 · 평면도
 
 **Files:**
-- Create: `search/SearchService.java`, `search/SearchController.java`, `floorplan/FloorPlan.java`, `floorplan/FloorPlanController.java`, `db/migration/V12__floorplans.sql`
+- Create: `search/SearchService.java`, `search/SearchController.java`, `floorplan/*`(프론트 담당이 구현 완료), `db/migration/V8__floorplans.sql`
 - Modify: `catalog/FixtureSeeder.java` (`seedFloorPlans()`)
 - Test: `search/SearchApiTest.java`, `floorplan/FloorPlanApiTest.java`
 
@@ -715,6 +716,14 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - FloorPlan 형식이 확장됨 (방 `kind`·`floor`, 문 `style`·`swing`, 벽 `height`, 가구 `fixtures[]`), 원점 = 벽 중심선 바운딩박스 좌상단. 서버는 **원문 JSON 그대로 저장·응답**하므로 필드를 해석하지 않는다 (필수 칸 `id`·`walls`·`entrance` 정도만 확인)
   - 평면도 작성은 평면도 이미지(Task 8 연결표의 치수 포함)를 보고 프론트 `docs/floorplan-ai-prompt.md` 방식으로. 만든 뒤 `housing_unit_types.floorplan_id`·`dorm_room_types.floorplan_id` 연결
   - 방 초대 링크(도면·위치 포함)는 프론트가 링크 뒤에 붙이는 것이라 `/invites` 변경 없음
+- **평면도 부분 완료 (2026-11-08, 프론트 담당 `06edeff`):**
+  - `floorplan/` — `FloorPlanSeeder`(서버가 뜰 때마다 `fixtures/floorplans/*.json` 을 id 기준으로 덮어쓰고, 파일이 지워지면 테이블에서도 지움), `FloorPlanValidator`(잘못된 파일이면 파일명·이유와 함께 서버 기동 실패), `FloorPlanService`·`FloorPlanController`(`GET /api/v1/floorplans/{id}`, 원문 JSON 그대로), `FloorPlanLinker`(이미 시드된 DB 의 빈 `floorplan_id` 를 채움)
+  - `V8__floorplans.sql`: `floorplans(id, name, area_m2, data jsonb, updated_at)`. `listings`·`housing_unit_types`·`dorm_room_types` 의 `floorplan_id` 는 FK 없이 이 id 를 가리킴
+  - id 구간: 1~99 청년안심주택 / 101~199 매물(데모) / 201~299 기숙사. 대응표는 백엔드 `fixtures/floorplans/README.md`
+  - 청년안심주택 연결: `floorplan-labels.json` 에 `floorplanId` 칸이 생겨서 수집(`HousingIngestJob`)이 주택형에 붙인다. `"use": "listing"` 인 줄은 매물용이라 붙이지 않음
+  - 매물 7건(4·6·10·17·18·19·20번)에 101~107, 기숙사 호실 6종에 201~206 연결
+  - 남은 일: 청아진 1·2번은 목업에서 옮긴 임시본(이미지로 다시 작성 필요), 한영스테이 면적 미상, **통합 검색**(이 Task 의 나머지)
+  - 마이그레이션 번호: 평면도가 V8 을 먼저 써서 양도 게시판은 V9, 이후 후기 V10·내 집 V11·알림 V12
 
 ### Task 15: 멀티플레이 WebSocket · 초대
 
