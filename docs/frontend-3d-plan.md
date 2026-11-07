@@ -1,5 +1,7 @@
 # 프론트·3D Implementation Plan (담당: 김준형)
 
+> **현재 구현 상태 (2026-11-07 갱신):** 3D 층은 **R3F `<Canvas>`(`@react-three/fiber`) + 순수 three.js 장면 조립(`buildWorld`)** 으로 동작합니다. 아래 문서의 `ecctrl`·`@react-three/rapier`·`drei`는 **도입하지 않았습니다** (충돌은 `PolyIndex` 다각형 조회로 충분하고 wasm·물리 바디 비용만 늡니다). Task 4·5·17의 파일 구조(`src/world/Buildings.tsx` 등)는 계획이며 실제 구조와 다릅니다. 실제 구조·규칙은 `frontend/CLAUDE.md`, 성능 개선 이력은 `frontend/docs/superpowers/plans/2026-11-07-3d-perf-and-r3f-port.md` 를 보세요. 품질 프리셋(`?q=high|med|low`)이 있어 성능 목표(30fps·draw call)는 프리셋별로 측정합니다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 행당·마장·답십리·왕십리·한양대 3D 공유 월드에서 매물·기숙사·청년안심주택을 걸어서 보고, 실내에 들어가고, 초과액 판정을 확인하는 웹 프론트를 백엔드 계약에 맞춰 만든다.
