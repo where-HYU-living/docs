@@ -15,8 +15,8 @@
 - 모든 경로 접두사 `/api/v1`, JSON camelCase, 금액 원 단위 `long`, 비율 소수 셋째 자리 반올림, 값 없음은 `null`
 - 게스트 허용: `/me/*`와 쓰기 요청(`/auth/*`, `/invites` 제외)만 인증 필요
 - 학교 메일 도메인 `@hanyang.ac.kr`만 허용, 코드 6자리·10분 유효·재발송 60초·5회 오류 시 폐기, JWT 7일
-- 등급 경계: `PENDING`(표본 부족) / `≤0.05 FAIR` / `≤0.15 SLIGHTLY_HIGH` / `≤0.30 HIGH` / `>0.30 CULPRIT`, 기준값은 설정 `pricing.grade-fair` · `pricing.grade-slight` · `pricing.grade-high`. 등급은 **셋째 자리로 반올림한 `excessRate`** 로 매긴다 (응답 값과 등급이 항상 일치)
-- 적정가 표본: 같은 동·면적 ±30%·최근 12개월, 10건 미만이면 인접 동 포함, 그래도 10건 미만이면 `PENDING`
+- 등급 경계: `PENDING`(표본 부족) / `≤0.10 FAIR` / `≤0.25 SLIGHTLY_HIGH` / `≤0.50 HIGH` / `>0.50 CULPRIT` (처음 초안 0.05/0.15/0.30 에서 실거래 분포로 재조정, 계약 v1.2 2-1장), 기준값은 설정 `pricing.grade-fair` · `pricing.grade-slight` · `pricing.grade-high`. 등급은 **셋째 자리로 반올림한 `excessRate`** 로 매긴다 (응답 값과 등급이 항상 일치)
+- 적정가 표본: 같은 동·면적 ±30%·최근 12개월(**판정하는 날의 직전 달까지**), 10건 미만이면 인접 동 포함, 그래도 10건 미만이면 `PENDING`. 표본 거래는 **신규 월세 계약만** (갱신·계약 구분 빈 값·전세 제외, 스펙 3-4 "갱신 계약 구분"을 앞당김)
 - 계약 기간 기본 24개월, 양도 글은 `remainingMonths`
 - 외부 API 실패 시 상위 응답은 200 + 해당 필드 `null`/`[]`, 단독 엔드포인트(`/walk`, `/geo/address`)만 502 `UPSTREAM_FAILED`
 - CORS 허용: `http://localhost:5173` + 배포 프론트 주소(설정값)
@@ -36,9 +36,23 @@
 |---|---|---|---|
 | 1 골격·에러·CORS·Swagger | 구현 완료 (커밋 전) | `CommonApiTest` 10 | |
 | 2 메일 인증·JWT·보안 | 구현 완료 (커밋 전) | `AuthApiTest` 16, `SecurityRulesTest` 10, `JwtProviderTest` 7 | 실제 서버로 로그인 흐름 확인 |
-| 3 프로필·학과·건물·시더 | 구현 완료 (커밋 전) | `ProfileApiTest` 7, `CatalogApiTest` 4, `FixtureSeederTest` 5 | **실제 학과·건물 픽스처는 Task 6 전까지 작성** |
+| 3 프로필·학과·건물·시더 | 구현 완료 (커밋 전) | `ProfileApiTest` 7, `CatalogApiTest` 4, `FixtureSeederTest` 5 | **실제 학과·건물 픽스처는 Task 7 전까지 작성** (도보 시간 계산에 과 건물 좌표 필요) |
 | 4 판정 엔진 | 구현 완료 (커밋 전) | `PriceCalculatorTest` 11, `GradePolicyTest` 7 | |
-| 5~16 | 대기 | | |
+| 5 실거래 수집·표본 | 구현 완료 + **실제 수집 완료** (커밋 전) | `RealDealNormalizerTest` 8, `MolitHttpClientTest` 3, `RealDealIngestJobTest` 5, `DongAdjacencyTest` 3, `FairRentEstimatorTest` 6 | 개발 DB에 27,718건 (2025-11 ~ 2026-10) |
+| 6 매물 API | 코드 완료 (커밋 전) | `ListingApiTest` 16 | **실제 데모 매물 `listings.json` 20건 미작성** |
+| 7~16 | 대기 | | |
+
+전체 테스트 118개 통과 (2026-11-07 기준).
+
+**판정 기준값 (현재)** — 모두 `application.yml` 의 `pricing.*` 설정값, 테스트는 별도 고정값(전환율 0.06, 기준 관리비 71,000) 사용
+| 값 | 현재 | 출처·근거 |
+|---|---|---|
+| 전환율 `conversion-rate` | **0.046** | 한국부동산원 지역별 전월세전환율, 서울 · 단독주택+연립다세대, 2026년 8월 (KOSIS 확인). 아파트가 섞인 종합값은 원룸 표본과 성격이 달라 쓰지 않음 |
+| 기준 관리비 `baseline-mgmt-fee` | **71,000원** | 한양대 인근 평균 관리비 (2024, `research/okrs-주제재해석.md` 7장 인용 기사) |
+| 등급 기준 `grade-*` | **0.10 / 0.25 / 0.50** | 대상 동 18㎡ 원룸 신규 월세 실거래 2,303건을 동 중앙값과 비교 → 적정 69% · 조금 비쌈 16% · 비쌈 10% · 범인 5% ("범인 = 실제 거래 상위 약 5%"를 목표로 고름. 초안 0.05/0.15/0.30 은 범인 11%) |
+| 최소 표본 `min-sample` | 10 | 계획 그대로 |
+
+**검증 메모 (OKR 안 2):** 같은 데이터에서 각 거래가 자기 동 중앙값에서 벗어난 정도의 중앙값은 약 14% → KR1 "적정 환산 월세 오차 중앙값 15% 이하"에 해당하는 근거. 정식 검증(실거래 일부를 떼어 두고 비교)은 아직 안 함
 
 **공통 테스트 기반:** `support/IntegrationTest`(PostgreSQL 컨테이너 공유, 매 테스트 전 `users`·`email_codes` 비움, 시드는 `classpath:test-fixtures/`), `MutableClock`(시간 이동), `FakeMailPort`, `TestSupportConfig`, 테스트 전용 `common/ErrorProbeController`
 
@@ -62,9 +76,9 @@ backend/
     ├── user/        User, UserRepository, Budget, ProfileController, ProfileService
     ├── catalog/     Department, Building, BuildingType, (Department|Building)Repository, CatalogController, FixtureSeeder
     ├── pricing/     PricingProperties, PriceInput, PriceResult, Sample, Grade, PriceCalculator, GradePolicy, FairRentEstimator, PriceCheckService
-    ├── realdeal/    RealDeal, RealDealRepository, MolitClient, RealDealNormalizer, RealDealIngestJob, DongAdjacency
-    ├── listing/     Listing, ListingRepository, ListingQuery, ListingController, ListingService
-    ├── geo/         WalkPort(TmapWalkAdapter), PlacePort(KakaoPlaceAdapter), AddressPort(KakaoAddressAdapter), GeoController, WalkService, NearbyService
+    ├── realdeal/    RealDeal, RealDealType, YearMonthIntegerConverter, RealDealRepository, MolitClient(+MolitHttpClient), MolitApiException, RealDealNormalizer, RealDealIngestJob, DongAdjacency
+    ├── listing/     Listing, RoomType, ListingRepository, ListingQuery, ListingDtos, ListingController, ListingService, ListingGradeJob
+    ├── geo/         WalkPort(TmapWalkAdapter), PlacePort(KakaoPlaceAdapter), AddressPort(KakaoAddressAdapter), GeoController, WalkService(지금은 null 만 돌려주는 임시 구현), NearbyService
     ├── housing/     Housing, UnitType, Announcement, AnnouncementEvent, Subscription, HousingController, HousingService
     ├── dorm/        Dorm, DormRoomType, DormController
     ├── compare/     AlternativeService (alternatives)
@@ -230,7 +244,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 - [x] **Step 2: 실패 확인** — `./gradlew test --tests '*PriceCalculatorTest' --tests '*GradePolicyTest'` → FAIL
 - [x] **Step 3: 구현** — 금액은 `Math.round`(원 단위), `excessRate`는 `BigDecimal` HALF_UP 셋째 자리. 스프링 의존 없음
   - **구현 반영:**
-    - **기준 관리비 `pricing.baseline-mgmt-fee`**: 적정 월세 = ㎡당 중앙값 × 면적 + 기준 관리비. 매물은 관리비를 포함하는데 실거래에는 관리비가 없어서 모든 매물이 관리비만큼 비싸게 판정되는 편향을 보정. **기본값 0**(지금은 계획 식과 동일), 실제 값은 Task 5에서 정함
+    - **기준 관리비 `pricing.baseline-mgmt-fee`**: 적정 월세 = ㎡당 중앙값 × 면적 + 기준 관리비. 매물은 관리비를 포함하는데 실거래에는 관리비가 없어서 모든 매물이 관리비만큼 비싸게 판정되는 편향을 보정 (스펙 3-1 식과 다름, 3-4 "관리비 보정"을 앞당김). 현재 **71,000원** (진행 현황의 판정 기준값 표 참고)
     - 등급은 반올림한 `excessRate`로 판정 (Global Constraints 참고)
     - 보류 조건: 표본 없음, 중앙값 없음, 건수 < `minSample`, 적정 월세 ≤ 0
     - 시세보다 싼 집의 음수 초과액은 0으로 자르지 않음
@@ -256,7 +270,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - `MolitClient.fetch(String lawdCd, YearMonth ym, String buildingType): String` (XML 원문), 서비스키는 설정 `external.molit.key`
   - `RealDealIngestJob.ingest(YearMonth from, YearMonth to)` — 성동구(11200)·동대문구(11230) 법정동코드 앞 5자리, 수동 실행용 관리자 엔드포인트 없이 `CommandLineRunner`(`app.ingest.enabled=true`)로 실행
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 ```java
 @Test void normalizer_dropsCanceled_andConvertsManwon() {
   var deals = normalizer.parse(readXml("officetel-rent-sample.xml"), "OFFICETEL");
@@ -268,15 +282,40 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 @Test void estimator_noneWhenStillShort()        // 합쳐도 9건 → scope "NONE", medianPerM2 null
 @Test void estimator_ignoresOldDeals()           // 13개월 전 거래는 제외
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*RealDealNormalizerTest' --tests '*FairRentEstimatorTest'` → FAIL
-- [ ] **Step 3: 구현** — 표본의 ㎡당 환산 월세 = `convertedRent(deposit, rent, null, rate) / areaM2` (실거래에는 관리비 없음), 중앙값은 정렬 후 가운데(짝수면 두 값 평균). 국토부 API 데이터셋 이름·파라미터는 공공데이터포털 상세 페이지 기준으로 확인 후 `MolitClient`에 상수로 기록
-  - **구현 전 확인할 것 (Task 1~4 진행 중 정리):**
-    - 전월세 응답에 **취소(해제) 필드가 실제로 있는지** (매매에는 있으나 전월세는 확인 필요) → 없으면 `normalizer_dropsCanceled` 테스트를 실제 필드에 맞게 수정
-    - **신규·갱신 계약 구분** 필드가 있으면 신규만 사용 (갱신은 인상 상한 때문에 시세보다 낮음)
-    - **전세(월세 0) 거래**는 월세 판정 표본에서 제외할지
-    - 동 이름은 **법정동**(`umdNm`) 기준. `DongAdjacency`, 픽스처의 `dong`도 법정동으로 (예: "왕십리"가 아니라 "상왕십리동"·"하왕십리동")
-    - 실제 수집 후 동별 표본 건수를 보고 **전환율(현재 0.06 임시) 출처, 기준 관리비(`baseline-mgmt-fee`, 현재 0), 등급 기준값**을 정함
-- [ ] **Step 4: 통과 확인** → PASS. 실제 키로 `./gradlew bootRun --args='--app.ingest.enabled=true'` 1회 실행 후 `select dong, count(*) from real_deals group by dong` 결과를 PR 설명에 기록 (OKR 안 2의 표본 수 근거)
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*RealDealNormalizerTest' --tests '*FairRentEstimatorTest'` → FAIL
+- [x] **Step 3: 구현** — 표본의 ㎡당 환산 월세 = `convertedRent(deposit, rent, null, rate) / areaM2` (실거래에는 관리비 없음), 중앙값은 정렬 후 가운데(짝수면 두 값 평균). 국토부 API 데이터셋 이름·파라미터는 공공데이터포털 상세 페이지 기준으로 확인 후 `MolitClient`에 상수로 기록
+  - **실제 응답으로 확인한 사실 (성동구 2026-10, 3개 데이터셋 모두 정상 조회):**
+    - 엔드포인트: `apis.data.go.kr/1613000/` + `RTMSDataSvcOffiRent/getRTMSDataSvcOffiRent`(오피스텔) · `RTMSDataSvcRHRent/getRTMSDataSvcRHRent`(연립다세대) · `RTMSDataSvcSHRent/getRTMSDataSvcSHRent`(단독다가구), 파라미터 `serviceKey`·`LAWD_CD`·`DEAL_YMD`(yyyyMM)·`pageNo`·`numOfRows`, 응답 UTF-8 XML, 정상 `resultCode` 는 `000`
+    - **취소(해제) 필드는 세 데이터셋 모두 없음** → 계획의 "취소 건 제외"는 하지 않음
+    - `contractType`(신규/갱신) 있음. 빈 값은 약 3% (첫 확인 때 10건짜리 한 페이지만 보고 "60%"라고 잘못 판단했던 것을 정정)
+    - 동 `umdNm` 은 법정동, 금액 `deposit`·`monthlyRent` 는 쉼표 포함 만원 문자열, 면적은 오피스텔·연립다세대 `excluUseAr` / 단독다가구 `totalFloorAr`, 단독다가구에는 `floor`·`jibun` 없음, 빈 값은 공백 한 칸
+  - **구현 반영:**
+    - 정제(`RealDealNormalizer`)는 형식이 틀린 행만 제외하고 **갱신·전세도 모두 저장**, 표본 조건은 `FairRentEstimator` 조회에서 적용 → 규칙을 바꿔도 재수집 불필요
+    - 시그니처: `parse(String xml, RealDealType type, Instant ingestedAt): MolitPage`(전체 건수·제외 건수 포함), `MolitClient.fetch(lawdCd, ym, type, pageNo, numOfRows)` — 페이지 처리 때문에 계획보다 인자가 늘어남. 건물 유형은 문자열 대신 enum `RealDealType`
+    - `MolitClient` 는 인터페이스, 실제 구현은 `MolitHttpClient`(서비스키는 한 번만 URL 인코딩, 응답은 바이트로 받아 UTF-8 해석, 연결 5초·읽기 15초)
+    - XML 외부 엔티티(XXE) 차단, 오류 응답(`OpenAPI_ServiceResponse`, `resultCode` ≠ `000`)은 `MolitApiException`
+    - 수집은 (구, 월, 유형) 묶음마다 **지우고 다시 넣기** → 여러 번 돌려도 중복 없음. 한 묶음이 실패해도 나머지는 계속, 실패 목록은 로그로
+    - 기본 수집 범위 `app.ingest.months: 12` → 직전 달까지 12개월
+    - 인접 동은 쌍으로 적어 자동으로 양방향 (`DongAdjacency`). 초안 목록이라 **사용자 확인 필요**, 다만 실제로 인접 확대가 일어나는 건 상왕십리동·응봉동뿐
+    - 표본 `dongs` 에는 실제 거래가 들어간 동만, 기준 동이 맨 앞. `NONE` 이면 `dongs: []`, 면적·기간 null
+- [x] **Step 4: 통과 확인** → PASS. 실제 키로 `./gradlew bootRun --args='--app.ingest.enabled=true'` 1회 실행 후 `select dong, count(*) from real_deals group by dong` 결과를 PR 설명에 기록 (OKR 안 2의 표본 수 근거)
+  - **실제 수집 결과 (2026-11-07):** 성동구·동대문구, 2025-11 ~ 2026-10, **27,718건 저장 · 형식 오류 0 · 실패 0**
+  - **동별 표본 (18㎡ ±30%, 신규 월세, 전환율 0.06 기준):**
+
+    | 동 | 표본 | ㎡당 중앙값 | 판정 범위 |
+    |---|---|---|---|
+    | 마장동 | 505 | 35,294원 | 같은 동 |
+    | 행당동 | 480 | 36,111원 | 같은 동 |
+    | 용답동 | 349 | 37,110원 | 같은 동 |
+    | 답십리동 | 346 | 36,372원 | 같은 동 |
+    | 사근동 | 267 | 31,668원 | 같은 동 |
+    | 도선동 | 222 | 46,739원 | 같은 동 |
+    | 하왕십리동 | 91 | 33,333원 | 같은 동 |
+    | 홍익동 | 43 | 32,895원 | 같은 동 |
+    | 응봉동 | 1 | — | 인접 확대 (행당동 포함 481건) |
+    | 상왕십리동 | 0 | — | 인접 확대 (홍익·하왕십리 포함 134건) |
+
+    18·26·33·45·60㎡ 모두에서 대상 동은 상왕십리동·응봉동을 빼고 같은 동 표본 10건 이상 → **표본 부족 위험은 해소**. 유형별로는 단독다가구 58% · 오피스텔 33% · 연립다세대 10%
 - [ ] **Step 5: 커밋** — `git commit -m "feat(realdeal): molit ingest, normalization, fair-rent sample"`
 
 ### Task 6: 자취방 매물 API (목록 필터 · 상세 · price-check)
@@ -293,7 +332,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - `ListingService.summaryOf(Listing l, Long buildingId, Long userIdOrNull): ListingSummaryDto` — 찜·양도·검색에서 재사용
   - 매물 등급·환산 월세는 저장 시 계산해 컬럼(`converted_rent`, `grade`)에 캐시 → 목록 필터 `grade`가 DB 조건으로 동작. 실거래 재수집 후 `ListingService.recomputeAll()`
 
-- [ ] **Step 1: 실패하는 테스트 작성** (픽스처 시드 사용)
+- [x] **Step 1: 실패하는 테스트 작성** (픽스처 시드 사용)
 ```java
 @Test void list_bboxFilter()        // bbox 행당동 범위 → 전부 lat/lng 범위 안
 @Test void list_gradeFilter()       // grade=HIGH,CULPRIT → 전부 두 등급 중 하나
@@ -305,10 +344,22 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 @Test void priceCheck_pendingListing_returns200WithNulls() // 시드의 PENDING 매물 → 200, $.fairRent null, $.sample.scope "NONE"
 @Test void priceCheck_budgetForLoggedIn() // rentCap 600000 설정 사용자 → $.budget.overRent == max(0, convertedRent-600000)
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*ListingApiTest'` → FAIL
-- [ ] **Step 3: 구현** — 목록은 JPA Specification으로 조건 조합. `favorited`는 Task 9 전까지 false
-  - **구현 전 확인할 것:** 실제 `departments.json`·`buildings.json`(과 건물 좌표)과 `listings.json`이 필요. 응답 `sample`에는 내부 값 `medianPerM2`를 싣지 않음(계약 PriceCheck 형식). Task 2의 `guest_canBrowse`에서 `/listings`를 200 검사로 바꿈
-- [ ] **Step 4: 통과 확인** → PASS
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*ListingApiTest'` → FAIL
+- [x] **Step 3: 구현** — 목록은 JPA Specification으로 조건 조합. `favorited`는 Task 9 전까지 false
+  - **구현 반영:**
+    - 매물 저장 구조 `V4__listings.sql` (`listings` + 순서 있는 `listing_options`·`listing_photos`), 시드는 SQL로 id 지정, 픽스처의 계산 필드(`convertedRent`·`grade`·`walkMin`·`favorited`)는 무시하고 서버가 다시 계산
+    - 등급·환산 월세 캐시는 `ListingService.recomputeAll()`. 서버 시작 시 **실거래 수집(CommandLineRunner) → 시드(`@Order(1)`) → 재계산(`ListingGradeJob`, `@Order(2)`)** 순서로 자동 실행
+    - `/price-check` 는 캐시가 아니라 요청마다 다시 계산 (표본·예산이 매번 다를 수 있음). 같은 데이터면 캐시 등급과 같음을 테스트로 확인
+    - 판정 기준월은 계산하는 날의 직전 달 (`PriceCheckService.evaluate`)
+    - 응답 `sample` 은 계약 형식(`from`·`to` 는 `"2025-11"`, 내부 값 `medianPerM2` 없음)
+    - 예산: 상한이 하나만 있으면 없는 쪽 `over*` 는 null
+    - 페이지 크기 100 초과는 100으로 줄임, `page < 0`·`size < 1`·잘못된 `bbox`(4개가 아님, 숫자 아님, 최솟값 > 최댓값)는 `400 VALIDATION_FAILED`
+    - 관리비 상한 필터는 관리비가 없는(null) 매물을 제외
+    - **도보 시간 필터:** 기준 건물이 있으면 조건에 맞는 매물을 모두 가져와 메모리에서 거르고 페이지를 나눔(데모 매물 수십 건 규모라 충분). 도보 시간을 모르는 매물은 제외 → 지금은 `WalkService` 가 null 만 돌려줘서 기준 건물 + 도보 필터 조합의 결과가 0건 (Task 7에서 해결)
+    - `guest_canBrowse` 의 `/listings` 를 200 검사로 변경
+    - 테스트는 어떤 판정 기준값에서도 결과가 같은 매물(매우 비싼 집 → 범인, 표본 없는 동·면적 → 보류)로 구성, 판정 기준값은 테스트에서 별도로 고정
+  - **남은 일:** 실제 데모 매물 `contract/fixtures/listings.json` 20건 (등급 5종 모두, 보류 1건 이상). 대상 동은 모두 판정 가능하므로 **보류 매물은 표본이 없는 조건(예: 큰 면적)으로 따로 만들어야 함**. 스펙 데모의 "한양대 도보 1분 11㎡ 월 95만 원"은 범인 등급
+- [x] **Step 4: 통과 확인** → PASS (실서버에서도 `/listings` 200, 잘못된 `bbox` 400, 없는 매물 404 확인)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(listing): search filters, detail, price-check"`
 
 ### Task 7: 지리 외부 API (도보 · 주변 · 주소) + 장애 규칙
@@ -338,6 +389,12 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*GeoApiTest' --tests '*WalkServiceTest'` → FAIL
 - [ ] **Step 3: 구현** — `RestClient`, 타임아웃 3초. 키는 `external.tmap.key`, `external.kakao.rest-key`
+  - **구현 전 확인할 것 (Task 5·6 진행 중 정리):**
+    - **실제 학과·건물 픽스처**(`contract/fixtures/departments.json`·`buildings.json`) 필요 — 과 건물 좌표가 도보 시간의 도착점. 좌표는 campus-data 저장소(건물 84곳, OSM 출입구·카카오 좌표)에서 뽑을 수 있음. 학과 5개와 주 건물, 입구 2개 이상은 사용자가 정함
+    - Task 6 의 임시 `WalkService`(항상 null)를 실제 구현으로 교체. 도보 필터는 "도보 시간을 모르면 제외"로 구현되어 있어 TMAP 장애 시 결과가 0건이 될 수 있음 → 이 동작을 유지할지 확인
+    - 카카오 주소 검색의 동은 `region_3depth_name`(법정동). 행정동(`region_3depth_h_name`)을 쓰면 표본이 0건이 되어 조용히 보류됨
+    - 통합 검색 보충(Task 14)은 주소 검색이 아니라 **키워드 검색**이어야 건물명이 잡힘
+    - campus-data 의 3D 원점은 사자상(37.5561486, 127.044341)으로 계약 4장 `ORIGIN`(정문 임시값)과 다름 → 프론트와 맞출 것 (서버는 위경도만 다뤄서 코드 영향 없음)
 - [ ] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(geo): walk time, nearby places, address search with graceful fallback"`
 
@@ -369,6 +426,10 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*HousingApiTest' --tests '*DormApiTest' --tests '*AlternativeServiceTest'` → FAIL
 - [ ] **Step 3: 구현** — 주택형 `convertedRent`는 `mgmtFee` 포함, 기숙사는 `monthlyCost`를 환산 월세로 사용
+  - **구현 전 확인할 것 (Task 6 진행 중 정리):**
+    - **스펙 C3 「청년안심주택 여부」 필터** — 세 문서(계약·두 계획) 모두에서 빠져 있음. 정리한 방식: **스위치(보여 줄지)는 프론트, 조건 적용은 백엔드.** `GET /housing` 에 `/listings` 와 같은 필터(`maxRent`·`maxDeposit`·`maxWalkMin`·`buildingId`·`bbox`, "조건을 만족하는 주택형이 하나라도 있으면 포함")를 추가하고, 목록 항목에 `minConvertedRent`(가장 싼 주택형)·`walkMin` 추가. 파라미터·필드 추가라 계약 0-2 상 자유 변경이지만 **계약에 적고 프론트에 알릴 것**
+    - 데이터는 사용자가 준비: `housing.json`(청아진 홍익동 133세대, 라봄성동 마장동 181세대 — 계약 최소 2단지, 더 넣어도 됨), `announcements.json`, `dorms.json`
+    - 주택형 환산 월세도 같은 전환율(4.6%)을 씀
 - [ ] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(housing,dorm): complexes, announcements, subscriptions, alternatives"`
 
@@ -497,6 +558,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*NotificationJobTest' --tests '*NotificationApiTest'` → FAIL
 - [ ] **Step 3: 구현** — 제목 예: `"[D-7] 왕십리역 청아진 접수 마감"`, `"계약 만료 60일 전이에요"`
+  - **구현 전 확인할 것 (Task 6 진행 중 정리):** 매물 등급 캐시는 서버 시작 시에만 다시 계산됨 → 서버를 띄운 채 달이 바뀌면 목록 등급이 판정 API(요청마다 계산)와 어긋날 수 있음. 같은 09:00 스케줄러에서 `ListingService.recomputeAll()` 도 매일 실행할지 정할 것
 - [ ] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(notification): daily dday and expiry notifications, inbox"`
 
@@ -578,6 +640,8 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
     - 배포용 `JWT_SECRET`은 로컬과 다른 값
     - 무료 플랜의 잠들기(09:00 알림·WebSocket 중단), 업로드 파일이 재배포 때 사라지는지 확인
     - `CORS_ALLOWED_ORIGINS`에 배포 프론트 주소 추가, `SEED_ENABLED` 결정
+    - **배포 DB에서 실거래 첫 수집** (`INGEST_ENABLED=true`로 1회 기동, 1~2분), `MOLIT_KEY` 환경 변수. 달이 바뀌면 최근 12개월이 유지되도록 **매달 재수집**할지 정할 것 (지금은 수동 실행만)
+    - 배포 DB 후보: 서버와 DB를 한 곳에(Railway 등) 또는 DB만 따로(Supabase·Neon 등, 스프링 서버는 별도). 무료 플랜의 잠들기·일시 정지 조건을 확인하고 결정. 프론트는 DB에 직접 붙지 않으므로 API 주소만 바뀜
 - [ ] **Step 4: 통과 확인** — 전체 `./gradlew test` → PASS, 배포 주소의 `/api/v1/health` 200, `/swagger-ui.html` 열림, 프론트 담당에게 배포 주소 공유
 - [ ] **Step 5: 커밋** — `git commit -m "chore: dockerize and deploy, contract smoke test"`
 
