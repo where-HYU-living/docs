@@ -46,10 +46,11 @@
 | 9 찜 | 구현 완료 | `FavoriteApiTest` 12 | 매물·양도 글 `favorited` 실제 값. 하트는 프론트가 `GET /me/favorites` 한 곳에서 읽음 (계약 v1.7) |
 | 10 양도 게시판·업로드 | 구현 완료 + **실서버 확인** | `TransferApiTest` 15 | 제목 필수 2~40자(계약 v1.7, 프론트와 같음), 남은 개월 기준 판정, 업로드는 전체 주소 응답·첫 바이트로 jpg/png 확인, 데모 양도 글 3건 |
 | 15 멀티플레이 | **구현 완료 (프론트 담당이 진행)** | `WorldServiceTest`·`SessionOutboxTest`·`WorldSocketIT`·`WorldLoadIT` | `/ws/world` 공유 월드(최대 30명, 10Hz), `POST /invites`. 계획과 다른 점은 아래 Task 15 참고 |
-| 14 통합 검색·평면도 | **평면도 완료 (프론트 담당이 구현)**, 통합 검색 대기 | `FloorPlanApiTest`·`FloorPlanSeederTest`·`FloorPlanValidatorTest`·`FloorPlanLinkerTest`·`FloorplanLabelTest` | `GET /floorplans/{id}`, 평면도 33개(청년안심주택 20·매물 7·기숙사 6), V8 |
-| 11~13, 16 | 대기 | | |
+| 14 통합 검색·평면도 | **평면도 완료 (프론트 담당이 구현)**, **통합 검색 완료 (하네스, backend `27c14ef`)** | `FloorPlanApiTest`·`FloorPlanSeederTest`·`FloorPlanValidatorTest`·`FloorPlanLinkerTest`·`FloorplanLabelTest` | `GET /floorplans/{id}`, 평면도 33개(청년안심주택 20·매물 7·기숙사 6), V8 |
+| 11 후기 · 12 내 집 기록·리포트·만료 알림 · 13 알림함·알림 생성 잡 | **구현 완료 (하네스 2026-11-08, backend `27c14ef`)** | `CommunityApiTest` 5 | 계약 5-8~5-10 그대로. 새 테이블은 JdbcTemplate(엔티티 없음). **마이그레이션은 `V10__reviews_home_notifications.sql` 하나로 합침** — 아래 V11·V12 는 쓰지 않는다. `NotificationJob` 매일 09:00 KST + 기동 시, `dedupe_key` 로 중복 방지 |
+| 16 | 대기 | | |
 
-전체 테스트 262개 통과 (2026-11-08 기준, 프론트 담당의 멀티플레이 테스트 포함).
+전체 테스트 293개 통과 (2026-11-08 하네스 기준, 프론트 담당의 멀티플레이 테스트 포함).
 
 **판정 기준값 (현재)** — 모두 `application.yml` 의 `pricing.*` 설정값, 테스트는 별도 고정값(전환율 0.06, 기준 관리비 71,000) 사용
 | 값 | 현재 | 출처·근거 |
@@ -724,6 +725,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - 매물 7건(4·6·10·17·18·19·20번)에 101~107, 기숙사 호실 6종에 201~206 연결
   - 남은 일: 청아진 1·2번은 목업에서 옮긴 임시본(이미지로 다시 작성 필요), 한영스테이 면적 미상, **통합 검색**(이 Task 의 나머지)
   - 마이그레이션 번호: 평면도가 V8 을 먼저 써서 양도 게시판은 V9, 이후 후기 V10·내 집 V11·알림 V12
+  - **2026-11-08 변경**: 후기·내 집·알림을 한 번에 구현하면서 `V10__reviews_home_notifications.sql` 하나에 담았다. 다음 마이그레이션은 **V11** 부터
 
 ### Task 15: 멀티플레이 WebSocket · 초대
 
