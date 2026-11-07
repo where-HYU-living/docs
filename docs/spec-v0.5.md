@@ -231,7 +231,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 
 ## 4-S. 구현 상태 표 (작업 목록)
 
-> 2026-11-08 코드 기준(frontend `f9c60ea`, backend `e80e50a`). 이 표가 하네스 작업 목록이다. 단계가 끝날 때마다 해당 줄을 갱신한다.
+> 2026-11-08 코드 기준. 처음 작성: frontend `f9c60ea`, backend `e80e50a` → 5단계 재갱신: frontend `4899a71`, backend `e5df918`. 이 표가 하네스 작업 목록이다. 최종 QA 결과는 `harness/final-qa.md`.
 > 상태 값: **완료 / 부분 / 미구현 / 해당없음**. 개선점이 없으면 `-`. **new** = 코드에는 있으나 명세서에 없던 기능(이번에 ID 부여).
 > 파일 경로는 frontend `src/` · backend `com.chatatda.api` 기준. 엔드포인트는 `/api/v1` 생략.
 
@@ -364,10 +364,11 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 |---|---|---|---|---|---|---|---|
 | Q1 | **new** 알림함 | 상단 종 → 목록, 안 읽은 개수 | `InboxPanel.tsx` · `GET /me/notifications`, `PATCH /me/notifications/{id}/read` | 완료 | - | 완료 | - |
 | Q2 | **new** 상단바 | 검색·탭·시간·지도·의상·초대·찜·알림·계정 | `TopBar.tsx` | 완료 | - | 해당없음 | - |
-| Q3 | **new** 개발용 목 서버 | `?mock=1` | `mock/*` | 완료 | - | 해당없음 | - |
+| Q3 | **new** 개발용 목 서버 | `?mock=1` | `mock/*` | 완료 | 목 매물 id 4·6·10·18·20 의 주소가 실서버 같은 id 와 달라, 목 모드에서 `siteForListing` 의 동네가 엉뚱함(실서버는 정상) | 해당없음 | - |
 | Q4 | **new** 개인정보처리방침·약관 | `/privacy.html`, `/terms.html` | `public/*.html` | 완료 | - | 해당없음 | - |
 | Q5 | **new** 헬스체크 | - | `GET /health` | 해당없음 | - | 완료 | - |
 | Q6 | **new** 평면도 자동 연결 | 서버 기동 시 비어 있는 매물·기숙사 평면도 채움 | `floorplan/FloorPlanLinker`, `FloorPlanSeeder` | 해당없음 | - | 완료 | - |
+| Q8 | **new** 숫자 점검 스크립트 (캡처 없음) | `node scripts/<이름>-check.mjs` — 라벨·캠퍼스 투어·상단바·지도·성능·로딩·멀티플레이·경로·최종 QA | `frontend/scripts/{labels,tour,topbar,map,perf,load,mp,route}-check.mjs`, `final-qa.mjs` | 완료 | - | 해당없음 | - |
 | Q7 | **new** 데이터 수집 잡 | 실거래·청년안심주택 공고 수집, 등급 재계산 | `realdeal/RealDealIngestJob`, `housing/HousingIngestJob`, `listing/ListingGradeJob` | 해당없음 | - | 완료 | - |
 
 ## 5. 핵심 사용자 흐름
