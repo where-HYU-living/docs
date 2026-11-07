@@ -3,7 +3,7 @@
 > 백엔드(장시현)와 프론트·3D(김준형)가 **함께 보는 단 하나의 기준 문서**.
 > 프론트는 이 문서에 맞춰 개발하고, 백엔드는 이 문서대로 응답한다.
 > 기준 스펙: `docs/spec-v0.5.md`
-> 버전: contract v1.6 (2026-11-08)
+> 버전: contract v1.7 (2026-11-08)
 
 ---
 
@@ -145,19 +145,25 @@
 ```json
 {
   "id": 5, "name": "청아진 18타입", "areaM2": 18.22, "ceilingHeight": 2.4,
-  "walls": [ { "from": [0, 0], "to": [2.6, 0], "thickness": 0.15 } ],
-  "openings": [ { "type": "door", "wall": 0, "offset": 0.3, "width": 0.9, "height": 2.1, "sill": 0 },
-                { "type": "window", "wall": 2, "offset": 0.5, "width": 1.6, "height": 1.2, "sill": 0.9 } ],
-  "rooms": [ { "name": "거실", "polygon": [[0, 0], [2.6, 0], [2.6, 4.2], [0, 4.2]] } ],
+  "walls": [ { "from": [0, 0], "to": [2.6, 0], "thickness": 0.15, "height": 2.4 } ],
+  "openings": [ { "type": "door", "wall": 0, "offset": 0.3, "width": 0.9, "height": 2.1, "sill": 0,
+                  "style": "swing", "swing": { "hinge": "start", "opensTo": -1 } },
+                { "type": "window", "wall": 2, "offset": 0.5, "width": 1.6, "height": 1.2, "sill": 0.9, "style": "sliding" } ],
+  "rooms": [ { "name": "거실", "polygon": [[0, 0], [2.6, 0], [2.6, 4.2], [0, 4.2]], "kind": "living",
+               "floor": { "material": "wood", "height": 0 } } ],
   "entrance": [1.3, 0],
+  "fixtures": [ { "kind": "bed", "position": [1.8, 3.2], "facing": "S", "size": [1.1, 2.0], "room": "거실" } ],
   "glbUrl": null
 }
 ```
-- 단위 m. 평면 좌표 `[x, y]`: **x = 오른쪽, y = 아래쪽**, 원점은 평면도 좌상단
+- 단위 m. 평면 좌표 `[x, y]`: **x = 오른쪽, y = 아래쪽**, 원점은 **벽 중심선 바운딩박스의 좌상단**. 벽은 중심선 기준
 - 3D 변환: 평면 `[x, y]` → three.js `(x, 높이, y)`
-- `wall`: `walls` 배열 인덱스, `offset`: 그 벽의 `from`에서 열린 곳 시작까지 거리
+- `walls[].height`: 없으면 `ceilingHeight` (낮은 칸막이·반벽)
+- `openings[]`: `wall` = `walls` 인덱스, `offset` = 그 벽의 `from` 에서 열린 곳 시작까지 거리. `style`: `swing`(여닫이, 기본)·`sliding`·`open`(문 없는 개구부). `swing.hinge`: `start`(from 쪽)·`end`(to 쪽), `swing.opensTo`: 위에서 본 평면도에서 벽 진행방향(from→to)을 바라볼 때 왼쪽으로 열리면 `+1`, 오른쪽 `-1`. 없으면 3D 가 정한다
+- `rooms[].kind`: `bedroom`·`living`·`kitchen`·`bathroom`·`entrance`·`balcony`·`utility`·`storage`·`hallway`·`other`. `rooms[].floor`: `material` = `wood`·`tile`·`vinyl`·`concrete`, `color`(선택), `height` = 기준 바닥 대비 단차(m, 욕실·현관 -0.05~-0.15)
+- `fixtures[]` (선택, 없으면 3D 가 방 이름·면적으로 예시 배치): `kind` = `toilet`·`sink`·`shower`·`bathtub`·`washer`·`kitchenSink`·`cooktop`·`fridge`·`kitchenCounter`·`upperCabinet`·`bed`·`desk`·`chair`·`wardrobe`·`builtinWardrobe`·`shoeRack`·`shelf`·`sofa`·`tv`·`table`·`acOutdoor`·`waterHeater`. `position` = 바닥 접지 면 중심, `facing` = 앞면 방향 `N`·`E`·`S`·`W`, `elevation`(선택, 공중에 놓인 것), `size` = `[폭, 깊이, 높이?]`(선택), `room`(선택, 검수용)
 - `glbUrl`이 있으면 프론트는 JSON 대신 GLB를 로드
-- 데이터는 팀이 손으로 작성한 JSON을 서버가 그대로 저장·제공
+- 데이터는 사람이(평면도 이미지를 보고, AI 보조 가능) 작성한 JSON을 **백엔드 `src/main/resources/fixtures/floorplans/{id}.json`** (파일 하나에 도면 하나, 파일명 = `id`)에 두고, 서버가 그대로 제공한다. 프론트 `interior/planFiles.test.ts` 가 이 폴더 전체를 검수한다(벽을 파고드는 문·가구, 걸어서 갈 수 없는 방). 정본 타입은 프론트 `src/api/types.ts` 의 `FloorPlan`
 
 ## 4. 좌표 기준 (3D ↔ 위경도)
 - 기준점(원점) `ORIGIN = { lat: 37.5561486, lng: 127.044341 }` — **확정**: 3D 월드의 사자상(한양대 정문 앞) 위치. 프론트 `src/app/map/geo.ts`의 값과 같다
@@ -230,7 +236,7 @@
 ### 5-4. 청년안심주택
 | 메서드 | 경로 | 요청 | 응답 |
 |---|---|---|---|
-| GET | `/housing` | `maxRent` `maxDeposit` `maxWalkMin` `buildingId` `bbox` (모두 선택) | `[{ "id", "name", "address", "lat", "lng", "recruiting": true, "nextEvent": { "type", "date" } \| null, "subscribed": false, "favorited": false, "minConvertedRent", "walkMin" }]` |
+| GET | `/housing` | `maxRent` `maxDeposit` `maxWalkMin` `buildingId` `bbox` (모두 선택) | `[{ "id", "name", "address", "lat", "lng", "recruiting": true, "nextEvent": { "type", "date" } \| null, "subscribed": false, "minConvertedRent", "walkMin" }]` |
 | GET | `/housing/{id}` | `buildingId`(선택) | 위 + `{ "unitTypes": [{ "id", "name", "exclusiveAreaM2", "deposit", "rent", "mgmtFee", "convertedRent", "floorplanId" }], "floorLayoutImageUrl", "contact", "walkMin" }` |
 | GET | `/housing/announcements` | `status` `housingId` | `[{ "id", "housingId", "title", "status", "events": [{ "type": EventType, "date" }] }]` |
 | POST 🔒 | `/housing/{id}/subscribe` | | `204` (이미 구독이면 그대로 204) |
@@ -247,12 +253,12 @@
   - 주택형 `name`은 soco 표기 그대로다 (`18타입(18.22)`, `19A`, `25A(20.00)` …). 이름 숫자가 전용면적과 다를 수 있으니 면적은 `exclusiveAreaM2`를 쓴다
   - `exclusiveAreaM2`는 **전용면적**(㎡)이다. 계약면적·공용면적은 없다
   - `floorLayoutImageUrl`은 지금 항상 `null`, 주택형 `floorplanId`는 Task 14(평면도) 전까지 `null`
-  - `favorited` = 로그인 사용자가 찜했는지 (게스트는 항상 `false`). 상세(`/housing/{id}`)에도 들어 있다. 하트는 이 값으로 그린다 (스펙 C6: 매물·청년안심주택·기숙사·양도 글 모두 찜)
+  - **하트(찜 여부)는 `GET /me/favorites` 한 곳에서 읽는다** (매물·청년안심주택·기숙사·양도 글 모두 같은 방식, 스펙 C6). 청년안심주택·기숙사 응답에는 `favorited` 가 없다. 매물·양도 글의 `favorited` 는 그대로 내려가지만 프론트는 쓰지 않아도 된다
 
 ### 5-5. 기숙사
 | 메서드 | 경로 | 응답 |
 |---|---|---|
-| GET | `/dorms` | `[{ "id", "name", "lat", "lng", "favorited": false, "roomTypes": [{ "id", "name", "capacity", "semesterFee", "semesterMonths", "mealIncluded", "monthlyCost", "floorplanId" }] }]` |
+| GET | `/dorms` | `[{ "id", "name", "lat", "lng", "roomTypes": [{ "id", "name", "capacity", "semesterFee", "semesterMonths", "mealIncluded", "monthlyCost", "floorplanId" }] }]` |
 | GET | `/dorms/{id}` | 위 단건 + `walkMin`(`buildingId` 쿼리 선택) |
 
 - `monthlyCost` = `round(semesterFee ÷ semesterMonths)`
@@ -280,7 +286,7 @@
 | POST 🔒 | `/uploads` | `multipart/form-data` `file` (jpg/png, 5MB 이하) | `{ "url" }` |
 
 - 양도 글 판정의 `contractMonths` = `remainingMonths`
-- 요청 검증 (어기면 `400 VALIDATION_FAILED`, `details`에 칸 이름): `title` **필수** 1~50자 · `address`·`dong`·`lat`·`lng`·`deposit`·`rent`·`areaM2`·`roomType`·`remainingMonths` 필수 · 금액 0 이상 · `areaM2` 0 초과 · `remainingMonths` 1~60 · `description` 2000자 이하 · `photoUrls` 10장 이하, **`/uploads` 가 돌려준 주소만**
+- 요청 검증 (어기면 `400 VALIDATION_FAILED`, `details`에 칸 이름): `title` **필수** 2~40자 (앞뒤 공백 제외) · `address`·`dong`·`lat`·`lng`·`deposit`·`rent`·`areaM2`·`roomType`·`remainingMonths` 필수 · 금액 0 이상 · `areaM2` 0 초과 · `remainingMonths` 1~60 · `description` 2000자 이하 · `photoUrls` 10장 이하, **`/uploads` 가 돌려준 주소만**
 - 선택 항목: `mgmtFee`·`floor`·`availableFrom`(`YYYY-MM-DD`)·`description`·`photoUrls` (없으면 `null` 또는 생략). `address`·`dong`·`lat`·`lng` 는 **`GET /geo/address` 결과를 그대로** 넣는다 (`dong` 은 법정동, 판정 기준이라 손으로 고치지 않는다)
 - `/uploads` 의 `url` 은 **전체 주소**(예 `https://api.…/files/3f2a….jpg`)다. 그대로 `<img src>`·`photoUrls`에 쓴다. 파일 내용(첫 바이트)으로 jpg·png 를 확인한다
 - 목록 `thumbnailUrl` = 첫 번째 사진, 없으면 `null`. 양도 글은 삭제 없이 `DONE` 으로 마감한다
@@ -381,7 +387,7 @@
 | `listings.json` | ListingDetail 배열 (데모용 샘플 매물) | 20건 (등급 5종 모두 포함, `PENDING` 1건 이상) |
 | `price-checks.json` | `{ "<listingId>": PriceCheck }` | 매물 수만큼 |
 | `dorms.json` | 기숙사 + 호실 유형 (id = 건물 id, 학기마다 모집요강 보고 갱신) | 1동 이상 |
-| `floorplans.json` | FloorPlan 배열 | 청아진 18·18A + 기숙사 1종 |
+| `floorplans/{id}.json` | FloorPlan 하나씩 (파일명 = id) | 청아진 18·18A + 기숙사 1종 |
 | `departments.json`, `buildings.json` | 학과·캠퍼스 건물·입구·기숙사 | 데모 학과 5개 이상, 입구 2개 이상 |
 | `transfers.json` | 양도 글 (`authorNickname` 으로 데모 작성자 생성, 판정은 서버 계산) | 3건 |
 | `reviews.json` | 후기 | 매물 5곳에 각 2건 |
@@ -390,7 +396,7 @@
 - [x] ORIGIN 좌표 확정 (4장) — 사자상 `37.5561486, 127.044341`
 - [x] 픽스처 파일 위치·첫 버전 커밋 (7장) — 백엔드 `src/main/resources/fixtures`
 - [x] `listings.json` 샘플 20건 금액·좌표 채우기 — 사근동 9·행당동 8·마장동 3, 등급 5종
-- [ ] 청아진 18·18A 평면도 JSON 작성 (`floorplans.json`)
+- [ ] 청아진 18·18A 평면도 JSON 작성 (`floorplans/{id}.json`)
 - [ ] 백엔드 로컬 실행 주소·CORS 허용 오리진 (`http://localhost:5173`)
 - [ ] Swagger 주소 공유
 
@@ -404,3 +410,4 @@
 | 2026-11-07 | v1.4 | 구글 로그인 `POST /auth/google` 확정(백엔드 구현·테스트 완료) + `hd` 검사·502 경우 추가 · 픽스처 위치를 실제 방식으로 정정(`src/main/resources/fixtures`, 학과·건물은 campus-data → 프론트 스크립트로 생성), 건물 id 규칙 |
 | 2026-11-07 | v1.5 | `GET /housing` 필터(`maxRent`·`maxDeposit`·`maxWalkMin`·`buildingId`·`bbox`)와 `minConvertedRent`·`walkMin` 추가(스펙 C3) · `nextEvent`에 오늘 포함 · 공고 `status`를 일정 날짜로 계산 · 청년안심주택은 soco 매일 수집(대상 동, 일반공급·청년) · 기숙사 id = 건물 id · 대안 비교는 더 싼 대상만 · 픽스처 `housing.json`·`announcements.json` 삭제(수집으로 대체) · 화면 참고(주택형 이름 표기, 전용면적, 비어 있는 필드, 기숙사 5동) |
 | 2026-11-08 | v1.6 | 양도 글 요청에 **`title` 필수** 추가(프론트 글쓰기 폼에 제목 칸 필요) · 양도 글 검증 규칙 · `/uploads` 는 전체 주소 응답, `photoUrls` 는 업로드 주소만 · 상태 `OPEN` 되돌리기 허용 · 현재 전환율 0.046·기준 관리비 71,000원 명시 (예시의 0.06 과 구분) · 청년안심주택·기숙사 목록·상세에 `favorited` 추가 (하트 상태, v1.5 의 "/me/favorites 로 판단" 대체) |
+| 2026-11-08 | v1.7 | 프론트 구현에 맞춤: 양도 글 `title` **2~40자** · 하트는 `GET /me/favorites` 로 판단하고 청년안심주택·기숙사 `favorited` 는 다시 뺌 · FloorPlan 확장 형식(방 종류·바닥·문 형태·열림 방향·벽 높이·가구 `fixtures`), 원점 = 벽 중심선 바운딩박스 좌상단, 서버 원본은 `fixtures/floorplans/{id}.json` |

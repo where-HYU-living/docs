@@ -43,8 +43,8 @@
 | 7 도보·주변·주소 | 구현 완료 + **실서버 확인** | `TmapWalkAdapterTest` 4, `KakaoAdaptersTest` 6, `BusStopIndexTest` 3, `WalkServiceTest` 6, `GeoApiTest` 12 | 실제 TMAP 도보 시간 확인 (행당동 지점 → 공업센터본관 11분, IT/BT관 14분) |
 | (프론트 담당 추가) 구글 로그인·Docker | 구현 완료 | `GoogleAuthApiTest`, `GoogleJwtVerifierTest` | `POST /auth/google`(계약 v1.4), `Dockerfile`·`docker compose up --build`로 DB+서버 실행 |
 | 8 청년안심주택·공고·구독·기숙사·대안 | 구현 완료 + **실제 수집 확인** | `ScheduleParserTest` 5, `SocoParserTest` 6, `AnnouncementStatusPolicyTest` 4, `HousingIngestJobTest` 11, `HousingApiTest` 12, `DormApiTest` 3, `AlternativeApiTest` 4 | soco 실수집: 단지 5곳(퀸즈W·한영스테이·라봄성동·청아진·힐데스하임), 최근 12개월 공고 16건, 실패 0. 2026-11-07 기준 접수 중인 공고 없음. 평면도 연결표 27장 모두 작성(연결표 없는 이미지 0). 한영스테이는 이미지에 면적이 없어 이름 숫자(18·22)를 전용면적으로 사용 |
-| 9 찜 | 구현 완료 | `FavoriteApiTest` 12 | 매물·청년안심주택·기숙사·양도 글 목록·상세 `favorited` 실제 값 (청년안심주택·기숙사는 계약 v1.6 에서 추가) |
-| 10 양도 게시판·업로드 | 구현 완료 + **실서버 확인** | `TransferApiTest` 15 | 제목 필수(계약 v1.6), 남은 개월 기준 판정, 업로드는 전체 주소 응답·첫 바이트로 jpg/png 확인, 데모 양도 글 3건 |
+| 9 찜 | 구현 완료 | `FavoriteApiTest` 12 | 매물·양도 글 `favorited` 실제 값. 하트는 프론트가 `GET /me/favorites` 한 곳에서 읽음 (계약 v1.7) |
+| 10 양도 게시판·업로드 | 구현 완료 + **실서버 확인** | `TransferApiTest` 15 | 제목 필수 2~40자(계약 v1.7, 프론트와 같음), 남은 개월 기준 판정, 업로드는 전체 주소 응답·첫 바이트로 jpg/png 확인, 데모 양도 글 3건 |
 | 15 멀티플레이 | **구현 완료 (프론트 담당이 진행)** | `WorldServiceTest`·`SessionOutboxTest`·`WorldSocketIT`·`WorldLoadIT` | `/ws/world` 공유 월드(최대 30명, 10Hz), `POST /invites`. 계획과 다른 점은 아래 Task 15 참고 |
 | 11~14, 16 | 대기 | | |
 
@@ -95,7 +95,7 @@ backend/
     ├── home/        Home, Payment, Utility, ExpiryAlert, HomeController, ReportService
     ├── notification/ Notification, NotificationController, NotificationJob
     ├── search/      SearchController, SearchService
-    ├── floorplan/   FloorPlan(jsonb 컬럼), FloorPlanController
+    ├── floorplan/   FloorPlan(jsonb 컬럼, 원본 fixtures/floorplans/{id}.json), FloorPlanController
     └── world/       WorldService, WorldSocketHandler, WorldPlayer, SessionOutbox(+Outbox), InviteService, InviteController, WorldProperties, WorldConfig (프론트 담당 구현)
 ```
 
@@ -571,7 +571,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - `TRANSFER` 는 양도 글 테이블이 없어서 지금은 404. **Task 10 에서 `FavoriteService.target()` 의 `TRANSFER` 분기를 채울 것**
   - 순환 의존 방지: `ListingService` 는 `FavoriteRepository` 를 직접 읽고, `FavoriteService` 가 `ListingService` 를 쓴다
   - 목록 조회는 트랜잭션으로 묶지 않음 (대상 하나가 404 면 묶인 트랜잭션 전체가 실패로 표시되어 500 이 났음)
-  - 청년안심주택·기숙사 목록·상세에도 `favorited` 추가 (2026-11-08, 계약 v1.6). 스펙 C6 "모든 대상 찜"인데 계약 응답에 찜 여부 칸이 매물에만 있어서 프론트 하트가 `false` 로 고정돼 있었음. `HousingService`·`DormService` 가 `FavoriteRepository.findTargetIds` 로 채움 (순환 의존 없음)
+  - 하트 상태: 스펙 C6 "모든 대상 찜"인데 계약 응답에 찜 여부 칸이 매물에만 있어서 프론트 단지 하트가 `false` 로 고정돼 있었음. v1.6 에서 청년안심주택·기숙사에 `favorited` 를 넣었으나, 프론트가 모든 하트를 `GET /me/favorites` 한 곳에서 읽도록 바꿔서(`bd4b8e7`) **v1.7 에서 다시 뺌** (쓰지 않는 칸)
 
 ### Task 10: 양도 게시판 · 업로드
 
@@ -599,7 +599,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 - [x] **Step 4: 통과 확인** → PASS (15개)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(transfer): transfer board with auto price-check and uploads"`
 - **구현하며 정한 것 (2026-11-08, 계약 v1.6):**
-  - **제목 필수** (1~50자, 사용자 결정): 원래 계약은 응답에만 `title`(ListingSummary 필드)이 있고 글쓰기 요청에는 없어서 앞뒤가 안 맞았음. 프론트 글쓰기 폼에 제목 칸 추가 필요
+  - **제목 필수** (2~40자, 앞뒤 공백 제외. 처음 1~50자로 했다가 프론트 폼 규칙에 맞춤): 원래 계약은 응답에만 `title`(ListingSummary 필드)이 있고 글쓰기 요청에는 없어서 앞뒤가 안 맞았음. 프론트 글쓰기 폼에 제목 칸 추가 필요
   - 검증: 금액 0 이상, 면적 0 초과, `remainingMonths` 1~60, 설명 2000자, 사진 10장. `photoUrls` 는 **우리 `/uploads` 가 돌려준 주소만** (`StoragePort.owns`)
   - 업로드: `StoragePort.save(byte[], ext)` 가 **전체 주소**를 돌려준다. 로컬은 `LocalDiskStorage`(디스크 `app.upload.dir` + `/files/**` 정적 제공), 앞부분은 `UPLOAD_PUBLIC_BASE_URL`(비우면 요청 주소). 배포에서 디스크가 지워지면 외부 저장소 구현만 추가 (Task 16). 파일 **첫 바이트**로 jpg·png 확인, 5MB 초과는 컨트롤러와 `spring.servlet.multipart` 둘 다 막음
   - 상태 `OPEN`↔`DONE` 양방향, 삭제 없음. 수정·상태 변경은 작성자만(403)
@@ -710,6 +710,11 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 - [ ] **Step 3: 구현** — FloorPlan은 `jsonb` 컬럼에 원문 저장, 그대로 응답
 - [ ] **Step 4: 통과 확인** → PASS
 - [ ] **Step 5: 커밋** — `git commit -m "feat(search,floorplan): unified search and floor plan data"`
+- **구현 전 확인할 것 (2026-11-08, 프론트 `bd4b8e7` 반영, 계약 v1.7):**
+  - 평면도 원본 위치가 `fixtures/floorplans.json`(배열 하나) → **`fixtures/floorplans/{id}.json`(도면마다 파일 하나, 파일명 = id)** 로 바뀜. 프론트 `interior/planFiles.test.ts` 가 이 폴더를 읽어 검수하므로 그대로 따를 것. 시더는 폴더의 `*.json` 을 모두 읽어 `id` 와 파일명이 같은지 확인
+  - FloorPlan 형식이 확장됨 (방 `kind`·`floor`, 문 `style`·`swing`, 벽 `height`, 가구 `fixtures[]`), 원점 = 벽 중심선 바운딩박스 좌상단. 서버는 **원문 JSON 그대로 저장·응답**하므로 필드를 해석하지 않는다 (필수 칸 `id`·`walls`·`entrance` 정도만 확인)
+  - 평면도 작성은 평면도 이미지(Task 8 연결표의 치수 포함)를 보고 프론트 `docs/floorplan-ai-prompt.md` 방식으로. 만든 뒤 `housing_unit_types.floorplan_id`·`dorm_room_types.floorplan_id` 연결
+  - 방 초대 링크(도면·위치 포함)는 프론트가 링크 뒤에 붙이는 것이라 `/invites` 변경 없음
 
 ### Task 15: 멀티플레이 WebSocket · 초대
 
