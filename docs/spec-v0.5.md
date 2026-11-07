@@ -280,7 +280,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 | D1 | 기본 정보 | 상세 '기본 정보' | `ListingDetailView.tsx` · `GET /listings/{id}` | 완료 | - | 완료 | - |
 | D2 | 환산 월세 | 상세·카드 '환산' | `pricing/PriceCalculator` · `GET /listings/{id}/price-check` | 완료 | - | 완료 | - |
 | D3 | 적정 월세 & 초과액 | 판결 카드 수치·근거 | `VerdictCard.tsx`, `dossier/ExcessGauge.tsx` · `pricing/FairRentEstimator` | 완료 | - | 완료 | - |
-| D5 | 과 건물까지 도보 시간 | 카드·상세 '도보 N분' | `geo/WalkService`(TMAP) · `walkMin` | 완료 | 누르면 경로를 보여 주는 기능 없음(4단계 F6) | 완료 | - |
+| D5 | 과 건물까지 도보 시간 | 카드·상세 '도보 N분' | `geo/WalkService`(TMAP) · `walkMin` | 완료 | - | 완료 | - |
 | D7 | 최종 판결 카드 | 상세 상단 판결 문구 | `VerdictCard.tsx` | 완료 | - | 해당없음 | - |
 | D8 | 대안 추천 | '같은 예산에서 더 싼 매물' | `ListingDetailView.tsx cheaperListings` · `GET /listings/{id}/alternatives` | 완료 | - | 완료 | - |
 | D9 | 예산 대비 표시 | 판결 카드 '예산보다 ○만 원' | `dossierLogic.budgetLine` · price-check `budget` | 완료 | - | 완료 | - |
@@ -296,10 +296,10 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 ### F. 주변 & 등굣길
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
-| F1 | 과 건물까지 도보 경로·시간 | (경로는 4단계 F6) | `geo/GeoController` · `GET /walk` | 미구현 | `/walk` 를 쓰는 화면 없음 → F6 | 완료 | TMAP 키 없으면 직선거리 추정인지 응답에서 구분 불가 |
+| F1 | 과 건물까지 도보 경로·시간 | (경로는 4단계 F6) | `geo/GeoController` · `GET /walk` | 완료 | - | 완료 | TMAP 키가 없거나 실패하면 502 (프론트는 직선 추정으로 대신) |
 | F3 | 언덕·계단 보정 | - | - | 미구현 | - | 미구현 | TMAP 보행 경로에 고도 없음. 지형 데이터로 보정 가능(P2) |
 | F5 | 집 주변 둘러보기 | 매물 선택 → 300m 편의점·세탁방·정류장·역 말풍선 | `WorldEffects.tsx` · `GET /listings/{id}/nearby` | 완료 | - | 완료 | - |
-| F6 | **new** 집 → 내 학과 건물 경로 | 상세 '도보 N분' 클릭 → 3D 바닥 경로 / 지도 폴리라인, 학과 미설정이면 안내 | (4단계) `GET /walk` | 미구현 | 4단계 | 완료 | `path` 좌표·`distanceM` 제공됨 |
+| F6 | **new** 집 → 내 학과 건물 경로 | 상세 '도보 N분' 클릭 → 3D 바닥 경로 / 지도 폴리라인, 학과 미설정이면 안내 | (4단계) `GET /walk` | 완료 | - | 완료 | - |
 
 ### G. 한양대생 후기
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
