@@ -3,7 +3,7 @@
 > 백엔드(장시현)와 프론트·3D(김준형)가 **함께 보는 단 하나의 기준 문서**.
 > 프론트는 이 문서에 맞춰 개발하고, 백엔드는 이 문서대로 응답한다.
 > 기준 스펙: `docs/spec-v0.5.md`
-> 버전: contract v1.3 (2026-11-07)
+> 버전: contract v1.5 (2026-11-07)
 
 ---
 
@@ -180,7 +180,7 @@
 | GET | `/departments` | | `[{ "id", "name", "college", "defaultBuildingIds": [] }]` |
 | GET | `/buildings?type=` | `type` 생략 시 전체 | `[{ "id", "name", "type", "lat", "lng" }]` |
 
-**구글 로그인 (제안, 백엔드 확인 필요)**
+**구글 로그인**
 
 | 메서드 | 경로 | 요청 | 응답 |
 |---|---|---|---|
@@ -188,6 +188,8 @@
 
 - 프론트가 Google Identity Services 버튼으로 받은 ID 토큰을 그대로 보낸다. `hd=hanyang.ac.kr` 는 계정 선택창 힌트일 뿐이라 **서버가 반드시 검증**한다: 구글 공개키로 서명·`aud`(우리 클라이언트 ID)·만료 확인, `email_verified` = true, 이메일이 `@hanyang.ac.kr` 로 끝나는지 확인.
 - 도메인이 다르면 `400 INVALID_EMAIL_DOMAIN`, 토큰이 잘못됐으면 `401 UNAUTHORIZED`(프론트는 "구글 로그인을 확인하지 못했어요"로 표시). 계정이 없으면 자동 생성(닉네임 규칙은 메일 인증과 동일).
+- 구글 계정에 워크스페이스 도메인(`hd`)이 있으면 `hanyang.ac.kr` 이어야 한다.
+- 서버에 클라이언트 ID(`google.client-id`)가 설정되지 않았거나 구글 공개키를 가져오지 못하면 `502 UPSTREAM_FAILED`.
 - 프론트 `VITE_GOOGLE_CLIENT_ID` 와 서버 설정의 클라이언트 ID 는 같은 값. 시크릿은 필요 없다.
 
 - 인증 코드: 숫자 6자리, 10분 유효, 재발송 60초 제한, 5회 틀리면 해당 코드 폐기
@@ -226,14 +228,24 @@
 ### 5-4. 청년안심주택
 | 메서드 | 경로 | 요청 | 응답 |
 |---|---|---|---|
-| GET | `/housing` | | `[{ "id", "name", "address", "lat", "lng", "recruiting": true, "nextEvent": { "type", "date" } \| null, "subscribed": false }]` |
+| GET | `/housing` | `maxRent` `maxDeposit` `maxWalkMin` `buildingId` `bbox` (모두 선택) | `[{ "id", "name", "address", "lat", "lng", "recruiting": true, "nextEvent": { "type", "date" } \| null, "subscribed": false, "minConvertedRent", "walkMin" }]` |
 | GET | `/housing/{id}` | `buildingId`(선택) | 위 + `{ "unitTypes": [{ "id", "name", "exclusiveAreaM2", "deposit", "rent", "mgmtFee", "convertedRent", "floorplanId" }], "floorLayoutImageUrl", "contact", "walkMin" }` |
 | GET | `/housing/announcements` | `status` `housingId` | `[{ "id", "housingId", "title", "status", "events": [{ "type": EventType, "date" }] }]` |
 | POST 🔒 | `/housing/{id}/subscribe` | | `204` (이미 구독이면 그대로 204) |
 | DELETE 🔒 | `/housing/{id}/subscribe` | | `204` |
 
 - `recruiting` = 해당 단지 공고 중 `OPEN` 또는 `ADDITIONAL`이 하나라도 있으면 `true`
-- `nextEvent` = 오늘 이후 가장 가까운 일정
+- `nextEvent` = 오늘(KST)을 포함해 그 이후 가장 가까운 일정
+- 필터는 `/listings`와 같은 의미이며 **주택형 중 하나라도 조건을 만족하면** 단지를 포함한다. `maxRent`·`maxDeposit`은 주택형의 월세·보증금, `maxWalkMin`은 `buildingId`(없으면 로그인 사용자의 첫 번째 건물) 기준 도보 분
+- `minConvertedRent` = 가장 싼 주택형의 환산 월세, `walkMin` = 위 기준 건물까지 도보 분(기준 건물이 없으면 `null`)
+- 단지·주택형·공고는 서버가 서울시 청년안심주택(soco.seoul.go.kr)에서 매일 수집한다. 대상 동(실거래 판정 대상 동)에 있는 단지만, 주택형은 **일반공급·청년 자격** 기준
+- 공고 `status`는 일정 날짜로 계산한다: 접수 시작 전 `UPCOMING` · 접수 기간 중 `OPEN`(추가모집 공고면 `ADDITIONAL`) · 접수 마감 후 발표 전 `CLOSED` · 발표일부터 `ANNOUNCED`
+- 공고는 최근 12개월 게시분만 있다. `events`는 날짜순이며 공고문에 없는 단계는 빠진다(예: "개별 안내"인 서류·계약)
+- 화면 참고:
+  - 주택형 `name`은 soco 표기 그대로다 (`18타입(18.22)`, `19A`, `25A(20.00)` …). 이름 숫자가 전용면적과 다를 수 있으니 면적은 `exclusiveAreaM2`를 쓴다
+  - `exclusiveAreaM2`는 **전용면적**(㎡)이다. 계약면적·공용면적은 없다
+  - `floorLayoutImageUrl`은 지금 항상 `null`, 주택형 `floorplanId`는 Task 14(평면도) 전까지 `null`
+  - 청년안심주택·기숙사 응답에는 찜 여부(`favorited`)가 없다. 하트 상태는 `GET /me/favorites` 목록으로 판단한다
 
 ### 5-5. 기숙사
 | 메서드 | 경로 | 응답 |
@@ -242,6 +254,9 @@
 | GET | `/dorms/{id}` | 위 단건 + `walkMin`(`buildingId` 쿼리 선택) |
 
 - `monthlyCost` = `round(semesterFee ÷ semesterMonths)`
+- 기숙사 `id` = 그 기숙사 건물의 건물 id (`buildings`의 `DORM`, 예: 801). 한 건물에 생활관이 둘이면(804 제2학생생활관·한양테크노숙사) 호실 유형으로 나눈다
+- 기숙사는 학부 재학생 모집 대상 5동(801·804·805·806·810)만 있다. 호실 `name`에 성별이 들어 있다(`2인실 (남)`). `mealIncluded`는 모두 `false`(식비 별도)
+- `/listings/{id}/alternatives`는 **보고 있는 매물보다 환산 월세가 낮은 대상만** 낮은 순으로 각각 최대 3개 (없으면 빈 배열)
 
 ### 5-6. 찜
 | 메서드 | 경로 | 요청 | 응답 |
@@ -347,17 +362,19 @@
 
 ## 7. 공유 픽스처 (목 데이터)
 
-- 위치: **백엔드 저장소 `contract/fixtures/*.json`이 정본**, 프론트는 이를 복사해 쓴다
+- 위치: 서버 시드는 **백엔드 저장소 `src/main/resources/fixtures/*.json`**. 아직 없는 픽스처(`listings.json` 등)도 이 폴더에 둔다
+- 학과·건물(`departments.json`·`buildings.json`)은 **손으로 고치지 않는다.** 원본은 campus-data `campus/departments.json`(출처·확신도 포함)이고, frontend `scripts/build-departments.mjs` 가 프론트 내장 목록과 백엔드 시드를 함께 만든다
+- 건물 id = 학교 건물 번호(101, 212 …). 번호가 숫자가 아닌 건물(L01·N08 …)은 1001부터. 프론트 `campusPlaces.json` 의 id 와 같다
+- 학과의 `defaultBuildingIds` 는 현재 **학과 행정팀(사무실) 건물** 기준이다 (수업 건물과 다를 수 있음, 첫 번째가 도보 시간 기준)
 - 픽스처의 `id`는 서버 DB에도 **그대로** 들어간다 (픽스처끼리 `floorplanId`, `housingId`, `defaultBuildingIds` 등으로 서로 참조하므로)
 - 프론트는 MSW 목 응답으로, 백엔드는 데모 시드 데이터로 **같은 파일**을 사용
+- 청년안심주택 단지·주택형·공고는 픽스처 파일이 없다. 서버가 soco 에서 매일 수집해 DB 에 저장한다 (5-4장)
 
 | 파일 | 내용 | 최소 수량 |
 |---|---|---|
 | `listings.json` | ListingDetail 배열 (데모용 샘플 매물) | 20건 (등급 5종 모두 포함, `PENDING` 1건 이상) |
 | `price-checks.json` | `{ "<listingId>": PriceCheck }` | 매물 수만큼 |
-| `housing.json` | 청년안심주택 단지 + 주택형 | 2단지 (청아진, 라봄성동) |
-| `announcements.json` | 공고 + 일정 | 단지별 1건 이상, `OPEN` 1건 포함 |
-| `dorms.json` | 기숙사 + 호실 유형 | 1동 이상 |
+| `dorms.json` | 기숙사 + 호실 유형 (id = 건물 id, 학기마다 모집요강 보고 갱신) | 1동 이상 |
 | `floorplans.json` | FloorPlan 배열 | 청아진 18·18A + 기숙사 1종 |
 | `departments.json`, `buildings.json` | 학과·캠퍼스 건물·입구·기숙사 | 데모 학과 5개 이상, 입구 2개 이상 |
 | `transfers.json` | 양도 글 | 3건 |
@@ -378,3 +395,5 @@
 | 2026-11-07 | v1.1 | 인증 5회 오류 응답 명시(429) · `Alternative.id` 의미 명시 · WS 실내 중 `move` 미전송 명시 · 픽스처 위치 확정, id 보존 · 에러 코드 `METHOD_NOT_ALLOWED`·`INTERNAL_ERROR` 추가 · 인증 세부 응답(코드 미요청, 메일 발송 실패, 계정 없음) · `PUT /me/profile` 수정 규칙 |
 | 2026-11-07 | v1.2 | 등급 기준 0.05/0.15/0.30 → **0.10/0.25/0.50** (실거래 분포로 재조정, 2-1장). API 형식 변경 없음 |
 | 2026-11-07 | v1.3 | ORIGIN 확정: 임시값 → 사자상 `37.5561486, 127.044341` (프론트 3D 월드 기준). 서버 거리 계산·시드 좌표는 위경도라 영향 없음, 3D 미터 좌표 해석하는 곳만 확인 |
+| 2026-11-07 | v1.4 | 구글 로그인 `POST /auth/google` 확정(백엔드 구현·테스트 완료) + `hd` 검사·502 경우 추가 · 픽스처 위치를 실제 방식으로 정정(`src/main/resources/fixtures`, 학과·건물은 campus-data → 프론트 스크립트로 생성), 건물 id 규칙 |
+| 2026-11-07 | v1.5 | `GET /housing` 필터(`maxRent`·`maxDeposit`·`maxWalkMin`·`buildingId`·`bbox`)와 `minConvertedRent`·`walkMin` 추가(스펙 C3) · `nextEvent`에 오늘 포함 · 공고 `status`를 일정 날짜로 계산 · 청년안심주택은 soco 매일 수집(대상 동, 일반공급·청년) · 기숙사 id = 건물 id · 대안 비교는 더 싼 대상만 · 픽스처 `housing.json`·`announcements.json` 삭제(수집으로 대체) · 화면 참고(주택형 이름 표기, 전용면적, 비어 있는 필드, 기숙사 5동) |

@@ -34,15 +34,18 @@
 ## 진행 현황
 | Task | 상태 | 테스트 | 비고 |
 |---|---|---|---|
-| 1 골격·에러·CORS·Swagger | 구현 완료 (커밋 전) | `CommonApiTest` 10 | |
-| 2 메일 인증·JWT·보안 | 구현 완료 (커밋 전) | `AuthApiTest` 16, `SecurityRulesTest` 10, `JwtProviderTest` 7 | 실제 서버로 로그인 흐름 확인 |
-| 3 프로필·학과·건물·시더 | 구현 완료 (커밋 전) | `ProfileApiTest` 7, `CatalogApiTest` 4, `FixtureSeederTest` 5 | **실제 학과·건물 픽스처는 Task 7 전까지 작성** (도보 시간 계산에 과 건물 좌표 필요) |
-| 4 판정 엔진 | 구현 완료 (커밋 전) | `PriceCalculatorTest` 11, `GradePolicyTest` 7 | |
-| 5 실거래 수집·표본 | 구현 완료 + **실제 수집 완료** (커밋 전) | `RealDealNormalizerTest` 8, `MolitHttpClientTest` 3, `RealDealIngestJobTest` 5, `DongAdjacencyTest` 3, `FairRentEstimatorTest` 6 | 개발 DB에 27,718건 (2025-11 ~ 2026-10) |
-| 6 매물 API | 코드 완료 (커밋 전) | `ListingApiTest` 16 | **실제 데모 매물 `listings.json` 20건 미작성** |
-| 7~16 | 대기 | | |
+| 1 골격·에러·CORS·Swagger | 구현 완료 | `CommonApiTest` 10 | |
+| 2 메일 인증·JWT·보안 | 구현 완료 | `AuthApiTest` 16, `SecurityRulesTest` 10, `JwtProviderTest` 7 | 실제 서버로 로그인 흐름 확인 |
+| 3 프로필·학과·건물·시더 | 구현 완료 + **실제 학과·건물 시드 있음** | `ProfileApiTest` 7, `CatalogApiTest` 4, `FixtureSeederTest` 5 | 학과 61개·건물 66곳(프론트 담당이 campus-data 에서 생성). 남은 문제: **입구(`GATE`) 1곳뿐**(계약 최소 2), 학과 건물이 **행정팀 기준**(공대 19개 학과가 모두 206 공업센터본관), 807 게스트하우스가 `DORM` |
+| 4 판정 엔진 | 구현 완료 | `PriceCalculatorTest` 11, `GradePolicyTest` 7 | |
+| 5 실거래 수집·표본 | 구현 완료 + **실제 수집 완료** | `RealDealNormalizerTest` 8, `MolitHttpClientTest` 3, `RealDealIngestJobTest` 5, `DongAdjacencyTest` 3, `FairRentEstimatorTest` 6 | 개발 DB에 27,718건 (2025-11 ~ 2026-10) |
+| 6 매물 API | 코드 완료 | `ListingApiTest` 16 | **실제 데모 매물 `listings.json` 20건 미작성** |
+| 7 도보·주변·주소 | 구현 완료 + **실서버 확인** | `TmapWalkAdapterTest` 4, `KakaoAdaptersTest` 6, `BusStopIndexTest` 3, `WalkServiceTest` 6, `GeoApiTest` 12 | 실제 TMAP 도보 시간 확인 (행당동 지점 → 공업센터본관 11분, IT/BT관 14분) |
+| (프론트 담당 추가) 구글 로그인·Docker | 구현 완료 | `GoogleAuthApiTest`, `GoogleJwtVerifierTest` | `POST /auth/google`(계약 v1.4), `Dockerfile`·`docker compose up --build`로 DB+서버 실행 |
+| 8 청년안심주택·공고·구독·기숙사·대안 | 구현 완료 + **실제 수집 확인** | `ScheduleParserTest` 5, `SocoParserTest` 6, `AnnouncementStatusPolicyTest` 4, `HousingIngestJobTest` 11, `HousingApiTest` 12, `DormApiTest` 3, `AlternativeApiTest` 4 | soco 실수집: 단지 5곳(퀸즈W·한영스테이·라봄성동·청아진·힐데스하임), 최근 12개월 공고 16건, 실패 0. 2026-11-07 기준 접수 중인 공고 없음. 평면도 연결표 27장 모두 작성(연결표 없는 이미지 0). 한영스테이는 이미지에 면적이 없어 이름 숫자(18·22)를 전용면적으로 사용 |
+| 9~16 | 대기 | | |
 
-전체 테스트 118개 통과 (2026-11-07 기준).
+전체 테스트 204개 통과 (2026-11-07 기준).
 
 **판정 기준값 (현재)** — 모두 `application.yml` 의 `pricing.*` 설정값, 테스트는 별도 고정값(전환율 0.06, 기준 관리비 71,000) 사용
 | 값 | 현재 | 출처·근거 |
@@ -78,9 +81,10 @@ backend/
     ├── pricing/     PricingProperties, PriceInput, PriceResult, Sample, Grade, PriceCalculator, GradePolicy, FairRentEstimator, PriceCheckService
     ├── realdeal/    RealDeal, RealDealType, YearMonthIntegerConverter, RealDealRepository, MolitClient(+MolitHttpClient), MolitApiException, RealDealNormalizer, RealDealIngestJob, DongAdjacency
     ├── listing/     Listing, RoomType, ListingRepository, ListingQuery, ListingDtos, ListingController, ListingService, ListingGradeJob
-    ├── geo/         WalkPort(TmapWalkAdapter), PlacePort(KakaoPlaceAdapter), AddressPort(KakaoAddressAdapter), GeoController, WalkService(지금은 null 만 돌려주는 임시 구현), NearbyService
-    ├── housing/     Housing, UnitType, Announcement, AnnouncementEvent, Subscription, HousingController, HousingService
-    ├── dorm/        Dorm, DormRoomType, DormController
+    ├── geo/         WalkPort(TmapWalkAdapter), PlacePort(KakaoPlaceAdapter), AddressPort(KakaoAddressAdapter), KakaoLocalClient, BusStopIndex, WalkService(+WalkKey·WalkCacheStore), NearbyService, GeoController, GeoMath, ExternalApiException
+    ├── housing/     Housing, HousingUnitType, Announcement, AnnouncementEvent, HousingSubscription, FloorplanImage, AnnouncementStatusPolicy, HousingController, HousingService, HousingIngestJob
+    │   └── soco/    SocoClient(+SocoHttpClient), SocoParser, ScheduleParser, SocoHome·SocoUnit·SocoNotice
+    ├── dorm/        Dorm, DormRoomType, DormController, DormService
     ├── compare/     AlternativeService (alternatives)
     ├── favorite/    Favorite, FavoriteController, FavoriteService
     ├── transfer/    Transfer, TransferController, TransferService, UploadController, StoragePort
@@ -173,7 +177,7 @@ backend/
 - Test: `user/ProfileApiTest.java`, `catalog/CatalogApiTest.java`, `catalog/FixtureSeederTest.java`
 
 **Interfaces:**
-- Produces: `FixtureSeeder.seedIfEmpty()` — `fixtures/*.json`(계약 7장)을 읽어 비어 있는 테이블에만 넣음, `app.seed.enabled=true`일 때 시작 시 실행. 다른 Task들의 엔티티 시드는 각 Task가 이 클래스에 메서드를 추가(`seedListings()`, `seedHousing()` …)
+- Produces: `FixtureSeeder.seedIfEmpty()` — `fixtures/*.json`(계약 7장)을 읽어 비어 있는 테이블에만 넣음, `app.seed.enabled=true`일 때 시작 시 실행. 다른 Task들의 엔티티 시드는 각 Task가 이 클래스에 메서드를 추가(`seedListings()`, `seedDorms()` …)
   - **픽스처 `id`를 그대로 저장**하고, 테이블마다 넣은 뒤 `select setval('<seq>', (select max(id) from <table>))`로 시퀀스를 맞춤 (이후 새로 만드는 행과 ID 충돌 방지)
   - `FixtureSeeder.demoUser(String nickname): long` — 후기·양도 글 픽스처의 `authorNickname`마다 데모 사용자를 만들어 ID 반환(이미 있으면 재사용). Task 10·11 시드에서 사용
 - Produces: `ProfileService.firstBuildingId(long userId): Optional<Long>` (Task 6, 8에서 도보 기준 건물로 사용), `ProfileService.budget(long userId): Optional<Budget>`, `record Budget(Long rentCap, Long depositCap)`
@@ -378,7 +382,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - `interface AddressPort { List<AddressDto> search(String q); }`
   - 카카오 카테고리 코드: 편의점 `CS2`, 지하철역 `SW8`. 세탁방·버스정류장은 키워드 검색(`코인세탁`, `버스정류장`)
 
-- [ ] **Step 1: 실패하는 테스트 작성** (포트는 `@MockBean`)
+- [x] **Step 1: 실패하는 테스트 작성** (포트는 `@MockBean` → 실제로는 `FakeWalkPort`·`FakePlacePort`·`FakeAddressPort` 를 `TestSupportConfig` 에 등록. 테스트마다 새 스프링 컨텍스트가 생기지 않게)
 ```java
 @Test void walk_ok()                    // GET /walk?... → $.minutes == 가짜 값
 @Test void walk_upstreamFails_502()     // WalkPort 예외 → 502, code UPSTREAM_FAILED
@@ -387,56 +391,153 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 @Test void nearby_radiusCappedAt500()   // radius=2000 → PlacePort가 500으로 호출됨
 @Test void walkService_caches()         // 같은 좌표 2회 → WalkPort 1회 호출
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*GeoApiTest' --tests '*WalkServiceTest'` → FAIL
-- [ ] **Step 3: 구현** — `RestClient`, 타임아웃 3초. 키는 `external.tmap.key`, `external.kakao.rest-key`
-  - **구현 전 확인할 것 (Task 5·6 진행 중 정리):**
-    - **실제 학과·건물 픽스처**(`contract/fixtures/departments.json`·`buildings.json`) 필요 — 과 건물 좌표가 도보 시간의 도착점. 좌표는 campus-data 저장소(건물 84곳, OSM 출입구·카카오 좌표)에서 뽑을 수 있음. 학과 5개와 주 건물, 입구 2개 이상은 사용자가 정함
-    - Task 6 의 임시 `WalkService`(항상 null)를 실제 구현으로 교체. 도보 필터는 "도보 시간을 모르면 제외"로 구현되어 있어 TMAP 장애 시 결과가 0건이 될 수 있음 → 이 동작을 유지할지 확인
-    - 카카오 주소 검색의 동은 `region_3depth_name`(법정동). 행정동(`region_3depth_h_name`)을 쓰면 표본이 0건이 되어 조용히 보류됨
-    - 통합 검색 보충(Task 14)은 주소 검색이 아니라 **키워드 검색**이어야 건물명이 잡힘
-    - campus-data 의 3D 원점은 사자상(37.5561486, 127.044341)으로 계약 4장 `ORIGIN`(정문 임시값)과 다름 → 프론트와 맞출 것 (서버는 위경도만 다뤄서 코드 영향 없음)
-- [ ] **Step 4: 통과 확인** → PASS
+- [x] **Step 2: 실패 확인** — `./gradlew test --tests '*GeoApiTest' --tests '*WalkServiceTest'` → FAIL
+- [x] **Step 3: 구현** — `RestClient`, 타임아웃 3초. 키는 `external.tmap.key`, `external.kakao.rest-key`
+  - **실제 응답으로 확인한 사실 (2026-11-07):**
+    - TMAP: `POST /tmap/routes/pedestrian?version=1`, 헤더 `appKey`, `startName`·`endName` 필수. 응답 GeoJSON, 첫 지점의 `totalTime`(초)·`totalDistance`(m), 경로는 `LineString` 들을 이은 것이고 좌표가 `[경도, 위도]`
+    - 카카오: 앱 설정에서 지도·로컬(OPEN_MAP_AND_LOCAL)을 켜야 함(꺼져 있으면 403). 편의점 `CS2`·지하철역 `SW8` 정상, **키워드 "버스정류장"은 0건**, "코인세탁"만으로는 "빨래방" 이름 가게를 놓침
+    - 주소 검색: `행당동 16-53` → 법정동 `행당동`, 행정동 `사근동`. 한양대(`왕십리로 222`)의 법정동은 `사근동` → **반드시 법정동(`region_3depth_name`)**
+  - **구현 반영:**
+    - 도보 분은 **올림**(506초 → 9분), 경로는 `[위도, 경도]` 로 바꾸고 연속 중복 점 제거, `gateId` 는 항상 null
+    - **캐시:** 도보 분은 메모리(Caffeine 24시간) + **DB `walk_cache` 30일**(`V5__walk_cache.sql`, 키 = 위경도 소수 4자리 + 건물 id). `/walk` 경로는 메모리 24시간만(DB에 경로 저장 안 함). 실패는 캐시하지 않음. 외부 API 약관상 결과 저장 조건은 확인하지 못함
+    - **차단 장치:** TMAP 연속 3번 실패 → 1분 동안 호출하지 않고 바로 null (목록 20건마다 3초씩 기다리는 것 방지)
+    - 캐시 저장은 **별도 트랜잭션**(`REQUIRES_NEW`)이고 실패해도 응답에 영향 없음 — 읽기 전용 트랜잭션(매물 목록) 안에서 저장하다 목록 전체가 500 이 나던 버그를 테스트가 잡아서 고침
+    - **버스정류장은 카카오 대신 서울시 공식 데이터:** 서울 열린데이터광장 「서울시 버스정류소 위치정보」(2026-09-02) 중 3D 범위(위도 37.548~37.574, 경도 127.022~127.063) 315곳을 `src/main/resources/geo/bus-stops.json` 으로 저장, `BusStopIndex` 가 거리로 찾음 (정류장은 거의 안 바뀌어서 실시간 API 대신 파일)
+    - 세탁방은 "코인세탁"·"빨래방" 두 키워드로 검색해 중복 제거
+    - 주변 시설은 카테고리마다 따로 실패 처리 → 카카오가 죽어도 버스정류장은 보여 줌. 결과는 편의점 → 세탁방 → 버스정류장 → 지하철역 순, 카테고리마다 가까운 순 최대 15곳, 1시간 메모리 캐시(일부라도 실패하면 캐시 안 함)
+    - 반경 기본 300m, 500 초과는 500으로, 1 미만은 400. 없는 건물로 `/walk` → 404
+    - Task 6 의 도보 필터 동작("도보 시간을 모르면 제외")은 유지
+    - Docker: `docker-compose.yml` 에 `MOLIT_KEY`·`TMAP_KEY`·`KAKAO_REST_KEY` 를 `.env` 에서 읽도록 추가(`.env.example` 양식). 없으면 도보 null·주소 502
+    - 통합 검색 보충(Task 14)은 주소 검색이 아니라 **키워드 검색**이어야 건물명이 잡힘 (그대로 Task 14로)
+- [x] **Step 4: 통과 확인** → PASS (실서버: 실제 TMAP 도보 시간·DB 캐시 저장, 실제 카카오 주소 검색 확인)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(geo): walk time, nearby places, address search with graceful fallback"`
 
-### Task 8: 청년안심주택 · 공고 · 구독 · 기숙사 · 대안 비교
+### Task 8: 청년안심주택(soco 수집) · 공고 · 구독 · 기숙사 · 대안 비교
+
+**정한 것 (2026-11-07, 사용자 결정):**
+| 항목 | 결정 | 비고 |
+|---|---|---|
+| 단지·주택형·공고 데이터 | **서버가 soco 를 매일 수집** (스펙 7장 수정) | 원래 계획은 사람이 JSON 작성. 공고가 수시로 올라와서 바꿈 |
+| 수집 대상 단지 | **대상 동(`DongAdjacency.dongs()`)에 있는 단지 자동** | 동은 카카오 주소 검색의 법정동 (매물·실거래와 같은 기준). 2026-11 기준 5곳: 청아진(홍익동)·라봄성동·한영스테이(마장동)·힐데스하임(용답동)·퀸즈W 청량리역(전농동, 인접 동이지만 사용자 결정으로 포함) |
+| 주택형 | **일반공급 + 청년 자격만** | 특별공급(소득 조건)·신혼부부 타입 제외 |
+| 공고 상태 | **일정 날짜로 계산** (저장값 아님) | 시간이 지나도 맞음. 계약 v1.5 |
+| 다음 일정 | **오늘 포함** | 마감 당일 D-day, Task 13 당일 알림과 맞음 |
+| 평면도 이미지 | **주소·지문(sha256)만 저장**, 파일 보관·앱 표시 안 함 | 이미지 → 타입·전용면적 연결표는 이미지를 보고 한 번 작성. 평면도 JSON·API는 Task 14 |
+| 기숙사 | **학기마다 모집요강 PDF 를 읽어 `dorms.json` 직접 입력** | PDF 가 이미지라 자동 수집 안 함. 2026-2학기 값 확보(모집요강 4·16쪽) |
+| 기숙사 id | **= 건물 id** (801 제1, 804 제2+한양테크노숙사, 805 개나리, 806 한누리, 810 제7) | 804 는 호실 유형 2개로 나눔 |
+| 대안 비교 | **보고 있는 매물보다 싼 것만**, 낮은 순 최대 3개씩 | 스펙 I19 "절약액". 없으면 빈 배열 (프론트는 빈 배열이면 비교 칸 숨김) |
+| 청년안심주택 필터 (스펙 C3) | `GET /housing` 에 `maxRent`·`maxDeposit`·`maxWalkMin`·`buildingId`·`bbox` + 응답 `minConvertedRent`·`walkMin` | Task 6 때 합의. 계약 v1.5 반영 |
+| soco 이용 조건 | 이용약관 페이지 없음(개인정보처리방침·저작권 표기만), `robots.txt` 없음 | 공개 정보, 1초 간격, 하루 1회 수준으로만 요청 |
+
+**soco 에서 받는 것 (2026-11-07 확인):**
+| 대상 | 방법 | 내용 |
+|---|---|---|
+| 단지 목록 | `POST /youth/pgm/home/yohome/yoHomeListJson.json` (`pageNum`, `rowCount`) → JSON | 101단지, `homeCode`·`homeName`·`adres`·`adresGu` |
+| 단지 상세 | `GET /youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=` → HTML | 좌표(`xpos`·`ypos`), 대표전화, 홈페이지, **일반공급 표**(구분·자격·보증금·월임대료·관리비), 평면도 `<img>` |
+| 모집공고 | `POST /youth/pgm/home/yohome/bbsListJson.json` (`bbsId=BMSR00015`, `pageIndex`) → JSON | 542건(10건/쪽), `boardId`·`nttSj`(제목)·`optn1`(게시일)·`content`(본문 HTML, `[공급일정]` 포함) |
 
 **Files:**
-- Create: `housing/Housing.java`, `housing/UnitType.java`, `housing/Announcement.java`, `housing/AnnouncementEvent.java`, `housing/Subscription.java`, `housing/HousingService.java`, `housing/HousingController.java`, `dorm/Dorm.java`, `dorm/DormRoomType.java`, `dorm/DormController.java`, `compare/AlternativeService.java`, `db/migration/V5__housing_dorm.sql`
-- Modify: `catalog/FixtureSeeder.java` (`seedHousing()`, `seedDorms()`), `listing/ListingController.java` (`/listings/{id}/alternatives`)
-- Test: `housing/HousingApiTest.java`, `dorm/DormApiTest.java`, `compare/AlternativeServiceTest.java`
+- Create:
+  - `housing/` — `EventType`, `AnnouncementStatus`, `AnnouncementStatusPolicy`, `HousingDtos`, `HousingService`, `HousingController`, `HousingIngestJob`
+  - `housing/soco/` — `SocoClient`(interface) + `SocoHttpClient`, `SocoParser`(목록 JSON·상세 HTML·공고 JSON, jsoup), `ScheduleParser`(본문 일정 → `EventType`·날짜), `SocoHome`·`SocoHomeDetail`·`SocoUnit`·`SocoNotice` record, `SocoApiException`
+  - `dorm/` — `DormService`(+`DormDto`·`RoomTypeDto`), `DormController`
+  - `compare/AlternativeService`, `common/SchedulingConfig`(`@EnableScheduling`)
+  - `db/migration/V6__housing_dorm.sql` (아래 "저장하는 데이터")
+  - `src/main/resources/fixtures/dorms.json`, `fixtures/floorplan-labels.json`
+  - 청년안심주택·기숙사는 **JPA 엔티티 없이 `JdbcTemplate`** 으로 읽고 쓴다. 수집이 soco 번호 기준 `insert … on conflict do update` 로 id 를 유지해야 해서 (계획의 엔티티 파일들은 만들지 않음)
+- Modify: `catalog/FixtureSeeder.java`(`seedDorms()`만, 테이블이 비었을 때만. 청년안심주택은 수집으로 들어오므로 `housing.json`·`announcements.json` 픽스처 없음), `listing/ListingController.java`(`/listings/{id}/alternatives`), `listing/ListingQuery.java`(`Bbox.parse`·`contains` 를 매물·청년안심주택이 같이 씀), `application.yml`(`app.housing-ingest.*`, `external.soco.base-url`), `build.gradle.kts`(jsoup 1.18.3)
+- Test: `housing/soco/SocoParserTest`, `housing/soco/ScheduleParserTest`, `housing/AnnouncementStatusPolicyTest`, `housing/HousingIngestJobTest`, `housing/HousingApiTest`(+`HousingFixtures`), `dorm/DormApiTest`, `compare/AlternativeApiTest`, `support/FakeSocoClient`
+- Test resources: `soco/home-list.json`, `soco/view-cheongajin.html`, `soco/view-labom.html`, `soco/notices.json` (실제 응답을 줄여서 저장), `soco/floorplan-labels.json`, `test-fixtures/dorms.json`
+
+**저장하는 데이터 (V6):**
+| 테이블 | 칸 | 채우는 곳 |
+|---|---|---|
+| `housing` | `id`, `soco_home_code`(unique), `name`, `address`, `dong`(법정동), `lat`·`lng`, `contact`(대표전화), `homepage_url`, `floor_layout_image_url`(지금은 비어 있음), `updated_at` | 수집 |
+| `housing_unit_types` | `id`, `housing_id`, `name`(예 `18타입(18.22)`, `19A`), `room_kind`(원룸·1.5룸), `exclusive_area_m2`(**전용면적만**), `deposit`, `rent`, `mgmt_fee`, `floorplan_id`(Task 14, 수집이 덮어쓰지 않음). unique `(housing_id, name)` | 수집 (일반공급·청년만) |
+| `announcements` | `id`, `soco_board_id`(unique), `housing_id`, `title`, `additional`(제목에 추가모집), `posted_on` | 수집 (최근 12개월, 지나면 삭제) |
+| `announcement_events` | `id`, `announcement_id`, `type`(`NOTICE`~`MOVE_IN`), `event_date`. unique `(announcement_id, type)` → 다시 수집해도 id 유지 (Task 13 알림이 참조) | 수집 |
+| `housing_subscriptions` | `user_id`, `housing_id`, `created_at`. PK `(user_id, housing_id)` | API |
+| `housing_floorplan_images` | `housing_id`, `position`, `url`(unique, soco 경로), `sha256`, `unit_type_name`(연결표로 채움) | 수집 (이미지 파일은 저장 안 함) |
+| `dorms` | `id`(= 건물 번호), `name`, `lat`·`lng`(buildings 에서 복사) | `dorms.json` 시드 |
+| `dorm_room_types` | `id`, `dorm_id`, `name`(성별 포함), `capacity`, `semester_fee`, `semester_months`, `meal_included`, `floorplan_id` | `dorms.json` 시드 |
+
+- **저장하지 않고 응답할 때 계산:** 공고 `status`·단지 `recruiting`·`nextEvent`(일정 날짜와 오늘), 주택형 `convertedRent`·단지 `minConvertedRent`(전환율 설정값), 기숙사 `monthlyCost`, `walkMin`(도보 캐시), 구독 여부
+- 외래키 없음: `floorplan_id`(평면도 테이블이 Task 14), `dorms.id`→`buildings.id`(시드에서 존재 확인)
 
 **Interfaces:**
-- Consumes: Task 4 `PriceCalculator.convertedRent`, Task 7 `WalkService.minutesOrNull`
+- Consumes: Task 4 `PriceCalculator.convertedRent`, Task 5 `DongAdjacency.dongs()`, Task 7 `WalkService.minutesOrNull`, `AddressPort`(법정동), `ProfileService.firstBuildingId`
 - Produces:
-  - `HousingService.recruiting(long housingId, LocalDate today): boolean`, `HousingService.nextEvent(long housingId, LocalDate today): Optional<EventDto>`
-  - `HousingService.subscriberIds(long housingId): List<Long>`, `HousingService.eventsOn(LocalDate date): List<AnnouncementEvent>` (Task 13)
-  - `DormRoomType.monthlyCost(): long` = `Math.round((double) semesterFee / semesterMonths)`
-  - `AlternativeService.forListing(long listingId, Long buildingId): AlternativesDto` — 청년안심주택 주택형·기숙사 호실을 환산 월세 낮은 순 최대 3개, `monthlyDiff = listing.convertedRent − alt.convertedRent`, `twoYearDiff = monthlyDiff × 24`. 응답 `id` = 단지·기숙사 ID (계약 3장 Alternative)
+  - `HousingService.subscriberIds(long housingId): List<Long>`, `HousingService.eventsOn(LocalDate date): List<EventOn>` — `EventOn(eventId, announcementId, housingId, housingName, type, date)` (Task 13)
+  - `HousingService.unitOptions(): List<UnitOption>` (대안 비교용)
+  - `AnnouncementStatusPolicy.statusOf(Map<EventType, LocalDate> events, boolean additional, LocalDate today): AnnouncementStatus`
+  - `DormService.RoomTypeDto.monthlyCost` = `Math.round((double) semesterFee / semesterMonths)`
+  - `AlternativeService.forListing(long listingId, Long buildingId, Long userIdOrNull): AlternativesDto` — 매물 환산 월세보다 **낮은** 주택형·호실만, 낮은 순 최대 3개씩. `monthlyDiff = listing − alt`(항상 양수), `twoYearDiff = monthlyDiff × 24`, `id` = 단지·기숙사 id. 기준 건물이 없으면 로그인 사용자의 첫 번째 건물
+  - `HousingIngestJob.run(LocalDate today): Report(homes, announcements, unlabeledImages, failures)` — `@Scheduled(cron = "0 0 6 * * *", zone = "Asia/Seoul")` + 켜져 있고 단지가 비어 있으면 기동 시 1회. 설정 `app.housing-ingest.enabled`(환경 변수 `HOUSING_INGEST_ENABLED`, 기본 false), `districts: 성동구,동대문구`, `notice-months: 12`, `request-interval-ms: 1000`, `labels-location`
   - 테스트용 오늘 날짜는 `Clock` 빈 주입
+
+**수집 규칙:**
+- 단지: 목록 전체 → 상세 HTML → 주소로 법정동 확인 → 대상 동이면 저장. `homeCode` 기준 덮어쓰기(단지 id 유지 → 구독 유지). 목록에서 사라진 단지는 지우지 않음
+- 주택형: 상세의 **일반공급** 표에서 신청자격 `청년` 행만. 이름 = 구분 칸(예 `18타입(18.22)`, `19A`). 전용면적 = 괄호 안 값, 없으면 연결표 값, 둘 다 없으면 이름의 숫자. `(housing_id, name)` 기준 덮어쓰기 → **`floorplan_id` 는 덮어쓰지 않음**(Task 14 연결 보존)
+- 공고: 최신 쪽부터 읽고, 한 쪽이 전부 이미 저장된 `boardId` 이거나 게시일이 12개월(`app.housing-ingest.notice-months: 12`)보다 오래되면 멈춤. 12개월보다 오래된 공고는 DB 에서도 지움. 제목을 정규화(공백·괄호·`청년주택` 제거)해 단지 이름이 들어 있으면 그 단지 공고. 제목에 `추가모집` → 추가모집
+- 일정(`[공급일정]` 본문): `모집공고`→`NOTICE`, `청약신청 A ~ B`→`APPLY_START`=A·`APPLY_END`=B, `서류…제출 … ~ B`→`DOCS_DUE`=B, `…발표`→`RESULT`, `계약체결`→`CONTRACT`(시작일), `입주지정기간`→`MOVE_IN`(시작일). `‘26. 07. 17.` 두 자리 연도, 범위 끝은 시작의 연도를 이어 씀. `개별 안내`·`추후` → 건너뜀
+- 평면도 이미지: 상세의 평면도 `<img>` 주소와 sha256 저장. `floorplan-labels.json` 에 없는 지문이면 경고 로그(새 평면도·바뀐 평면도 → 연결표 갱신 필요)
+- 실패: 한 단지·한 공고 파싱 실패는 건너뛰고 로그, soco 접속 실패는 이번 실행 중단. 기존 DB 데이터는 그대로
+
+**공고 상태 (오늘 기준):** 접수 시작 전 `UPCOMING` → 접수 기간(마감 당일 포함) `OPEN`/`ADDITIONAL` → 마감 후 발표 전 `CLOSED` → 발표일부터 `ANNOUNCED`. 접수 일정이 없으면 `CLOSED`
 
 - [ ] **Step 1: 실패하는 테스트 작성**
 ```java
-@Test void housing_recruitingFlag()    // OPEN 공고가 있는 단지 → recruiting true, 없는 단지 → false
-@Test void housing_nextEvent()         // clock=2026-11-07, 일정 11-05·11-10·11-20 → nextEvent.date "2026-11-10"
-@Test void announcements_filterByStatus() // ?status=OPEN → 전부 OPEN
-@Test void subscribe_idempotent()      // POST 두 번 → 둘 다 204, 구독 1건
+// SocoParserTest (저장한 실제 응답)
+@Test void homeList_parsesCodesAndAddresses()
+@Test void view_generalSupplyYouthOnly()   // 라봄: 19A·19B·20·25A·25B 5개, 39A·39B(신혼부부) 제외, 특별공급 제외
+@Test void view_areaFromParentheses()      // 청아진 18타입(18.22) → 18.22
+@Test void view_coordinatesPhoneImages()   // xpos·ypos, 02-6273-0266, 평면도 img 2개
+// ScheduleParserTest (실제 본문 문구)
+@Test void cheongajin_fullSchedule()       // 공고 26-07-07, 접수 07-17~07-20, 발표 07-21, 서류 ~07-29, 계약 08-06, 입주 08-17
+@Test void labom_individualNoticeSkipped() // 서류·계약 "개별 안내" → 없음
+@Test void hanyoung_resultAndContract()
+// AnnouncementStatusPolicyTest
+@Test void upcoming_open_closed_announced() // 접수 전·중·마감 당일·마감 후·발표일
+@Test void additionalWithinApply()          // 추가모집 + 접수 중 → ADDITIONAL
+// HousingIngestJobTest (FakeSocoClient·FakeAddressPort)
+@Test void onlyTargetDongs()               // 용답동 O, 중랑구 X
+@Test void runTwice_noDuplicates()
+@Test void rerun_keepsSubscriptionsAndFloorplanId()
+@Test void socoDown_keepsExistingData()
+@Test void unlabeledFloorplan_logged()
+// HousingApiTest
+@Test void housing_recruitingFlag()
+@Test void housing_nextEvent_includesToday() // clock=2026-11-07, 일정 11-05·11-07·11-20 → 11-07
+@Test void housing_filters_and_minConvertedRent() // maxRent, maxWalkMin+buildingId, 관리비 포함 환산 월세
+@Test void housing_subscribedFlag()        // 로그인 구독 → true, 비로그인 → false
+@Test void announcements_filterByStatusAndHousing()
+@Test void subscribe_idempotent()          // POST 두 번 → 204, 1건 / DELETE 없어도 204
 @Test void subscribe_guest401()
-@Test void dorm_monthlyCost()          // semesterFee 1_200_000, months 4 → monthlyCost 300000
-@Test void alternatives_sortedAndDiff() // 결과 housing 리스트 convertedRent 오름차순, size ≤ 3, twoYearDiff == monthlyDiff*24
+@Test void housing_unknown404()
+// DormApiTest
+@Test void dorm_monthlyCost()              // 1_137_000 / 4 → 284250
+@Test void dorm_detailWalkMin()
+@Test void dorm_unknown404()
+// AlternativeServiceTest
+@Test void alternatives_onlyCheaper_sortedAndDiff() // 싼 것만, 오름차순, ≤3, twoYearDiff == monthlyDiff*24
+@Test void alternatives_noneCheaper_empty()
+@Test void alternatives_unknownListing404()
 ```
-- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*HousingApiTest' --tests '*DormApiTest' --tests '*AlternativeServiceTest'` → FAIL
-- [ ] **Step 3: 구현** — 주택형 `convertedRent`는 `mgmtFee` 포함, 기숙사는 `monthlyCost`를 환산 월세로 사용
-  - **구현 전 확인할 것 (Task 6 진행 중 정리):**
-    - **스펙 C3 「청년안심주택 여부」 필터** — 세 문서(계약·두 계획) 모두에서 빠져 있음. 정리한 방식: **스위치(보여 줄지)는 프론트, 조건 적용은 백엔드.** `GET /housing` 에 `/listings` 와 같은 필터(`maxRent`·`maxDeposit`·`maxWalkMin`·`buildingId`·`bbox`, "조건을 만족하는 주택형이 하나라도 있으면 포함")를 추가하고, 목록 항목에 `minConvertedRent`(가장 싼 주택형)·`walkMin` 추가. 파라미터·필드 추가라 계약 0-2 상 자유 변경이지만 **계약에 적고 프론트에 알릴 것**
-    - 데이터는 사용자가 준비: `housing.json`(청아진 홍익동 133세대, 라봄성동 마장동 181세대 — 계약 최소 2단지, 더 넣어도 됨), `announcements.json`, `dorms.json`
-    - 주택형 환산 월세도 같은 전환율(4.6%)을 씀
-- [ ] **Step 4: 통과 확인** → PASS
-- [ ] **Step 5: 커밋** — `git commit -m "feat(housing,dorm): complexes, announcements, subscriptions, alternatives"`
+- [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*Soco*' --tests '*Schedule*' --tests '*AnnouncementStatus*' --tests '*HousingIngest*' --tests '*HousingApiTest' --tests '*DormApiTest' --tests '*AlternativeServiceTest'` → FAIL
+- [ ] **Step 3: 구현** — 주택형 `convertedRent`는 `mgmtFee` 포함·전환율 4.6%, 기숙사는 `monthlyCost`를 환산 월세로 사용
+- [ ] **Step 4: 통과 확인** → PASS. 실서버에서 수집 1회 실행해 4단지·공고·일정 확인
+- [ ] **Step 5: 커밋** — `git commit -m "feat(housing,dorm): soco ingest, announcements, subscriptions, dorms, alternatives"`
+- **실수집에서 발견해 고친 것:** 카카오 주소 검색이 라봄성동 지번(마장동 339-2)을 못 찾아 조용히 빠졌음 → 카카오 결과가 없거나 장애면 **주소 글자에서 동 이름**을 찾고(`dongFromText`), 그래도 없으면 실패로 기록
+- **남은 일:**
+  - ~~`floorplan-labels.json` 작성~~ → 완료(27장). 새 평면도가 올라오면 수집 로그의 "연결표에 없는 이미지" 경고를 보고 추가
+  - 참고: 퀸즈W 35A·35B 는 전용 20.00㎡ + 확장 15.22㎡ (이름 숫자가 전용면적이 아님). 우리는 전용면적만 저장
+  - 데모 날 접수 중인 공고가 없을 수 있음 → Task 16 에서 결정
+  - 807 게스트하우스 `DORM` 분류, 학과 건물·입구는 campus-data 원본 수정(Task 3 남은 일)
 
 ### Task 9: 찜
 
 **Files:**
-- Create: `favorite/Favorite.java`, `favorite/FavoriteService.java`, `favorite/FavoriteController.java`, `db/migration/V6__favorites.sql` (unique `(user_id, type, target_id)`)
+- Create: `favorite/Favorite.java`, `favorite/FavoriteService.java`, `favorite/FavoriteController.java`, `db/migration/V7__favorites.sql` (unique `(user_id, type, target_id)`)
 - Modify: `listing/ListingService.java` (`favorited` 채우기)
 - Test: `favorite/FavoriteApiTest.java`
 
@@ -461,7 +562,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 10: 양도 게시판 · 업로드
 
 **Files:**
-- Create: `transfer/Transfer.java`, `transfer/TransferService.java`, `transfer/TransferController.java`, `transfer/UploadController.java`, `transfer/StoragePort.java`, `transfer/LocalDiskStorage.java`, `db/migration/V7__transfers.sql`
+- Create: `transfer/Transfer.java`, `transfer/TransferService.java`, `transfer/TransferController.java`, `transfer/UploadController.java`, `transfer/StoragePort.java`, `transfer/LocalDiskStorage.java`, `db/migration/V8__transfers.sql`
 - Modify: `catalog/FixtureSeeder.java` (`seedTransfers()`)
 - Test: `transfer/TransferApiTest.java`
 
@@ -487,7 +588,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 11: 후기
 
 **Files:**
-- Create: `review/Review.java`, `review/ReviewController.java`, `db/migration/V8__reviews.sql`
+- Create: `review/Review.java`, `review/ReviewController.java`, `db/migration/V9__reviews.sql`
 - Test: `review/ReviewApiTest.java`
 
 **Interfaces:**
@@ -509,7 +610,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 12: 내 집 기록 · 월간 리포트 · 만료 알림 설정
 
 **Files:**
-- Create: `home/Home.java`, `home/Payment.java`, `home/Utility.java`, `home/ExpiryAlert.java`, `home/HomeController.java`, `home/ReportService.java`, `db/migration/V9__home.sql`
+- Create: `home/Home.java`, `home/Payment.java`, `home/Utility.java`, `home/ExpiryAlert.java`, `home/HomeController.java`, `home/ReportService.java`, `db/migration/V10__home.sql`
 - Test: `home/HomeApiTest.java`, `home/ReportServiceTest.java`
 
 **Interfaces:**
@@ -538,7 +639,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 13: 알림 생성 스케줄러 · 알림함
 
 **Files:**
-- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V10__notifications.sql` (unique `(user_id, type, source_id, ref_date, days_before)` 로 중복 생성 방지)
+- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V11__notifications.sql` (unique `(user_id, type, source_id, ref_date, days_before)` 로 중복 생성 방지)
   - `source_id` = 공고 일정(`announcement_events.id`) 또는 만료 알림 설정(`expiry_alerts.id`), `ref_date` = 그 일정 날짜 또는 `contractEnd`, `days_before` = 7·1·0 또는 설정값
   - 기존 키 `(user_id, type, target_id, ref_date)`는 같은 일정의 D-7·D-1·당일이 같은 키가 되어 하나만 저장되므로 쓰지 않음
 - Test: `notification/NotificationJobTest.java`, `notification/NotificationApiTest.java`
@@ -565,7 +666,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 14: 통합 검색 · 평면도
 
 **Files:**
-- Create: `search/SearchService.java`, `search/SearchController.java`, `floorplan/FloorPlan.java`, `floorplan/FloorPlanController.java`, `db/migration/V11__floorplans.sql`
+- Create: `search/SearchService.java`, `search/SearchController.java`, `floorplan/FloorPlan.java`, `floorplan/FloorPlanController.java`, `db/migration/V12__floorplans.sql`
 - Modify: `catalog/FixtureSeeder.java` (`seedFloorPlans()`)
 - Test: `search/SearchApiTest.java`, `floorplan/FloorPlanApiTest.java`
 
@@ -629,7 +730,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 - Test: `src/test/java/com/chatatda/api/ContractSmokeTest.java`
 
 **Interfaces:**
-- Produces: 환경 변수 `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `MAIL_*`, `MOLIT_KEY`, `TMAP_KEY`, `KAKAO_REST_KEY`, `CORS_ALLOWED_ORIGINS`, `FRONT_BASE_URL`
+- Produces: 환경 변수 `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `MAIL_*`, `MOLIT_KEY`, `TMAP_KEY`, `KAKAO_REST_KEY`, `HOUSING_INGEST_ENABLED`, `CORS_ALLOWED_ORIGINS`, `FRONT_BASE_URL`
 
 - [ ] **Step 1: 실패하는 테스트 작성** — 계약 5장의 모든 GET 엔드포인트를 픽스처 시드 상태에서 한 번씩 호출해 2xx(또는 `/me/*`는 토큰으로 2xx)인지 확인하는 표 기반 테스트 `allContractGetsRespond()`
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*ContractSmokeTest'` → 누락 엔드포인트가 있으면 FAIL
@@ -640,6 +741,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
     - 배포용 `JWT_SECRET`은 로컬과 다른 값
     - 무료 플랜의 잠들기(09:00 알림·WebSocket 중단), 업로드 파일이 재배포 때 사라지는지 확인
     - `CORS_ALLOWED_ORIGINS`에 배포 프론트 주소 추가, `SEED_ENABLED` 결정
+    - **청년안심주택 수집 켜기**: `HOUSING_INGEST_ENABLED=true` (단지가 비어 있으면 기동 시 1회 + 매일 06:00, 1~2분). 서버가 잠드는 무료 플랜이면 06:00 수집이 빠질 수 있음. 데모 날 접수 중인 공고가 없을 때 대책도 여기서 결정
     - **배포 DB에서 실거래 첫 수집** (`INGEST_ENABLED=true`로 1회 기동, 1~2분), `MOLIT_KEY` 환경 변수. 달이 바뀌면 최근 12개월이 유지되도록 **매달 재수집**할지 정할 것 (지금은 수동 실행만)
     - 배포 DB 후보: 서버와 DB를 한 곳에(Railway 등) 또는 DB만 따로(Supabase·Neon 등, 스프링 서버는 별도). 무료 플랜의 잠들기·일시 정지 조건을 확인하고 결정. 프론트는 DB에 직접 붙지 않으므로 API 주소만 바뀜
 - [ ] **Step 4: 통과 확인** — 전체 `./gradlew test` → PASS, 배포 주소의 `/api/v1/health` 200, `/swagger-ui.html` 열림, 프론트 담당에게 배포 주소 공유
