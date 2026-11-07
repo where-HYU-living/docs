@@ -250,17 +250,17 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 |---|---|---|---|---|---|---|---|
 | B1 | 3D 동네 맵 | 접속하면 캠퍼스 3D | `world/WorldCanvas.tsx`, `world/buildWorld.js`, `zones/*`, `public/world.json` | 부분 | 5개 역을 잇는 연속 맵이 아니라 캠퍼스 + 집 주변 조각 12곳(B11) 구조. 월드 전환마다 geometry ~20·texture ~8 누수(3-4) | 해당없음 | - |
 | B2 | 캐릭터 걷기 | WASD/방향키, 모바일 조이스틱 | `player.js`, `WorldLayer.tsx` | 완료 | - | 해당없음 | - |
-| B3 | 건물 말풍선 | 매물·단지·기숙사·양도 가격 필, 클릭 → 상세 | `ListingMarkers.tsx`, `PlaceMarkers.tsx`, `TransferMarkers.tsx` · `buildWorld.js setMarkers` | 부분 | 거리 숨김이 CSS2DRenderer 에 덮여 먼 말풍선까지 전부 뜸(3-1 A). 겹침 처리·최대 개수 없음 | 해당없음 | - |
-| B4 | 순간이동 | 목록·지도·검색 선택 → 그 건물 앞 | `goTo.ts`, `state/area.ts`, `NeighborhoodHud` | 부분 | 동네 월드에서 캠퍼스 좌표로 가는 경로가 캠퍼스 투어에서 빠짐(3-1 B) | 해당없음 | - |
-| B5 | 캠퍼스 입구·과 건물 표시 | 정문·후문 아치, '내 과 건물' 말풍선 | `WorldEffects.tsx`, `world/campus.ts` | 완료 | 라벨 겹침은 B3 과 같이 처리 | 해당없음 | - |
+| B3 | 건물 말풍선 | 매물·단지·기숙사·양도 가격 필, 클릭 → 상세 | `ListingMarkers.tsx`, `PlaceMarkers.tsx`, `TransferMarkers.tsx` · `buildWorld.js setMarkers` | 완료 | - | 해당없음 | - |
+| B4 | 순간이동 | 목록·지도·검색 선택 → 그 건물 앞 | `goTo.ts`, `state/area.ts`, `NeighborhoodHud` | 완료 | - | 해당없음 | - |
+| B5 | 캠퍼스 입구·과 건물 표시 | 정문·후문 아치, '내 과 건물' 말풍선 | `WorldEffects.tsx`, `world/campus.ts` | 완료 | - | 해당없음 | - |
 | B6 | 캐릭터 꾸미기 | 상단 [의상] → 잠바·머리·피부 | `app/avatar/AvatarPicker.tsx`, `world/avatar.ts` · WS `look` | 완료 | - | 완료 | - |
 | B7 | 멀티플레이 공유 월드 | 접속하면 다른 사람 캐릭터가 보임 | `net/*` · WS `/ws/world` (`world/WorldSocketHandler`, `WorldService`) | 부분 | 월드(캠퍼스↔동네) 바꿀 때마다 소켓을 끊고 다시 붙음(api 의존) → 상대에게 퇴장·입장으로 보임. 다른 월드에 있는 사람 처리 없음 | 완료 | - |
 | B8 | 초대 링크 | [초대] → 링크 복사 → 받은 사람은 옆에 스폰 | `InviteButton.tsx`, `net/useMultiplayer.ts` · `POST /invites` | 부분 | 초대한 사람이 동네 월드에 있으면 받은 사람은 캠퍼스 월드에서 그 좌표로 순간이동 → 월드 밖 | 완료 | - |
 | B9 | 이모트·채팅 | 하단 [같이 걷기] 이모트·40자 채팅 | `WorldChat.tsx` · WS `emote`, `chat` | 완료 | - | 완료 | - |
-| B10 | **new** 캠퍼스 투어 | [캠퍼스 투어] 탭 → 건물 검색 → 클릭 → 그 건물 앞 | `CampusTourPanel.tsx`, `campusSearch.ts`, `data/campusPlaces.json` | 부분 | 동네 월드에서 누르면 이동 안 됨(3-1 B) | 해당없음 | - |
+| B10 | **new** 캠퍼스 투어 | [캠퍼스 투어] 탭 → 건물 검색 → 클릭 → 그 건물 앞 | `CampusTourPanel.tsx`, `campusSearch.ts`, `data/campusPlaces.json` | 완료 | - | 해당없음 | - |
 | B11 | **new** 집 주변 동네 월드 (매물 7·단지 5) | 상세 [주변 걸어보기] / 검색 → 동네 조각 3D, [캠퍼스로] | `NeighborhoodButton.tsx`, `state/area.ts`, `world/neighborhood.ts`, `world/serviceArea.ts`, `public/neighborhoods/*.json` | 완료 | 전환 누수(3-4), 캠퍼스 복귀 후 위치 복원 검증 필요 | 해당없음 | - (데이터는 campus-data) |
 | B12 | **new** 품질 프리셋 | `?q=high|med|low`, 기기 자동 | `quality.ts` | 완료 | - | 해당없음 | - |
-| B13 | **new** 랜드마크 이름표·역 출구 | 본관·역사관·애지문·노천극장 이름표, 지하철 출구 | `buildWorld.js labels`, `landmarks.js` | 부분 | B3 과 같은 원인으로 거리 숨김이 안 먹음(3-1 A) | 해당없음 | - |
+| B13 | **new** 랜드마크 이름표·역 출구 | 본관·역사관·애지문·노천극장 이름표, 지하철 출구 | `buildWorld.js labels`, `landmarks.js` | 완료 | - | 해당없음 | - |
 | B14 | **new** WebGL 컨텍스트 손실 복구 | GPU 리셋 시 안내·재시작 | `world/contextLoss.ts` | 완료 | - | 해당없음 | - |
 | B15 | **new** 동네 월드 지형·건물·가로등 | 동네 조각 지형(수치지도)·건물·가로등 | `world/streetlamps.ts`, `worldExtras.js` | 완료 | - | 해당없음 | - |
 

@@ -9,7 +9,15 @@
 - Phase 2-1: complete — backend `27c14ef`(신규 API 8묶음+알림 잡, `CommunityApiTest` 5건). 테스트: backend `gradlew test` 293/293 통과, 로컬 서버 스모크(검색·후기 201·내 집·리포트·알림) 통과
 - Phase 2-2: complete — frontend `efed957` + I19 커밋(관리비 필터·양도 글 고치기·내 집 달 선택·지난 기록·전환율 4.6%·외형 문구·내 집 대비). 테스트: vitest 343/343, tsc 0
 - Phase 2-3: complete — backend 초대 `expiresAt`. 테스트: WorldSocketIT 통과. K2 외부 저장소는 보류(범위 밖)
-- Phase 3-1: QA 버그(A 라벨, B 캠퍼스 투어) — 진행 중
+- Phase 3-1: complete — frontend `ddb3f0d`. 테스트: vitest 347/347, `scripts/labels-check.mjs`(전 최대 862m·겹침 2쌍 → 후 70m·0쌍), `scripts/tour-check.mjs`(12동네×3항목 36/36, h2 전체 63/63, 캠퍼스 안 63/63)
+- Phase 3-2: 상단바 — 진행 중
+
+### 3-1 결과
+| 버그 | 회귀 원인 | 수정 | 전 | 후 |
+|---|---|---|---|---|
+| A 먼 라벨 | 110f243 의 거리 숨김(`style.display`)을 R3F `Post` 의 `CSS2DRenderer.render` 가 매 프레임 덮어씀(three r180 은 display 를 직접 씀). 이식 전엔 렌더 순서가 달라 가려져 있었음 | `src/world/labelCull.ts pickLabels` — 거리(말풍선 60m·이름표 90m)·화면 안·우선순위(내 집·과 건물 3, 입구 2, 랜드마크 1)·겹침 제거·최대 14개, `object.visible` 로 숨김 (0.1초마다) | 사자상 앞 보임 11·최대 862m·겹침 2 / 본관 사이 8·691m·1 / 동쪽 2·420m | 1·13m·0 / 0 / 0 / 말풍선 앞 2·70m·0 |
+| B 동네→캠퍼스 투어 | `CampusTourPanel` 이 지금 월드(동네)의 `api.goToPlace` 에 캠퍼스 좌표를 넘김(빈자리 못 찾음). 지도 캠퍼스 핀도 같음 | `goTo.ts useGoToCampus` — 동네면 `useArea.goTo('campus', x, z)` → 도착 후 `NeighborhoodHud` 가 이동 | h2/l18 에서 120초 동안 이동 없음 | 36/36·63/63 통과, 건물까지 25m, 전환 1.5~1.8초 |
+
 
 ### 2-1 프론트↔백엔드 어긋남 표
 | # | 항목 | 프론트 | 백엔드(이전) | 판단 기준 | 결과 |
@@ -47,3 +55,5 @@
 - Ruling: 백엔드에 없는 8개 API 는 계약 문서(기준 문서)에 이미 정의돼 있으므로 백엔드를 계약대로 구현(프론트를 바꾸지 않음). 틀리면 비용: 백엔드 담당과 필드 협의 1회.
 - Ruling: 새 테이블은 JPA 엔티티 없이 JdbcTemplate(기존 DormService 방식). 이유: ddl validate 부담·코드량 감소. 틀리면 비용: 엔티티 전환 시 리팩터 1회.
 - Ruling: 양도 사진 외부 저장소(S3 등) 전환은 외부 서비스 설정이라 하지 않고 보류로 기록. 틀리면 비용: 재배포 때 데모 사진 재업로드.
+- Ruling: 3-1 B '12개 동네 전부에서 각 항목' 은 동네마다 첫·가운데·마지막 3항목 + 신고된 h2 는 63항목 전부 + 캠퍼스 안 63항목 전부로 검증. 이유: 항목 이동 로직은 항목과 무관하게 같은 경로(useGoToCampus)라 표본으로 충분, 전수는 12×63 월드 로드(약 40분). 틀리면 비용: `node scripts/tour-check.mjs --items=63` 한 번.
+- Ruling: 말풍선 최대 거리 60m·이름표 90m 는 110f243 의 원래 값을 유지하고 최대 14개·겹침 제거를 더함. 틀리면 비용: 상수 2개 조정.
