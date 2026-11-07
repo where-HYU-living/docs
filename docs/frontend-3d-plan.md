@@ -1,6 +1,6 @@
 # 프론트·3D Implementation Plan (담당: 김준형)
 
-> **현재 구현 상태 (2026-11-07 갱신):** 3D 층은 **R3F `<Canvas>`(`@react-three/fiber`) + 순수 three.js 장면 조립(`buildWorld`)** 으로 동작합니다. 아래 문서의 `ecctrl`·`@react-three/rapier`·`drei`는 **도입하지 않았습니다** (충돌은 `PolyIndex` 다각형 조회로 충분하고 wasm·물리 바디 비용만 늡니다). Task 4·5·17의 파일 구조(`src/world/Buildings.tsx` 등)는 계획이며 실제 구조와 다릅니다. 실제 구조·규칙은 `frontend/CLAUDE.md`, 성능 개선 이력은 `frontend/docs/superpowers/plans/2026-11-07-3d-perf-and-r3f-port.md` 를 보세요. 품질 프리셋(`?q=high|med|low`)이 있어 성능 목표(30fps·draw call)는 프리셋별로 측정합니다.
+> **현재 구현 상태 (2026-11-07 갱신):** 3D 층은 **R3F `<Canvas>`(`@react-three/fiber`) + 순수 three.js 장면 조립(`buildWorld`)** 으로 동작합니다. 아래 문서의 `ecctrl`·`@react-three/rapier`·`drei`·MSW(목 서버)는 **도입하지 않았습니다** (충돌은 `PolyIndex` 다각형 조회로 충분하고, 서버는 목 없이 실서버 API 에 바로 붙입니다). 파일 구조는 계획과 다르게 `src/app/`(메뉴 패널)·`src/api/`·`src/net/`·`src/interior/`·`src/world/` 입니다. 구현된 화면: 집 찾기(목록·필터·상세·판결 카드)·후기·찜(+찜 목록)·기숙사·청년안심주택(공고 캘린더·D-day 구독)·양도 게시판·내 집 기록(월간 리포트·만료 알림)·알림함·로그인/온보딩·상단 통합 검색·카카오 2D 지도(매물 핀)·실내 3D(평면도→벽 조각)·멀티플레이(재접속·보간·이모트·채팅·초대)·캠퍼스 투어. 서버에 아직 없는 API 는 화면이 빈 상태/오류 문구로 안전하게 보입니다. 실제 구조·규칙은 `frontend/CLAUDE.md`, 성능 개선 이력은 `frontend/docs/superpowers/plans/2026-11-07-3d-perf-and-r3f-port.md` 를 보세요. 품질 프리셋(`?q=high|med|low`)이 있어 성능 목표(30fps·draw call)는 프리셋별로 측정하며, draw call 200 이하 목표는 현재 미달성(med 697, low 346)입니다.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
