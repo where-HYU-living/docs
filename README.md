@@ -8,5 +8,10 @@
 | [docs/api-contract.md](docs/api-contract.md) | **API·WebSocket·좌표·픽스처 계약 (기준 문서)** | 전원 |
 | [docs/backend-plan.md](docs/backend-plan.md) | 백엔드 구현 계획 | 장시현 |
 | [docs/frontend-3d-plan.md](docs/frontend-3d-plan.md) | 프론트·3D 구현 계획 | 김준형 |
+| [docs/research/api-데이터-현황.md](docs/research/api-데이터-현황.md) | 쓰는 공공 API·데이터 현황과 신청 계획 | 전원 |
+| [docs/research/3d-한양대-따오기.md](docs/research/3d-한양대-따오기.md) | 한양대 3D 데이터 소스 조사 | 김준형 |
+| [docs/research/okrs-주제재해석.md](docs/research/okrs-주제재해석.md) | 주제 재해석·방향 조사 | 전원 |
+
+건물 자료실·3D 월드 데이터는 [campus-data](https://github.com/where-HYU-living/campus-data) 레포에 있습니다.
 
 계약 문서가 바뀌면 둘 다 확인한 뒤 머지합니다.
