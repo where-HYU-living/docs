@@ -180,6 +180,16 @@
 | GET | `/departments` | | `[{ "id", "name", "college", "defaultBuildingIds": [] }]` |
 | GET | `/buildings?type=` | `type` 생략 시 전체 | `[{ "id", "name", "type", "lat", "lng" }]` |
 
+**구글 로그인 (제안, 백엔드 확인 필요)**
+
+| 메서드 | 경로 | 요청 | 응답 |
+|---|---|---|---|
+| POST | `/auth/google` | `{ "idToken": "<구글 ID 토큰(JWT)>" }` | `/auth/email/verify` 와 같은 `{ accessToken, expiresIn, user }` |
+
+- 프론트가 Google Identity Services 버튼으로 받은 ID 토큰을 그대로 보낸다. `hd=hanyang.ac.kr` 는 계정 선택창 힌트일 뿐이라 **서버가 반드시 검증**한다: 구글 공개키로 서명·`aud`(우리 클라이언트 ID)·만료 확인, `email_verified` = true, 이메일이 `@hanyang.ac.kr` 로 끝나는지 확인.
+- 도메인이 다르면 `400 INVALID_EMAIL_DOMAIN`, 토큰이 잘못됐으면 `401 UNAUTHORIZED`(프론트는 "구글 로그인을 확인하지 못했어요"로 표시). 계정이 없으면 자동 생성(닉네임 규칙은 메일 인증과 동일).
+- 프론트 `VITE_GOOGLE_CLIENT_ID` 와 서버 설정의 클라이언트 ID 는 같은 값. 시크릿은 필요 없다.
+
 - 인증 코드: 숫자 6자리, 10분 유효, 재발송 60초 제한, 5회 틀리면 해당 코드 폐기
   - 1~4번째 오류 → `400 CODE_MISMATCH` / 5번째 오류 → `429 TOO_MANY_REQUESTS` + 코드 폐기 (이후 verify도 `429`, 재발송 필요)
   - 코드를 요청한 적 없는 메일로 verify → `400 CODE_MISMATCH`
