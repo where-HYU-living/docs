@@ -240,7 +240,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 |---|---|---|---|---|---|---|---|
 | A1 | 학교 메일 인증 | 상단 [로그인] → 메일 입력 → 코드 입력 | `app/LoginModal.tsx` · `POST /auth/email/send`, `/auth/email/verify` | 완료 | - | 완료 | - |
 | A2 | 전공·과 건물 등록 | [내 계정] → 학과 고르기 → 건물 추가/삭제 | `app/ProfileModal.tsx`, `DepartmentPicker`, `BuildingPicker` · `GET/PUT /me/profile`, `GET /departments`, `/buildings` | 완료 | - | 완료 | - |
-| A5 | 상단 통합 검색 + 탭 | 검색창 입력 → 결과(서버·카카오 장소·동네 12곳·랜드마크) 클릭 → 3D 이동 | `app/TopBar.tsx`, `features/search.ts`, `features/kakaoPlaces.ts`, `goTo.ts` · `GET /search` | 부분 | 서버 `/search` 연결됨(2-1). 지도 모드에서도 3D 로 튕김(3-3) | 완료 | - |
+| A5 | 상단 통합 검색 + 탭 | 검색창 입력 → 결과(서버·카카오 장소·동네 12곳·랜드마크) 클릭 → 3D 이동 | `app/TopBar.tsx`, `features/search.ts`, `features/kakaoPlaces.ts`, `goTo.ts` · `GET /search` | 완료 | - | 완료 | - |
 | A6 | 예산 목표 설정 | [내 계정] → 월세·보증금 상한 | `ProfileModal.tsx` · `PUT /me/profile` `budget` | 완료 | - | 완료 | - |
 | A7 | **new** 구글 로그인 | 로그인 창 [Google 로 계속] | `app/auth/GoogleButton.tsx` · `POST /auth/google` | 완료 | - | 완료 | - |
 | A8 | **new** 로그아웃·만료 처리 | [로그아웃], 401 이면 자동 로그아웃 | `state/session.ts`, `api/client.ts` | 완료 | - | 해당없음 | - |
@@ -267,12 +267,12 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 ### C. 지도 & 매물 검색 (2D)
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
-| C1 | 2D 지도 | [지도로 보기] → 핀 → 카드 → [3D로 가기] | `map/KakaoMap.tsx`, `map/geo.ts` | 부분 | 지도 안 검색 없음(상단 검색은 3D 로 튕김), 검색 결과 마커·정보 카드 없음, 단지·기숙사·양도 핀 없음, 서비스 밖 안내 없음(3-3) | 해당없음 | - |
+| C1 | 2D 지도 | [지도로 보기] → 핀 → 카드 → [3D로 가기] | `map/KakaoMap.tsx`, `map/geo.ts` | 완료 | - | 해당없음 | - |
 | C2 | 매물 목록 | [집 찾기] 카드 목록 → 클릭 → 상세 + 3D 이동 | `ListingsPanel.tsx`, `dossier/DossierCard.tsx` · `GET /listings` | 완료 | - | 완료 | - |
 | C3 | 필터 | [조건] 월세·보증금·도보·구조·등급·단지 표시 | `ListingsPanel.tsx`, `features/listings.ts` | 완료 | - | 완료 | - |
 | C6 | 찜하기 | 하트(카드·상세·말풍선·지도 카드) | `HeartButton.tsx`, `features/favorites.ts` · `POST/DELETE /me/favorites` | 완료 | - | 완료 | - |
 | C7 | 찜 목록 | 상단 하트 → 종류별 목록 → 클릭 → 3D | `FavoritesPanel.tsx` · `GET /me/favorites` | 완료 | - | 완료 | - |
-| C8 | **new** 지도 모드 검색·정보 카드·3D로 가기 | 지도에서 검색 → 마커·정보 카드(서비스 안/밖, 가까운 집) → [3D로 가기] | `map/KakaoMap.tsx`, `TopBar.tsx`, `goTo.ts` | 미구현 | 3-3 에서 구현 | 해당없음 | - |
+| C8 | **new** 지도 모드 검색·정보 카드·3D로 가기 | 지도에서 검색 → 마커·정보 카드(서비스 안/밖, 가까운 집) → [3D로 가기] | `map/KakaoMap.tsx`, `TopBar.tsx`, `goTo.ts` | 완료 | - | 해당없음 | - |
 
 ### D. 집 상세 & 판결
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
@@ -320,7 +320,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 ### I. 청년안심주택
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
-| I1 | 단지 지도·3D 표시 | 3D 단지 말풍선, 모집 중 빛 기둥 | `PlaceMarkers.tsx`, `WorldEffects.tsx` · `GET /housing` | 부분 | 2D 지도에는 단지 핀이 없음(3-3) | 완료 | - |
+| I1 | 단지 지도·3D 표시 | 3D 단지 말풍선, 모집 중 빛 기둥 | `PlaceMarkers.tsx`, `WorldEffects.tsx` · `GET /housing` | 완료 | - | 완료 | - |
 | I2 | 공개 평면도 3D | 단지 상세 주택형 [실내 보기] | `HousingPanel.tsx` · `GET /floorplans/{id}` | 완료 | - | 완료 | 평면도 JSON 검수(데이터) |
 | I3 | 단지 상세 | 주택형·보증금·월세·연락처 | `HousingPanel.tsx` · `GET /housing/{id}` | 완료 | - | 완료 | - |
 | I5 | 과 건물까지 도보 | 단지 카드 '도보 N분' | `walkMin` | 완료 | - | 완료 | - |
