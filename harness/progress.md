@@ -86,7 +86,7 @@
 - Phase 5-1: complete — 명세서 4-S 재갱신(Q8 추가, 커밋 기준 갱신, 상태·개선점 반영)
 - Phase 5-2: complete — `scripts/final-qa.mjs` 로 4-S 80줄 실행: 프론트 통과 72·부분 3·미구현 2·해당없음 3, 백엔드 통과 49·미구현 2·해당없음 29. 실패 7건 한 번 고침(제품 버그 B4·K4 → frontend `300f19b`, 나머지 스크립트) → 실패 0
 - Phase 5-3: complete — `harness/final-qa.md`
-- Phase 5-4: 전체 테스트 backend 293/293 · frontend vitest 360/360 · tsc 0 · build OK · campus-data 11/11 → main 푸시·배포 확인 — 진행 중
+- Phase 5-4: complete — 전체 테스트 초록(backend 293 · frontend 360 · tsc · build · campus-data 11) → main 푸시(backend e5df918, frontend 300f19b, docs) → Railway SUCCESS·health UP·새 API 200, Vercel Ready·라이브 번들 확인, 실서버 스모크 오류 0
 
 ### 3-1 결과
 | 버그 | 회귀 원인 | 수정 | 전 | 후 |
