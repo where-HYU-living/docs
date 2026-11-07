@@ -3,6 +3,8 @@
 > 한양대 신입생을 위한 3D 첫 집 찾기 서비스 (가칭: **찾았다**)
 > 작성일: 2026-11-07 / 상태: 팀 검토 반영본
 
+**2026-11-08 갱신**: 코드 기준 구현 상태 표(4-S) 추가 — 명세서에 없던 기능에 ID 부여(A7·A8, B10~B15, C8, E3·E4, F6, Q1~Q7), 프론트/백엔드 상태·개선점 열.
+
 **v0.5 변경 요약**
 - **찜하기** 추가 (C6, C7)
 - v0.4 검토에서 X 처리된 기능 제거 → 부록으로 이동 (E5, E7, E8, H9, I21, P4, K1, J2)
@@ -226,6 +228,147 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 | N1 | 용의자 파일 | 집 상세를 "용의자 프로필" 형식으로: 환산 월세, 적정가, 초과액, 등급 | **P0** | O | 김준형 |
 | N2 | 수배 전단 | 초과 등급 "범인" 매물을 수배 전단 카드로 (수치만, 비방 없음) | P2 | O | 김준형 |
 | N3 | 판결 & 비교 | 판결 카드 다음 화면에 근처 청년안심주택·기숙사와의 비교 ("청년안심주택 ○○, 2년 ○○○만 원 차이") | **P0** | O | 김준형 |
+
+## 4-S. 구현 상태 표 (작업 목록)
+
+> 2026-11-08 코드 기준(frontend `f9c60ea`, backend `e80e50a`). 이 표가 하네스 작업 목록이다. 단계가 끝날 때마다 해당 줄을 갱신한다.
+> 상태 값: **완료 / 부분 / 미구현 / 해당없음**. 개선점이 없으면 `-`. **new** = 코드에는 있으나 명세서에 없던 기능(이번에 ID 부여).
+> 파일 경로는 frontend `src/` · backend `com.chatatda.api` 기준. 엔드포인트는 `/api/v1` 생략.
+
+### A. 온보딩 & 내 정보
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| A1 | 학교 메일 인증 | 상단 [로그인] → 메일 입력 → 코드 입력 | `app/LoginModal.tsx` · `POST /auth/email/send`, `/auth/email/verify` | 완료 | - | 완료 | - |
+| A2 | 전공·과 건물 등록 | [내 계정] → 학과 고르기 → 건물 추가/삭제 | `app/ProfileModal.tsx`, `DepartmentPicker`, `BuildingPicker` · `GET/PUT /me/profile`, `GET /departments`, `/buildings` | 완료 | - | 완료 | - |
+| A5 | 상단 통합 검색 + 탭 | 검색창 입력 → 결과(서버·카카오 장소·동네 12곳·랜드마크) 클릭 → 3D 이동 | `app/TopBar.tsx`, `features/search.ts`, `features/kakaoPlaces.ts`, `goTo.ts` · `GET /search` | 부분 | 서버 `/search` 가 없어 매물·단지·기숙사·양도 결과가 비어 있음. 지도 모드에서도 3D 로 튕김(3-3) | 미구현 | `/search` 엔드포인트 없음 → 매물·단지·기숙사·양도·건물 이름 검색 + 주소 보충 구현 |
+| A6 | 예산 목표 설정 | [내 계정] → 월세·보증금 상한 | `ProfileModal.tsx` · `PUT /me/profile` `budget` | 완료 | - | 완료 | - |
+| A7 | **new** 구글 로그인 | 로그인 창 [Google 로 계속] | `app/auth/GoogleButton.tsx` · `POST /auth/google` | 완료 | - | 완료 | - |
+| A8 | **new** 로그아웃·만료 처리 | [로그아웃], 401 이면 자동 로그아웃 | `state/session.ts`, `api/client.ts` | 완료 | - | 해당없음 | - |
+
+### B. 3D 월드
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| B1 | 3D 동네 맵 | 접속하면 캠퍼스 3D | `world/WorldCanvas.tsx`, `world/buildWorld.js`, `zones/*`, `public/world.json` | 부분 | 5개 역을 잇는 연속 맵이 아니라 캠퍼스 + 집 주변 조각 12곳(B11) 구조. 월드 전환마다 geometry ~20·texture ~8 누수(3-4) | 해당없음 | - |
+| B2 | 캐릭터 걷기 | WASD/방향키, 모바일 조이스틱 | `player.js`, `WorldLayer.tsx` | 완료 | - | 해당없음 | - |
+| B3 | 건물 말풍선 | 매물·단지·기숙사·양도 가격 필, 클릭 → 상세 | `ListingMarkers.tsx`, `PlaceMarkers.tsx`, `TransferMarkers.tsx` · `buildWorld.js setMarkers` | 부분 | 거리 숨김이 CSS2DRenderer 에 덮여 먼 말풍선까지 전부 뜸(3-1 A). 겹침 처리·최대 개수 없음 | 해당없음 | - |
+| B4 | 순간이동 | 목록·지도·검색 선택 → 그 건물 앞 | `goTo.ts`, `state/area.ts`, `NeighborhoodHud` | 부분 | 동네 월드에서 캠퍼스 좌표로 가는 경로가 캠퍼스 투어에서 빠짐(3-1 B) | 해당없음 | - |
+| B5 | 캠퍼스 입구·과 건물 표시 | 정문·후문 아치, '내 과 건물' 말풍선 | `WorldEffects.tsx`, `world/campus.ts` | 완료 | 라벨 겹침은 B3 과 같이 처리 | 해당없음 | - |
+| B6 | 캐릭터 꾸미기 | 상단 [의상] → 잠바·머리·피부 | `app/avatar/AvatarPicker.tsx`, `world/avatar.ts` · WS `look` | 완료 | 안내 문구 "다른 접속자에게는 아직 보이지 않아요" 가 서버 구현 후에도 남아 있음 | 완료 | - |
+| B7 | 멀티플레이 공유 월드 | 접속하면 다른 사람 캐릭터가 보임 | `net/*` · WS `/ws/world` (`world/WorldSocketHandler`, `WorldService`) | 부분 | 월드(캠퍼스↔동네) 바꿀 때마다 소켓을 끊고 다시 붙음(api 의존) → 상대에게 퇴장·입장으로 보임. 다른 월드에 있는 사람 처리 없음 | 완료 | - |
+| B8 | 초대 링크 | [초대] → 링크 복사 → 받은 사람은 옆에 스폰 | `InviteButton.tsx`, `net/useMultiplayer.ts` · `POST /invites` | 부분 | 초대한 사람이 동네 월드에 있으면 받은 사람은 캠퍼스 월드에서 그 좌표로 순간이동 → 월드 밖 | 완료 | - |
+| B9 | 이모트·채팅 | 하단 [같이 걷기] 이모트·40자 채팅 | `WorldChat.tsx` · WS `emote`, `chat` | 완료 | - | 완료 | - |
+| B10 | **new** 캠퍼스 투어 | [캠퍼스 투어] 탭 → 건물 검색 → 클릭 → 그 건물 앞 | `CampusTourPanel.tsx`, `campusSearch.ts`, `data/campusPlaces.json` | 부분 | 동네 월드에서 누르면 이동 안 됨(3-1 B) | 해당없음 | - |
+| B11 | **new** 집 주변 동네 월드 (매물 7·단지 5) | 상세 [주변 걸어보기] / 검색 → 동네 조각 3D, [캠퍼스로] | `NeighborhoodButton.tsx`, `state/area.ts`, `world/neighborhood.ts`, `world/serviceArea.ts`, `public/neighborhoods/*.json` | 완료 | 전환 누수(3-4), 캠퍼스 복귀 후 위치 복원 검증 필요 | 해당없음 | - (데이터는 campus-data) |
+| B12 | **new** 품질 프리셋 | `?q=high|med|low`, 기기 자동 | `quality.ts` | 완료 | - | 해당없음 | - |
+| B13 | **new** 랜드마크 이름표·역 출구 | 본관·역사관·애지문·노천극장 이름표, 지하철 출구 | `buildWorld.js labels`, `landmarks.js` | 부분 | B3 과 같은 원인으로 거리 숨김이 안 먹음(3-1 A) | 해당없음 | - |
+| B14 | **new** WebGL 컨텍스트 손실 복구 | GPU 리셋 시 안내·재시작 | `world/contextLoss.ts` | 완료 | - | 해당없음 | - |
+| B15 | **new** 동네 월드 지형·건물·가로등 | 동네 조각 지형(수치지도)·건물·가로등 | `world/streetlamps.ts`, `worldExtras.js` | 완료 | - | 해당없음 | - |
+
+### C. 지도 & 매물 검색 (2D)
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| C1 | 2D 지도 | [지도로 보기] → 핀 → 카드 → [3D로 가기] | `map/KakaoMap.tsx`, `map/geo.ts` | 부분 | 지도 안 검색 없음(상단 검색은 3D 로 튕김), 검색 결과 마커·정보 카드 없음, 단지·기숙사·양도 핀 없음, 서비스 밖 안내 없음(3-3) | 해당없음 | - |
+| C2 | 매물 목록 | [집 찾기] 카드 목록 → 클릭 → 상세 + 3D 이동 | `ListingsPanel.tsx`, `dossier/DossierCard.tsx` · `GET /listings` | 완료 | - | 완료 | - |
+| C3 | 필터 | [조건] 월세·보증금·도보·구조·등급·단지 표시 | `ListingsPanel.tsx`, `features/listings.ts` | 부분 | 관리비 상한(`maxMgmtFee`) 입력 없음 | 완료 | - |
+| C6 | 찜하기 | 하트(카드·상세·말풍선·지도 카드) | `HeartButton.tsx`, `features/favorites.ts` · `POST/DELETE /me/favorites` | 완료 | - | 완료 | - |
+| C7 | 찜 목록 | 상단 하트 → 종류별 목록 → 클릭 → 3D | `FavoritesPanel.tsx` · `GET /me/favorites` | 완료 | - | 완료 | - |
+| C8 | **new** 지도 모드 검색·정보 카드·3D로 가기 | 지도에서 검색 → 마커·정보 카드(서비스 안/밖, 가까운 집) → [3D로 가기] | `map/KakaoMap.tsx`, `TopBar.tsx`, `goTo.ts` | 미구현 | 3-3 에서 구현 | 해당없음 | - |
+
+### D. 집 상세 & 판결
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| D1 | 기본 정보 | 상세 '기본 정보' | `ListingDetailView.tsx` · `GET /listings/{id}` | 완료 | - | 완료 | - |
+| D2 | 환산 월세 | 상세·카드 '환산' | `pricing/PriceCalculator` · `GET /listings/{id}/price-check` | 완료 | - | 완료 | - |
+| D3 | 적정 월세 & 초과액 | 판결 카드 수치·근거 | `VerdictCard.tsx`, `dossier/ExcessGauge.tsx` · `pricing/FairRentEstimator` | 완료 | - | 완료 | - |
+| D5 | 과 건물까지 도보 시간 | 카드·상세 '도보 N분' | `geo/WalkService`(TMAP) · `walkMin` | 완료 | 누르면 경로를 보여 주는 기능 없음(4단계 F6) | 완료 | - |
+| D7 | 최종 판결 카드 | 상세 상단 판결 문구 | `VerdictCard.tsx` | 완료 | - | 해당없음 | - |
+| D8 | 대안 추천 | '같은 예산에서 더 싼 매물' | `ListingDetailView.tsx cheaperListings` · `GET /listings/{id}/alternatives` | 완료 | - | 완료 | - |
+| D9 | 예산 대비 표시 | 판결 카드 '예산보다 ○만 원' | `dossierLogic.budgetLine` · price-check `budget` | 완료 | - | 완료 | - |
+
+### E. 집 내부 (3D 실내)
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| E1 | 실내 입장 | 문 마커 앞 E/탭, 상세 [실내 보기] | `world/doors.ts`, `WorldEffects.tsx`, `interior/InteriorScene.tsx` | 완료 | - | 해당없음 | - |
+| E2 | 평면도 기반 3D | 실내 걷기 | `interior/*` · `GET /floorplans/{id}` | 완료 | - | 완료 | AI 로 뽑은 JSON 중 id 1 만 검수 완료(나머지는 데이터 작업) |
+| E3 | **new** 방 투어 HUD | 방 바로가기·평면도 미니맵·조작법·시간대 | `interior/TourHud.tsx`, `Minimap.tsx`, `tourNav.ts` | 완료 | - | 해당없음 | - |
+| E4 | **new** 방 초대 링크 | 실내에서 링크 → 받은 사람이 같은 방 옆자리 | `net/useRoomInvite.ts`, `net/inviteLink.ts` (`?room=&at=`) | 완료 | - | 해당없음 | - |
+
+### F. 주변 & 등굣길
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| F1 | 과 건물까지 도보 경로·시간 | (경로는 4단계 F6) | `geo/GeoController` · `GET /walk` | 미구현 | `/walk` 를 쓰는 화면 없음 → F6 | 완료 | TMAP 키 없으면 직선거리 추정인지 응답에서 구분 불가 |
+| F3 | 언덕·계단 보정 | - | - | 미구현 | - | 미구현 | TMAP 보행 경로에 고도 없음. 지형 데이터로 보정 가능(P2) |
+| F5 | 집 주변 둘러보기 | 매물 선택 → 300m 편의점·세탁방·정류장·역 말풍선 | `WorldEffects.tsx` · `GET /listings/{id}/nearby` | 완료 | - | 완료 | - |
+| F6 | **new** 집 → 내 학과 건물 경로 | 상세 '도보 N분' 클릭 → 3D 바닥 경로 / 지도 폴리라인, 학과 미설정이면 안내 | (4단계) `GET /walk` | 미구현 | 4단계 | 완료 | `path` 좌표·`distanceM` 제공됨 |
+
+### G. 한양대생 후기
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| G1 | 건물 후기 작성·보기 | 상세 '한양대생 후기' → [후기 쓰기] | `ReviewSection.tsx` · `GET/POST /reviews` | 완료 | 서버가 없어 실서버에선 항상 '불러오지 못했어요' | 미구현 | `/reviews` 없음 |
+| G4 | 3D 실내 후기 핀 | 실내에서 바닥 클릭 → 핀 후기 | `interior/PinPanel.tsx`, `pins.ts`, `useIndoorReviews.ts` | 완료 | G1 과 같음 | 미구현 | `/reviews` 의 `pin` |
+
+### H. 내 집 기록
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| H1 | 내 집 등록 | [내 집 기록] → 주소·계약 정보 | `MyHomePanel.tsx` · `GET/PUT /me/home` | 완료 | 실서버에선 저장 실패 | 미구현 | `/me/home` 없음 |
+| H2 | 월세 납부 내역 | 월세 기록 추가 | `MyHomePanel.tsx` · `GET/POST /me/payments` | 완료 | 〃 | 미구현 | 〃 |
+| H3 | 공과금 기록 | 전기·가스·수도·인터넷 | `MyHomePanel.tsx` · `POST /me/utilities` | 완료 | 지난 기록 보기 없음(`GET /me/utilities` 안 씀) | 미구현 | 〃 |
+| H5 | 월간 리포트 | 월 고르기 → 총 주거비·지난달 대비·초과액 | `MyHomePanel.tsx` · `GET /me/report` | 완료 | 〃 | 미구현 | 〃 |
+| H6 | 계약 만료 알림 | 만료 N일 전 알림 추가·끄기·삭제 | `MyHomePanel.tsx` · `/me/home/alerts` | 완료 | 〃 | 미구현 | 알림 생성 스케줄러 없음 |
+| H8 | 거주자 평면도 등록 (△) | - | - | 미구현 | 후순위 | 미구현 | 후순위 |
+
+### I. 청년안심주택
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| I1 | 단지 지도·3D 표시 | 3D 단지 말풍선, 모집 중 빛 기둥 | `PlaceMarkers.tsx`, `WorldEffects.tsx` · `GET /housing` | 부분 | 2D 지도에는 단지 핀이 없음(3-3) | 완료 | - |
+| I2 | 공개 평면도 3D | 단지 상세 주택형 [실내 보기] | `HousingPanel.tsx` · `GET /floorplans/{id}` | 완료 | - | 완료 | 평면도 JSON 검수(데이터) |
+| I3 | 단지 상세 | 주택형·보증금·월세·연락처 | `HousingPanel.tsx` · `GET /housing/{id}` | 완료 | - | 완료 | - |
+| I5 | 과 건물까지 도보 | 단지 카드 '도보 N분' | `walkMin` | 완료 | - | 완료 | - |
+| I6 | 공고 캘린더 | [청년안심주택] → 공고 캘린더 | `HousingPanel.tsx`, `features/catalog.groupEventsByMonth` · `GET /housing/announcements` | 완료 | - | 완료 | - |
+| I7 | D-day 알림 | 단지 [알림 받기] | `useSubscribe` · `POST/DELETE /housing/{id}/subscribe` | 부분 | 알림함(Q1)이 서버 없음 | 부분 | 구독은 저장되지만 알림 생성(D-7·D-1·당일)·`/me/notifications` 없음 |
+| I8 | 진행 상태 배지 | 예정·접수 중·마감·발표·추가모집 | `STATUS_LABEL` · `AnnouncementStatusPolicy` | 완료 | - | 완료 | - |
+| I19 | 절약액 계산 | 판결 & 비교 '2년 ○○만 원 차이' | `CompareSection.tsx` · alternatives | 부분 | '내 집 대비' 비교 없음 | 완료 | - |
+
+### P. 기숙사 3D 투어
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| P1 | 캠퍼스 안 기숙사 표시 | 3D 기숙사 말풍선(월 환산) | `PlaceMarkers.tsx` · `GET /dorms` | 완료 | - | 완료 | - |
+| P2 | 기숙사 호실 3D 투어 | [기숙사] → 호실 [실내 보기] | `DormPanel.tsx` · floorplans 201~ | 완료 | - | 완료 | 평면도 201~206 데이터 검수 |
+| P3 | 기숙사 정보 카드 | 호실·인원·관비 → 월 환산·도보 | `DormPanel.tsx` · `GET /dorms/{id}` | 완료 | - | 완료 | - |
+
+### K. 양도 게시판
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| K2 | 양도 글 올리기 | [양도] → [양도 글 올리기] → 주소·금액·기간·사진 | `TransferPanel.tsx`, `AddressPicker.tsx`, `forms/PhotoGrid.tsx` · `POST /transfers`, `POST /uploads` | 완료 | - | 완료 | 업로드가 로컬 디스크(`LocalDiskStorage`) → Railway 재배포 때 사진 사라짐 |
+| K3 | 양도 글 보기 | 목록 → 상세(자동 판정·도보) | `TransferPanel.tsx` · `GET /transfers`, `/transfers/{id}` | 완료 | - | 완료 | - |
+| K4 | 양도 집 3D로 보기 | 상세 [3D로 보기] | `TransferMarkers.tsx`, `goTo.ts` | 완료 | - | 해당없음 | - |
+| K5 | 글 관리 | 내 글 [양도 완료] | `TransferPanel.tsx` · `PATCH /transfers/{id}/status`, `PUT /transfers/{id}` | 부분 | 수정 화면 없음(마감만) | 완료 | - |
+
+### M. 3D 레이어
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| M1 | 시간대 조명 | 상단 시간 슬라이더 | `world/timeOfDay.ts`, `TopBar.tsx` | 완료 | 상단바 정리 대상(3-2) | 해당없음 | - |
+| M2 | 밤길 안전 레이어 (△) | 가로등 | `world/streetlamps.ts` | 부분 | CCTV 없음, 가로등만 | 해당없음 | - |
+| M4 | 미니맵 | 오른쪽 아래 미니맵, 클릭 이동 | `buildWorld.js drawMinimap`, `WorldLayer.tsx` | 완료 | - | 해당없음 | - |
+| M5 | 모집 중 단지 강조 | 빛 기둥·깃발 | `WorldEffects.tsx` · `recruiting` | 완료 | - | 완료 | - |
+
+### N. 컨셉 UI
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| N1 | 용의자 파일 | 상세 '용의자 파일' | `ListingDetailView.tsx`, `dossier/*` | 완료 | - | 해당없음 | - |
+| N2 | 수배 전단 | 범인 등급 상세 | `dossier/WantedFlyer.tsx` | 완료 | - | 해당없음 | - |
+| N3 | 판결 & 비교 | 근처 단지·기숙사 비교 | `dossier/CompareSection.tsx` · alternatives | 완료 | - | 완료 | - |
+
+### Q. 알림·운영 (new)
+| ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
+|---|---|---|---|---|---|---|---|
+| Q1 | **new** 알림함 | 상단 종 → 목록, 안 읽은 개수 | `InboxPanel.tsx` · `GET /me/notifications`, `PATCH /me/notifications/{id}/read` | 완료 | 서버 없음 | 미구현 | 엔드포인트·생성 스케줄러 없음 |
+| Q2 | **new** 상단바 | 검색·탭·시간·지도·의상·초대·찜·알림·계정 | `TopBar.tsx` | 부분 | 한 줄에 요소 과다 → 3-2 정리 | 해당없음 | - |
+| Q3 | **new** 개발용 목 서버 | `?mock=1` | `mock/*` | 완료 | - | 해당없음 | - |
+| Q4 | **new** 개인정보처리방침·약관 | `/privacy.html`, `/terms.html` | `public/*.html` | 완료 | - | 해당없음 | - |
+| Q5 | **new** 헬스체크 | - | `GET /health` | 해당없음 | - | 완료 | - |
+| Q6 | **new** 평면도 자동 연결 | 서버 기동 시 비어 있는 매물·기숙사 평면도 채움 | `floorplan/FloorPlanLinker`, `FloorPlanSeeder` | 해당없음 | - | 완료 | - |
+| Q7 | **new** 데이터 수집 잡 | 실거래·청년안심주택 공고 수집, 등급 재계산 | `realdeal/RealDealIngestJob`, `housing/HousingIngestJob`, `listing/ListingGradeJob` | 해당없음 | - | 완료 | - |
 
 ## 5. 핵심 사용자 흐름
 
