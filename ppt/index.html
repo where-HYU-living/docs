@@ -206,8 +206,8 @@
       <div><p class="kicker"><span class="no">04</span>핵심 기능 01</p><h2>기준은 두 가지, 실거래 적정가와 AI 적정가입니다</h2></div>
     </div>
     <div class="body">
-      <div class="two" style="grid-template-columns:340px 450px 1fr;gap:56px">
-        <figure class="fig"><img class="shot tall" src="assets/shots/listings-cards.png" alt="매물 목록과 등급" style="width:340px;height:607px"><figcaption><b>매물 목록</b>카드마다 등급과 환산 월세</figcaption></figure>
+      <div class="two" style="grid-template-columns:520px 450px 1fr;gap:48px">
+        <figure class="fig"><img class="shot" src="assets/shots/map-areas.png" alt="2D 지도의 3D 구역 표시" style="width:520px;height:607px;object-fit:cover;object-position:62% 60%"><figcaption><b>2D 지도</b></figcaption></figure>
         <figure class="fig"><img class="shot" src="assets/shots/verdict-card.png" alt="판결 카드" style="width:450px;height:607px;object-fit:cover;object-position:top"><figcaption><b>판결 카드</b>이 집과 두 적정가를 한 눈금에</figcaption></figure>
         <div class="std">
           <div class="std-b">
@@ -227,7 +227,6 @@
               <dt>결과</dt><dd>적정 월세와 25~75% 범위</dd>
             </dl>
           </div>
-          <p class="std-end">두 기준이 같은 쪽을 가리키면 더 믿고 판단할 수 있습니다.</p>
         </div>
       </div>
     </div>
@@ -339,7 +338,6 @@
         </div>
       </div>
     </div>
-    <p class="src">월세·공과금, 월간 리포트, 계약 만료 알림은 "내 집 기록" 탭에 있습니다. 찜과 통합 검색도 있습니다.</p>
   </div>
   <aside class="notes">핵심 네 가지 말고도 몇 가지가 더 있습니다. 같은 돈이면 기숙사나 청년안심주택은 얼마나 싼지 비교해 주고 청년안심주택 공고 일정을 알려 줍니다. 링크로 친구나 부모님을 초대하면 내가 있는 방 바로 옆자리에 나타나서 같은 방을 함께 둘러볼 수 있습니다.</aside>
 </section>
@@ -373,23 +371,28 @@
       <div><p class="kicker"><span class="no">05</span>기술 구조</p><h2>아키텍처</h2></div>
       <div class="stat"><p class="big">3<small>개 서버</small></p><small>Vercel 프론트, Railway 백엔드·AI</small></div>
     </div>
-    <div class="body">
-      <div class="diagram" style="width:1230px;height:700px;margin:0 auto">
+    <div class="body" style="position:relative">
+      <div class="diagram" style="width:1230px;height:700px;margin:0">
         <img src="assets/img/04-overview.svg" alt="전체 아키텍처">
-        <div class="mark fragment" style="left:11.3%;top:20.5%;width:28%;height:10%"><i>1</i></div>
-        <div class="mark fragment" style="left:31.5%;top:40%;width:19%;height:9%"><i>2</i></div>
-        <div class="mark fragment" style="left:46.6%;top:21%;width:51%;height:42%"><i>3</i></div>
-        <div class="mark fragment" style="left:31.5%;top:57%;width:11%;height:12%"><i>4</i></div>
+        <div class="mark fragment fade-out" data-fragment-index="1" style="left:12.19%;top:15.93%;width:86.88%;height:62.64%"><i>1</i></div>
       </div>
+        <figure class="arch-pop fragment fade-in-then-out" data-fragment-index="1" style="width:960px"><img src="assets/img/02-floorplan-pipeline.png" alt="평면도 → 실내 3D 파이프라인"><figcaption><i>2</i>평면도 → 실내 3D</figcaption></figure>
+        <figure class="arch-pop fragment fade-in-then-out" data-fragment-index="2" style="width:780px"><img src="assets/img/03-rent-model.png" alt="적정 월세 AI 학습에서 판결까지"><figcaption><i>3</i>적정 월세 모델</figcaption></figure>
+      <aside class="stack fragment fade-out" data-fragment-index="1" aria-label="기술 스택">
+        <div><p>프론트엔드</p><ul><li>React 18 · TypeScript 5 · Vite 6</li><li>three.js · R3F로 3D 캠퍼스·동네·실내 모델링</li><li>TanStack Query · Zustand · Kakao Maps</li></ul></div>
+        <div><p>백엔드</p><ul><li>Spring Boot 3.5 · Java 21</li><li>Spring Security + JWT</li><li>WebSocket 멀티플레이 · Swagger</li></ul></div>
+        <div><p>데이터</p><ul><li>PostgreSQL 16 · Flyway</li></ul></div>
+        <div><p>AI 서버</p><ul><li>FastAPI · Python 3.11 · Docker</li><li>PyTorch CubiCasa5K · PaddleOCR</li><li>scikit-learn GBM 분위 회귀</li></ul></div>
+        <div><p>배포</p><ul><li>Vercel · Railway</li></ul></div>
+      </aside>
       <div class="legend-row">
-        <span><i>1</i><b>요청</b> React → Spring Boot REST, JWT</span>
-        <span><i>2</i><b>공유 월드</b> WebSocket 10Hz, 최대 30명</span>
-        <span><i>3</i><b>AI 서버</b> 평면도 경로와 적정 월세 경로</span>
-        <span><i>4</i><b>스케줄러</b> 06시 청년안심주택 수집, 09시 알림</span>
+        <span><i>1</i><b>요청 흐름</b> React ↔ Spring Boot ↔ PostgreSQL ↔ AI 서버</span>
+        <span><i>2</i><b>평면도</b> 평면도·면적 → AI → Spring Boot → 실내 3D</span>
+        <span><i>3</i><b>적정 월세 모델</b> 실거래 학습 → 판결 등급</span>
       </div>
     </div>
   </div>
-  <aside class="notes">구조는 세 덩어리입니다. 프론트는 Vercel의 React와 three.js, 백엔드는 Railway의 Spring Boot, AI 서버는 FastAPI입니다. AI 서버에는 평면도를 3D 데이터로 바꾸는 길과 적정 월세를 내는 길 두 가지가 있습니다.</aside>
+  <aside class="notes">구조는 세 덩어리입니다. 프론트는 Vercel의 React와 three.js·R3F, 백엔드는 Railway의 Spring Boot, AI 서버는 FastAPI입니다. 첫째, 요청은 React에서 Spring Boot로 가고, Spring Boot가 PostgreSQL과 AI 서버를 부릅니다. 둘째, 평면도 이미지는 AI가 분할과 글자 인식으로 읽고, 평면도가 없으면 면적과 방 수로 템플릿을 골라 FloorPlan JSON을 만든 뒤 Spring Boot에 저장해 실내 3D로 보여 줍니다. 셋째, 적정 월세 모델은 국토부 실거래로 학습한 GBM 분위 회귀이고 판결 등급에 쓰입니다.</aside>
 </section>
 
 <!-- 21 ERD -->
@@ -402,20 +405,10 @@
     <div class="body">
       <div class="diagram" style="width:1332px;height:720px;margin:0 auto">
         <img src="assets/img/06-erd-relations.svg" alt="테이블 관계도">
-        <div class="mark" style="left:73.4%;top:26.2%;width:10.5%;height:30.4%"><i>1</i></div>
-        <div class="mark" style="left:87.8%;top:58.7%;width:10.5%;height:20.4%"><i>2</i></div>
-        <div class="mark" style="left:73.4%;top:14.3%;width:10.5%;height:10.4%"><i>3</i></div>
-        <div class="mark" style="left:30.5%;top:14.3%;width:10.5%;height:26.2%"><i>4</i></div>
-      </div>
-      <div class="legend-row" style="margin-top:6px">
-        <span><i>1</i><b>listings</b> 환산 월세·등급 저장</span>
-        <span><i>2</i><b>real_deals</b> 국토부 실거래, 판결의 기준</span>
-        <span><i>3</i><b>floorplans</b> 실내 3D용 JSON</span>
-        <span><i>4</i><b>reviews</b> 별점·5개 항목·실내 핀 좌표</span>
       </div>
     </div>
   </div>
-  <aside class="notes">테이블은 29개, 외래 키는 23개입니다. 판결에 쓰는 매물과 실거래, 룸투어의 평면도, 후기 테이블을 표시했습니다. 후기에는 실내 핀 좌표와 평면도 번호가 함께 저장됩니다.</aside>
+  <aside class="notes">테이블은 29개, 외래 키는 23개입니다. 판결에 쓰는 매물과 실거래, 룸투어의 평면도, 후기 테이블이 중심입니다.</aside>
 </section>
 
 <!-- 24 기대 효과 -->
@@ -452,24 +445,24 @@
 <section data-step="6">
   <div class="frame">
     <div class="head">
-      <div><p class="kicker"><span class="no">06</span>수익 모델</p><h2>학생은 무료, 돈은 집을 내놓는 쪽과 이사 이후에서</h2></div>
+      <div><p class="kicker"><span class="no">06</span>수익 모델</p><h2>학생은 무료, 돈은 집을 내놓는 쪽에서</h2></div>
     </div>
     <div class="body">
       <p class="rev-free"><b>신입생·부모님</b>판결, 룸투어, 투어, 후기와 양도까지 모두 무료로 씁니다.</p>
       <ol class="rev">
         <li>
           <p class="rev-step"><span class="no">1</span></p>
-          <p class="rev-who">이사·가구·인터넷·청소·보증보험</p>
-          <h4>계약 이후 제휴 수수료</h4>
-          <p>집이 정해진 순간 한꺼번에 필요한 서비스를 연결하고 성사될 때마다 수수료를 받습니다. 학생은 제휴 할인을 받습니다.</p>
-          <p class="rev-ext">매물이 적어도 바로 시작할 수 있습니다</p>
+          <p class="rev-who">중개사</p>
+          <h4>카메라 촬영만으로 실내 3D를 만드는 앱</h4>
+          <p>중개사가 앱으로 방을 한 번 찍으면 곰팡이, 얼룩, 낡은 곳까지 실제 상태 그대로 3D로 만들어집니다. 매물을 보여 주러 몇 번씩 가지 않아도 됩니다.</p>
+          <p class="rev-ext">평면도로 만든 깨끗한 룸투어는 무료, 실물 3D는 유료</p>
         </li>
         <li>
           <p class="rev-step"><span class="no">2</span>매물과 후기가 쌓이면</p>
-          <p class="rev-who">중개사·임대인</p>
+          <p class="rev-who">임대인·청년안심주택 운영사</p>
           <h4>3D 룸투어 제작과 검증 매물</h4>
           <p>평면도를 넣으면 AI가 실내 3D를 만듭니다. 매물당 요금이나 월 구독으로 3D 룸투어, "검증 매물" 표시, 목록 상단 노출을 제공합니다.</p>
-          <p class="rev-ext">청년안심주택 운영사·기숙사로 넓힙니다</p>
+          <p class="rev-ext">기숙사로도 넓힙니다</p>
         </li>
         <li>
           <p class="rev-step"><span class="no">3</span>다른 대학가로 넓힐 때</p>
@@ -481,9 +474,9 @@
       </ol>
       <p class="rev-rule">가격 판결과 등급은 돈을 낸 매물에도 똑같이 붙습니다. 판결은 돈으로 바뀌지 않습니다.</p>
     </div>
-    <p class="src">기숙사 수용률: 대학알리미 2024 기준(한국경제 2025.3.12). 수익 모델과 단계는 계획이며 아직 매출은 없습니다.</p>
+    <p class="src">기숙사 수용률: 대학알리미 2024 기준(한국경제 2025.3.12).</p>
   </div>
-  <aside class="notes">수익 모델의 원칙은 두 가지입니다. 신입생과 부모님은 모든 기능을 무료로 쓰고, 가격 판결은 돈으로 바뀌지 않습니다. 돈은 세 단계로 법니다. 처음에는 매물이 적어도 할 수 있는 이사·가구·인터넷 제휴 수수료부터 시작합니다. 판결과 후기로 학생이 모이면 중개사와 임대인에게 AI 평면도로 만든 3D 룸투어와 검증 매물 표시를 팝니다. 다른 대학가로 넓힐 때는 대학과 지자체에 학교 밖 주거 안내 서비스로 들어갑니다. 돈을 낸 매물도 판결과 등급은 똑같이 붙습니다.</aside>
+  <aside class="notes">수익 모델의 원칙은 두 가지입니다. 신입생과 부모님은 모든 기능을 무료로 쓰고, 가격 판결은 돈으로 바뀌지 않습니다. 돈은 세 단계로 법니다. 지금 룸투어는 평면도로 만든 깨끗한 방입니다. 그래서 첫째로, 카메라 촬영만으로 실내 3D를 만드는 앱을 중개사에게 팝니다. 방을 한 번 찍으면 곰팡이나 얼룩까지 실제 상태 그대로 3D가 됩니다. 판결과 후기로 학생이 모이면 임대인과 청년안심주택 운영사에게 AI 평면도로 만든 3D 룸투어와 검증 매물 표시를 팝니다. 다른 대학가로 넓힐 때는 대학과 지자체에 학교 밖 주거 안내 서비스로 들어갑니다. 돈을 낸 매물도 판결과 등급은 똑같이 붙습니다.</aside>
 </section>
 
 <!-- 25 발전 방향 + 역할 -->
@@ -509,7 +502,6 @@
         </ol>
       </div>
     </div>
-    <p class="src">이 장의 항목은 아직 구현 전인 개선 방향입니다.</p>
   </div>
   <aside class="notes">앞으로는 판결을 더 정밀하게 다듬고, 언덕과 계단을 도보 시간에 반영하고, 캠퍼스와 동네 3D를 하나로 이으려고 합니다. 더 나아가 다른 대학가로 넓히고, 평면도와 후기의 정확도를 높이고, 계약 직전에 볼 항목까지 판결 옆에 두려고 합니다.</aside>
 </section>
@@ -617,17 +609,25 @@
         </div>
       </div>
     </div>
-    <p class="src">출처: docs/harness/final-review-2026-11.md (P0 #1, 5장 전후 수치). 회귀 테스트 FinalQaFixesTest.sameWalkKey_atOnce_callsTmapOnce.</p>
   </div>
   <aside class="notes">개발 중 가장 큰 문제는 도보 시간 계산이었습니다. 요청이 몰리면 30초 동안 API 전체가 멈췄는데, 트랜잭션과 외부 호출을 분리해서 1.8초로 줄였습니다.</aside>
 </section>
 
 <section data-step="0">
   <div class="frame">
-    <div class="head"><div><p class="kicker">Appendix</p><h2>출처</h2></div></div>
+    <div class="head"><div><p class="kicker">Appendix</p><h2>코드와 출처</h2></div></div>
     <div class="body">
+      <h4 class="src-h">GitHub</h4>
+      <ul class="repos">
+          <li><b>프론트엔드</b><a class="src-link" href="https://github.com/where-HYU-living/frontend" target="_blank" rel="noopener">github.com/where-HYU-living/frontend</a></li>
+          <li><b>백엔드</b><a class="src-link" href="https://github.com/where-HYU-living/backend" target="_blank" rel="noopener">github.com/where-HYU-living/backend</a></li>
+          <li><b>AI 서버</b><a class="src-link" href="https://github.com/where-HYU-living/ai-server" target="_blank" rel="noopener">github.com/where-HYU-living/ai-server</a></li>
+          <li><b>캠퍼스 데이터</b><a class="src-link" href="https://github.com/where-HYU-living/campus-data" target="_blank" rel="noopener">github.com/where-HYU-living/campus-data</a></li>
+          <li><b>기능 명세서</b><a class="src-link" href="https://github.com/where-HYU-living/docs/blob/main/spec/feature-spec.md" target="_blank" rel="noopener">where-HYU-living/docs · spec/feature-spec.md</a></li>
+          <li><b>API 명세서</b><a class="src-link" href="https://github.com/where-HYU-living/docs/blob/main/spec/api-spec.md" target="_blank" rel="noopener">where-HYU-living/docs · spec/api-spec.md</a></li>
+      </ul>
+      <h4 class="src-h">출처</h4>
       <ul class="sources">
-        <li><b>소스 코드 (GitHub)</b> <a class="src-link" href="https://github.com/where-hyu-living" target="_blank" rel="noopener">github.com/where-hyu-living</a></li>
         <li><b>대학가 원룸 월세+관리비 70.9만 원(2026.7)</b> 다방, 국민일보 인용 kmib.co.kr/article/view.asp?arcid=9000002388</li>
         <li><b>대학생 월평균 지출 68.1만 원</b> 대학내일20대연구소 소비지출 정기조사 2025, openads.co.kr/content/contentDetail?contsId=20343</li>
         <li><b>1인 가구 주거비 비중 20.2%</b> 한국은행, 이투데이 인용 etoday.co.kr/news/view/2428375</li>
@@ -667,7 +667,7 @@
   Reveal.initialize({
     width: 1920, height: 1080, margin: 0, center: false, hash: true,
     slideNumber: 'c/t', transition: 'fade', backgroundTransition: 'none',
-    controls: false, progress: true, pdfSeparateFragments: false,
+    controls: false, progress: true, pdfSeparateFragments: true,
     plugins: [RevealNotes],
   });
 </script>
