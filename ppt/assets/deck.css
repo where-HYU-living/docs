@@ -206,8 +206,8 @@ html, body { background: var(--paper); }
 .solve::before { content: '주제와 연결'; display: block; font-size: 18px; color: var(--hy); font-weight: 700; margin-bottom: 8px; }
 .media { position: relative; height: 100%; min-height: 0; }
 .media .shot { position: absolute; }
-.callout { position: absolute; z-index: 3; display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; color: var(--ink); background: #fff; padding: 9px 16px 9px 9px; border-radius: 999px; box-shadow: 0 6px 18px -6px rgba(22,32,46,.35); white-space: nowrap; }
-.callout i { width: 34px; height: 34px; border-radius: 50%; background: var(--hy); color: #fff; display: grid; place-items: center; font: 800 18px/1 var(--num); font-style: normal; }
+.callout { position: absolute; z-index: 3; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--ink); background: rgba(255,255,255,.94); padding: 6px 12px 6px 10px; border-radius: 999px; box-shadow: 0 4px 12px -4px rgba(22,32,46,.35); white-space: nowrap; }
+.callout i { width: 8px; height: 8px; border-radius: 50%; background: var(--hy); flex: none; }
 
 /* 룸투어 4종 */
 .reveal .types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; height: 100%; }
@@ -380,3 +380,46 @@ html, body { background: var(--paper); }
 /* 6장: 문제 정의 + 대응표 */
 .define.small { font-size: 36px; margin-bottom: 40px; }
 .map td:first-child small { display: block; margin-top: 6px; font-size: 19px; font-weight: 400; color: var(--ink-2); line-height: 1.45; }
+/* 8쪽: 판결 화면 아래 계산식 띠 */
+.body.body-strip { display: flex; flex-direction: column; }
+.body.body-strip > .feat { height: 548px; flex: none; }
+.body.body-strip > .calc-strip { flex: none; margin-top: 64px; }
+.body-strip .steps li { padding: 13px 24px; font-size: 22px; }
+.body-strip .steps li small { font-size: 17px; margin-top: 3px; }
+.body-strip .steps li + li { margin-top: 30px; }
+.body-strip .steps li + li::before { top: -25px; height: 12px; }
+.body-strip .steps li + li::after { top: -14px; }
+.body-strip .solve { padding-top: 18px; font-size: 22px; }
+.media.fit { height: 100%; width: auto; justify-self: start; }
+.calc-strip { display: grid; grid-template-columns: 0.9fr 1.35fr 1.1fr; column-gap: 36px; row-gap: 10px; margin-top: 44px; padding-top: 16px; border-top: 2px solid var(--ink); position: relative; }
+.calc-strip::before { content: '판결 계산 기준'; position: absolute; left: 0; top: -32px; font-size: 16px; font-weight: 700; color: var(--hy); }
+.calc-strip p { font-size: 17px; color: var(--ink-2); line-height: 1.4; }
+.calc-strip b { display: block; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.calc-strip .grades { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 26px; }
+.calc-strip .grades b { display: inline; margin: 0 6px 0 0; }
+.calc-strip .grades i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; vertical-align: 0; }
+
+/* 화면 + 아래 설명: 모든 장에서 같은 간격·크기 */
+.reveal .fig { margin: 0; display: flex; flex-direction: column; }
+.reveal .fig .shot { flex: none; }
+.reveal .fig figcaption, .reveal .types figcaption, .reveal .extras figcaption { margin-top: 18px; font-size: 19px; line-height: 1.45; color: var(--ink-2); }
+.reveal .fig figcaption b, .reveal .types figcaption b, .reveal .extras figcaption b { display: block; font-size: 24px; font-weight: 750; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
+.reveal .types figcaption span { margin-top: 0; font-size: 19px; }
+.reveal .extras figcaption { height: 84px; }
+.figrow { display: flex; gap: 40px; align-items: flex-start; height: 100%; }
+/* 룸투어 장: 오른쪽 아래 작은 팝업 */
+.pop { position: absolute; z-index: 4; right: -36px; bottom: 40px; width: 340px; margin: 0; background: #fff; padding: 8px 8px 10px; border-radius: 14px; box-shadow: 0 18px 40px -12px rgba(22,32,46,.45); }
+.pop img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 12% 60%; border-radius: 8px; }
+.pop figcaption { margin-top: 8px; font-size: 16px; font-weight: 700; color: var(--ink); padding-left: 4px; }
+/* 8쪽: 두 기준 정리 */
+.std { display: flex; flex-direction: column; height: 607px; }
+.std .std-b + .std-b { margin-top: 40px; }
+.std h4 { display: flex; align-items: center; gap: 12px; font-size: 28px; font-weight: 750; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+.std h4 span { margin-left: auto; font-size: 18px; font-weight: 500; color: var(--mute); }
+.std .mk-deal { width: 5px; height: 24px; border-radius: 2px; background: var(--ink); }
+.std .mk-ai { width: 20px; height: 20px; border-radius: 5px; border: 2px solid #5b6ad0; background: repeating-linear-gradient(135deg, #5b6ad0 0 2px, #e3e6fa 2px 6px); }
+.std dl { display: grid; grid-template-columns: 150px 1fr; margin: 0; }
+.std dt, .std dd { margin: 0; padding: 11px 0; border-bottom: 1px solid var(--rule); font-size: 21px; line-height: 1.4; }
+.std dt { color: var(--mute); font-weight: 600; font-size: 19px; }
+.std dd { color: var(--ink); }
+.reveal .std-end { margin-top: auto; font-size: 24px; font-weight: 700; color: var(--hy); }
