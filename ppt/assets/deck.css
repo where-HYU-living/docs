@@ -423,3 +423,40 @@ html, body { background: var(--paper); }
 .std dt { color: var(--mute); font-weight: 600; font-size: 19px; }
 .std dd { color: var(--ink); }
 .reveal .std-end { margin-top: auto; font-size: 24px; font-weight: 700; color: var(--hy); }
+
+/* 수익 모델 */
+.reveal .rev-free { display: flex; align-items: baseline; gap: 22px; font-size: 28px; color: var(--ink-2); padding-bottom: 40px; }
+.rev-free b { font-size: 34px; color: var(--hy); font-weight: 800; }
+.rev { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 56px; }
+.rev > div { border-top: 2px solid var(--ink); padding-top: 28px; display: flex; flex-direction: column; }
+.reveal .rev-who { font-size: 21px; font-weight: 700; color: var(--hy); }
+.rev h4 { margin-top: 12px; font-size: 38px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.25; }
+.reveal .rev p:not(.rev-who):not(.rev-ext) { margin-top: 18px; font-size: 24px; color: var(--ink-2); line-height: 1.55; }
+.reveal .rev-ext { margin-top: 22px; font-size: 20px; color: var(--mute); }
+.reveal .rev-rule { margin-top: 64px; padding-top: 26px; border-top: 1px solid var(--rule); font-size: 32px; font-weight: 750; color: var(--ink); }
+.reveal .rev-steps { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 56px; }
+.reveal .rev-steps li { border-top: 2px solid var(--ink); padding-top: 24px; }
+.rev-steps .no { font: 800 80px/1 var(--num); font-stretch: 116%; color: var(--hy); }
+.reveal .rev-steps .when { margin-top: 20px; font-size: 21px; font-weight: 700; color: var(--hy); }
+.rev-steps h4 { margin-top: 8px; font-size: 38px; font-weight: 750; letter-spacing: -0.02em; }
+.reveal .rev-steps p:not(.when):not(.uses) { margin-top: 16px; font-size: 24px; color: var(--ink-2); line-height: 1.55; }
+.reveal .rev-steps .uses { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 20px; color: var(--mute); }
+/* 수익 모델 한 장 (단계 + 수익원) */
+.reveal ol.rev { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 56px; }
+.reveal ol.rev > li { border-top: 2px solid var(--ink); padding-top: 24px; display: flex; flex-direction: column; }
+.reveal .rev-step { display: flex; align-items: center; gap: 14px; font-size: 20px; font-weight: 700; color: var(--ink-2); margin-bottom: 20px; }
+.rev-step .no { font: 800 44px/1 var(--num); font-stretch: 116%; color: var(--hy); }
+.reveal ol.rev li > p:not(.rev-step):not(.rev-who):not(.rev-ext) { margin-top: 16px; font-size: 23px; color: var(--ink-2); line-height: 1.55; }
+.reveal ol.rev h4 { margin-top: 10px; font-size: 34px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.25; }
+.reveal ol.rev .rev-ext { margin-top: auto; padding-top: 18px; font-size: 19px; color: var(--mute); }
+.reveal .rev-free { padding-bottom: 30px; }
+.reveal .rev-rule { margin-top: 44px; }
+/* 그 밖의 기능: 높이 같게, 폭은 사진 비율대로, 오른쪽 목록 */
+.extras2 { display: flex; gap: 32px; align-items: flex-start; height: 100%; }
+.extras2 .fig { flex: none; }
+.extras2 .fig .shot { height: 540px; width: auto; object-fit: cover; }
+.extras2 .fig figcaption { width: 0; min-width: 100%; }
+.more-list { flex: 1; min-width: 0; padding-left: 8px; }
+.reveal .more-list p { font-size: 19px; font-weight: 700; color: var(--hy); padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+.reveal .more-list li { padding: 16px 0; border-bottom: 1px solid var(--rule); font-size: 23px; font-weight: 650; color: var(--ink); }
+.reveal .plan .grid22 { align-content: start; row-gap: 64px; }
