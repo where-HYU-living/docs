@@ -289,7 +289,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
 | E1 | 실내 입장 | 문 마커 앞 E/탭, 상세 [실내 보기] | `world/doors.ts`, `WorldEffects.tsx`, `interior/InteriorScene.tsx` | 완료 | - | 해당없음 | - |
-| E2 | 평면도 기반 3D | 실내 걷기 | `interior/*` · `GET /floorplans/{id}` | 완료 | - | 완료 | AI 로 뽑은 JSON 중 id 1 만 검수 완료(나머지는 데이터 작업) |
+| E2 | 평면도 기반 3D | 실내 걷기 | `interior/*` · `GET /floorplans/{id}` | 완료 | - | 완료 | - (평면도 33개 검수 완료 2026-11-08: 원본 이미지 대조, 9·12·104·105 수정. 백엔드 `fixtures/floorplans/README.md`) |
 | E3 | **new** 방 투어 HUD | 방 바로가기·평면도 미니맵·조작법·시간대 | `interior/TourHud.tsx`, `Minimap.tsx`, `tourNav.ts` | 완료 | - | 해당없음 | - |
 | E4 | **new** 방 초대 링크 | 실내에서 링크 → 받은 사람이 같은 방 옆자리 | `net/useRoomInvite.ts`, `net/inviteLink.ts` (`?room=&at=`) | 완료 | - | 해당없음 | - |
 
@@ -321,7 +321,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
 | I1 | 단지 지도·3D 표시 | 3D 단지 말풍선, 모집 중 빛 기둥 | `PlaceMarkers.tsx`, `WorldEffects.tsx` · `GET /housing` | 완료 | - | 완료 | - |
-| I2 | 공개 평면도 3D | 단지 상세 주택형 [실내 보기] | `HousingPanel.tsx` · `GET /floorplans/{id}` | 완료 | - | 완료 | 평면도 JSON 검수(데이터) |
+| I2 | 공개 평면도 3D | 단지 상세 주택형 [실내 보기] | `HousingPanel.tsx` · `GET /floorplans/{id}` | 완료 | - | 완료 | - |
 | I3 | 단지 상세 | 주택형·보증금·월세·연락처 | `HousingPanel.tsx` · `GET /housing/{id}` | 완료 | - | 완료 | - |
 | I5 | 과 건물까지 도보 | 단지 카드 '도보 N분' | `walkMin` | 완료 | - | 완료 | - |
 | I6 | 공고 캘린더 | [청년안심주택] → 공고 캘린더 | `HousingPanel.tsx`, `features/catalog.groupEventsByMonth` · `GET /housing/announcements` | 완료 | - | 완료 | - |
@@ -333,7 +333,7 @@ O/X 열: **O** = 유지 / **△** = 후순위 / **new** = 이번 버전 신규
 | ID | 기능 | 사용자 동작 | 관련 파일 / 엔드포인트 | 프론트 | 프론트 개선점 | 백엔드 | 백엔드 개선점 |
 |---|---|---|---|---|---|---|---|
 | P1 | 캠퍼스 안 기숙사 표시 | 3D 기숙사 말풍선(월 환산) | `PlaceMarkers.tsx` · `GET /dorms` | 완료 | - | 완료 | - |
-| P2 | 기숙사 호실 3D 투어 | [기숙사] → 호실 [실내 보기] | `DormPanel.tsx` · floorplans 201~ | 완료 | - | 완료 | 평면도 201~206 데이터 검수 |
+| P2 | 기숙사 호실 3D 투어 | [기숙사] → 호실 [실내 보기] | `DormPanel.tsx` · floorplans 201~ | 완료 | - | 완료 | - (201~206 은 공개 도면이 없어 호실 사진·면적으로 만든 추정 평면도) |
 | P3 | 기숙사 정보 카드 | 호실·인원·관비 → 월 환산·도보 | `DormPanel.tsx` · `GET /dorms/{id}` | 완료 | - | 완료 | - |
 
 ### K. 양도 게시판
