@@ -243,6 +243,7 @@ html, body { background: var(--paper); }
 .head .stat { text-align: right; }
 .head .stat .big { font-size: 64px; color: var(--hy); }
 .head .stat small { display: block; font-size: 18px; color: var(--mute); margin-top: 6px; }
+.head .stat .big small { display: inline; font-size: 28px; color: var(--hy); margin: 0 0 0 4px; }
 
 /* 기능 명세 표 */
 .spec { width: 100%; border-collapse: collapse; font-size: 17px; }
@@ -310,6 +311,7 @@ html, body { background: var(--paper); }
 .reveal .sources { columns: 2; column-gap: 64px; font-size: 20px; line-height: 1.55; color: var(--ink-2); }
 .sources li { break-inside: avoid; margin-bottom: 16px; }
 .sources b { color: var(--ink); }
+.reveal .sources a.src-link { color: var(--hy); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
 
 /* 발표 중 깜빡이지 않게: 프래그먼트는 투명도만 */
 .reveal .slides section .fragment { transition: opacity .35s ease; transform: none !important; }
