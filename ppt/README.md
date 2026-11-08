@@ -24,7 +24,7 @@ cd docs/ppt && python3 -m http.server 8000
 
 ```
 node docs/ppt/build/verify.mjs   # 모든 장 렌더링, 넘침·글꼴·영상 확인 (build/renders/)
-node docs/ppt/build/pdf.mjs      # docs/ppt/어디서사냥-발표.pdf
+node docs/ppt/build/pdf.mjs      # docs/ppt/어디서사냥.pdf
 ```
 
 ## 배포 (Vercel)

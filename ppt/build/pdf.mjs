@@ -3,7 +3,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '/Users/inter4259/maindesktop/chatatda-hanyang/frontend/node_modules/playwright-core/index.mjs';
 const here = dirname(fileURLToPath(import.meta.url));
-const out = process.argv[2] || join(here, '..', '어디서사냥-발표.pdf');
+const out = process.argv[2] || join(here, '..', '어디서사냥.pdf');
 const b = await chromium.launch({ channel: 'chrome', headless: true });
 const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
 await p.goto('file://' + join(here, '..', 'index.html') + '?print-pdf');
