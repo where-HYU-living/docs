@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <!-- 구분 장 배경: 남색 위 흰 모눈 -->
+  <defs>
+    <pattern id="mi" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#fff" stroke-opacity=".08"/></pattern>
+    <pattern id="ma" width="120" height="120" patternUnits="userSpaceOnUse"><path d="M120 0H0V120" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.4"/></pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="#123f74"/>
+  <rect width="1920" height="1080" fill="url(#mi)"/><rect width="1920" height="1080" fill="url(#ma)"/>
+</svg>

@@ -14,7 +14,7 @@ await p.waitForFunction(() => window.Reveal && Reveal.isReady());
 await p.evaluate(() => document.fonts.ready);
 await p.waitForTimeout(1500);
 const n = await p.evaluate(() => Reveal.getTotalSlides());
-const fonts = await p.evaluate(() => ({ pre: document.fonts.check('700 40px "Pretendard Variable"'), arc: document.fonts.check('800 40px Archivo') }));
+const fonts = await p.evaluate(() => ({ pre: document.fonts.check('700 40px "Pretendard Variable"'), arc: document.fonts.check('800 40px Archivo'), pap: document.fonts.check('800 40px Paperlogy') }));
 console.log('slides', n, 'fonts', JSON.stringify(fonts));
 for (let i = 0; i < n; i++) {
   await p.evaluate((i) => { Reveal.slide(i, 0, 99); }, i);

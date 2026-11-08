@@ -7,6 +7,8 @@ reveal.js 5.1.0으로 만든 웹 발표 자료입니다.
 - **슬라이드는 `index.html`을 직접 고칩니다.** 빌드 단계는 없습니다.
 - 스타일은 `assets/deck.css`, 차트 숫자는 `assets/charts.js`에 있습니다.
 - 캡처는 `assets/shots/`, 영상은 `assets/clips/`, 도식·로고·QR은 `assets/img/`에 둡니다.
+- 배경 테마는 `assets/theme/`의 SVG 세 장입니다. 본문 장은 `page.svg`, 표지와 마무리는 `cover.svg`, 구분 장은 `blueprint.svg`를 씁니다. `index.html` 아래쪽 스크립트가 장마다 자동으로 붙입니다.
+- 제목·큰 숫자 글씨체는 Paperlogy(SIL OFL)이고 `assets/fonts/`에 있습니다. 본문은 Pretendard입니다.
 - 슬라이드 안에 `<section>` 태그를 또 넣지 마세요. reveal이 새 장으로 인식합니다.
 - 슬라이드에 넣는 수치는 `research.md`에 출처와 함께 적어 둡니다.
 

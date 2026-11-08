@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <!-- 표지·마무리 배경: 왼쪽 글 영역 전체에 평면도 모눈 -->
+  <defs>
+    <pattern id="mi" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#123f74" stroke-opacity=".10"/></pattern>
+    <pattern id="ma" width="120" height="120" patternUnits="userSpaceOnUse"><path d="M120 0H0V120" fill="none" stroke="#123f74" stroke-opacity=".20" stroke-width="1.4"/></pattern>
+    <linearGradient id="fv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity=".35"/></linearGradient>
+    <mask id="m"><rect width="1920" height="1080" fill="url(#fv)"/></mask>
+  </defs>
+  <rect width="1920" height="1080" fill="#f6f8fb"/>
+  <g mask="url(#m)"><rect width="1920" height="1080" fill="url(#mi)"/><rect width="1920" height="1080" fill="url(#ma)"/></g>
+  <rect width="1920" height="10" fill="#123f74"/>
+</svg>
