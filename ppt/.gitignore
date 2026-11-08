@@ -1,2 +1,5 @@
 .vercel
 .env*
+build/renders/
+build/spec.html
+build/api.html

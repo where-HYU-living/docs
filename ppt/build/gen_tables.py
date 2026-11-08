@@ -1,4 +1,6 @@
-# 기능 명세서·API 명세서를 읽어 슬라이드용 HTML 조각을 만든다 (index.html 의 <!--SPEC-->, <!--API--> 자리에 넣음)
+# 기능 명세서·API 명세서가 바뀌었을 때만 쓴다. 표 조각을 build/spec.html, build/api.html 로 출력하니
+# index.html 의 부록 '기능 명세' <tbody> 와 'API' <div class="apis"> 안을 이 내용으로 바꿔 붙인다.
+#   python3 docs/ppt/build/gen_tables.py
 import re, html, pathlib, sys
 root = pathlib.Path(__file__).resolve().parents[2]
 CORE = {  # 핵심 기능 4개에 쓰이는 기능 ID → 핵심 기능 번호
