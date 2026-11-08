@@ -518,3 +518,5 @@ html, body { background: var(--paper); -webkit-print-color-adjust: exact; print-
 .reveal .solve { padding-top: 0; }
 .reveal .rev-rule { margin-top: 40px; padding-top: 0; }
 .reveal .toc li { padding: 26px 0; }
+/* 아키텍처 팝업: PDF 인쇄 때 transform 레이어가 어긋나므로 transform 없이 가운데 정렬 */
+.reveal .slides section .body > .fragment.arch-pop { left: 0; right: 0; top: 0; margin: 0 auto; width: fit-content; transform: none !important; }
