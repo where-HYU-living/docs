@@ -46,10 +46,13 @@
 | 9 찜 | 구현 완료 | `FavoriteApiTest` 12 | 매물·양도 글 `favorited` 실제 값. 하트는 프론트가 `GET /me/favorites` 한 곳에서 읽음 (계약 v1.7) |
 | 10 양도 게시판·업로드 | 구현 완료 + **실서버 확인** | `TransferApiTest` 15 | 제목 필수 2~40자(계약 v1.7, 프론트와 같음), 남은 개월 기준 판정, 업로드는 전체 주소 응답·첫 바이트로 jpg/png 확인, 데모 양도 글 3건 |
 | 15 멀티플레이 | **구현 완료 (프론트 담당이 진행)** | `WorldServiceTest`·`SessionOutboxTest`·`WorldSocketIT`·`WorldLoadIT` | `/ws/world` 공유 월드(최대 30명, 10Hz), `POST /invites`. 계획과 다른 점은 아래 Task 15 참고 |
-| 14 통합 검색·평면도 | **평면도 완료 (프론트 담당이 구현)**, 통합 검색 대기 | `FloorPlanApiTest`·`FloorPlanSeederTest`·`FloorPlanValidatorTest`·`FloorPlanLinkerTest`·`FloorplanLabelTest` | `GET /floorplans/{id}`, 평면도 33개(청년안심주택 20·매물 7·기숙사 6), V8 |
-| 11~13, 16 | 대기 | | |
+| 14 통합 검색·평면도 | **구현 완료 (프론트 담당)** — 평면도 `06edeff`, 통합 검색 `27c14ef` | `FloorPlanApiTest`·`FloorPlanSeederTest`·`FloorPlanValidatorTest`·`FloorPlanLinkerTest`·`FloorplanLabelTest` | `GET /floorplans/{id}`, 평면도 33개(청년안심주택 20·매물 7·기숙사 6), V8 |
+| 11 후기 | 구현 완료 (두 사람이 각각 만들어 **프론트 담당 구현으로 합침**) | `ReviewApiTest` 14, `CommunityApiTest` | 프론트 담당 `ReviewController`(V10) + 백엔드 담당이 핀 방 번호 `floorplanId`(V11, 계약 v1.8)·데모 후기 10건·테스트 14개를 옮겨 붙임 |
+| 12 내 집 기록·리포트·만료 알림 | **구현 완료 (프론트 담당 `27c14ef`)**, 계획 대비 점검 전 | `CommunityApiTest` | `HomeController`·`HomeService`, V10 |
+| 13 알림 생성·알림함 | **구현 완료 (프론트 담당 `27c14ef`)**, 계획 대비 점검 전 | `CommunityApiTest` | `NotificationController`·`NotificationJob`, V10 |
+| 16 배포 | 대기 | | |
 
-전체 테스트 262개 통과 (2026-11-08 기준, 프론트 담당의 멀티플레이 테스트 포함).
+전체 테스트 302개 통과 (2026-11-08 기준, 프론트 담당의 멀티플레이·평면도 테스트 포함).
 
 **판정 기준값 (현재)** — 모두 `application.yml` 의 `pricing.*` 설정값, 테스트는 별도 고정값(전환율 0.06, 기준 관리비 71,000) 사용
 | 값 | 현재 | 출처·근거 |
@@ -613,7 +616,8 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 11: 후기
 
 **Files:**
-- Create: `review/Review.java`, `review/ReviewController.java`, `db/migration/V10__reviews.sql`
+- Create: `review/ReviewController.java` (프론트 담당 구현, 하나의 컨트롤러에 요청·응답·검증 포함), `db/migration/V10__reviews_home_notifications.sql`(후기·내 집·알림 테이블 한 번에), `db/migration/V11__review_floorplan.sql`
+- **합친 경위 (2026-11-08):** 백엔드 담당도 `review/` 패키지 6파일 + `V10__reviews.sql` 로 같은 기능을 만들었으나, 프론트 담당 구현(`27c14ef`)이 먼저 `main` 에 올라가 있어서 그쪽을 기준으로 하고 내 중복 파일은 삭제. 내 쪽에만 있던 `floorplanId`(V11 로 칸 추가 + 컨트롤러에 저장·응답·검증), 데모 후기 시드(`user_id` 칸에 맞춤), 테스트 14개를 옮겨 붙임. 내용(`text`)은 프론트 담당 구현대로 **필수(빈 문자열은 허용)**
 - Test: `review/ReviewApiTest.java`
 
 **Interfaces:**
@@ -628,14 +632,19 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 @Test void pinOptional()         // pin 없이 POST → 201, pin null
 ```
 - [ ] **Step 2: 실패 확인** — `./gradlew test --tests '*ReviewApiTest'` → FAIL
-- [ ] **Step 3: 구현** — `scores`는 개별 컬럼 5개, `pin`은 `double[]` → jsonb
-- [ ] **Step 4: 통과 확인** → PASS
+- [x] **Step 3: 구현** — `scores`는 개별 컬럼 5개, `pin`은 `pin_x`·`pin_y`·`pin_z` 컬럼 3개 (셋 다 있거나 셋 다 없게 check)
+- [x] **Step 4: 통과 확인** → PASS (14개)
 - [ ] **Step 5: 커밋** — `git commit -m "feat(review): reviews with category scores and optional pin"`
+- **구현하며 정한 것 (2026-11-08, 계약 v1.8):**
+  - **`floorplanId` 추가** (핀을 찍은 방, 선택): 프론트는 실내 핀 후기를 "그 평면도를 쓰는 단지·기숙사"에 다는데, 한 단지에 주택형(평면도)이 여러 개라 19A 방에서 찍은 핀이 20타입 방에도 같은 좌표로 떴음. 실내에서는 같은 `floorplanId` 핀만 그리고, 상세 후기 목록은 전부 보여 준다. 없는 평면도면 400. 프론트가 보내기 전까지는 없이 와도 저장(`null`)
+  - 같은 사람이 같은 대상에 여러 번 작성 허용(핀마다), 내용은 비어도 됨, 수정·삭제 없음, 없는 대상 404
+  - 추가 테스트: 내용 없이 작성, 핀+평면도 그대로 응답, 평면도 없는 핀, 핀 숫자 개수 400, 없는 평면도 400, 없는 대상 404, 비로그인 401, 평균 반올림·최신순·대상 분리, 필수 파라미터 400
+  - 시드 `fixtures/reviews.json` 10건 (매물 1·2·6·10·13번 × 2, 데모 작성자)
 
 ### Task 12: 내 집 기록 · 월간 리포트 · 만료 알림 설정
 
 **Files:**
-- Create: `home/Home.java`, `home/Payment.java`, `home/Utility.java`, `home/ExpiryAlert.java`, `home/HomeController.java`, `home/ReportService.java`, `db/migration/V11__home.sql`
+- Create: `home/Home.java`, `home/Payment.java`, `home/Utility.java`, `home/ExpiryAlert.java`, `home/HomeController.java`, `home/ReportService.java`, `db/migration/V11__home.sql` → **실제: 프론트 담당이 `home/HomeController`·`HomeService` 로 구현, 테이블은 V10 에 포함**
 - Test: `home/HomeApiTest.java`, `home/ReportServiceTest.java`
 
 **Interfaces:**
@@ -664,7 +673,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
 ### Task 13: 알림 생성 스케줄러 · 알림함
 
 **Files:**
-- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V12__notifications.sql` (unique `(user_id, type, source_id, ref_date, days_before)` 로 중복 생성 방지)
+- Create: `notification/Notification.java`, `notification/NotificationController.java`, `notification/NotificationJob.java`, `db/migration/V12__notifications.sql` → **실제: 프론트 담당이 구현, 테이블은 V10 에 포함 (`dedupe_key` unique 로 중복 방지)** (unique `(user_id, type, source_id, ref_date, days_before)` 로 중복 생성 방지)
   - `source_id` = 공고 일정(`announcement_events.id`) 또는 만료 알림 설정(`expiry_alerts.id`), `ref_date` = 그 일정 날짜 또는 `contractEnd`, `days_before` = 7·1·0 또는 설정값
   - 기존 키 `(user_id, type, target_id, ref_date)`는 같은 일정의 D-7·D-1·당일이 같은 키가 되어 하나만 저장되므로 쓰지 않음
 - Test: `notification/NotificationJobTest.java`, `notification/NotificationApiTest.java`

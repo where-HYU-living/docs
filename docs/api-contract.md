@@ -3,7 +3,7 @@
 > 백엔드(장시현)와 프론트·3D(김준형)가 **함께 보는 단 하나의 기준 문서**.
 > 프론트는 이 문서에 맞춰 개발하고, 백엔드는 이 문서대로 응답한다.
 > 기준 스펙: `docs/spec-v0.5.md`
-> 버전: contract v1.7 (2026-11-08)
+> 버전: contract v1.8 (2026-11-08)
 
 ---
 
@@ -295,10 +295,12 @@
 ### 5-8. 후기
 | 메서드 | 경로 | 요청 | 응답 |
 |---|---|---|---|
-| GET | `/reviews` | `targetType` `targetId` | `{ "average": 4.1, "count": 7, "items": [{ "id", "rating", "scores": { "noise", "light", "bugs", "landlord", "depositReturn" }, "text", "pin": [x, y, z] \| null, "authorNickname", "createdAt" }] }` |
-| POST 🔒 | `/reviews` | `{ "targetType", "targetId", "rating", "scores", "text", "pin" }` | `201` + 항목 |
+| GET | `/reviews` | `targetType` `targetId` | `{ "average": 4.1, "count": 7, "items": [{ "id", "rating", "scores": { "noise", "light", "bugs", "landlord", "depositReturn" }, "text", "pin": [x, y, z] \| null, "floorplanId", "authorNickname", "createdAt" }] }` |
+| POST 🔒 | `/reviews` | `{ "targetType", "targetId", "rating", "scores", "text", "pin", "floorplanId" }` | `201` + 항목 |
 
-- `rating`, `scores.*`: 1~5 정수. `text` 500자 이하. `pin`은 실내 3D 좌표(FloorPlan 기준, 선택)
+- `rating`, `scores.*`(5개 모두): 1~5 정수, 필수. `text` 필수(빈 문자열 `""` 은 허용) 500자 이하. `pin`은 실내 3D 좌표 `[x, y, z]`(FloorPlan 기준, 선택, 숫자 3개)
+- **`floorplanId`** = 핀을 찍은 평면도(방) 번호 (선택, 없는 평면도면 400). 한 단지·기숙사에 평면도가 여러 개라 **실내에서는 지금 방과 `floorplanId` 가 같은 핀만 그린다**. 단지·기숙사·매물 상세의 후기 목록은 `floorplanId` 와 상관없이 전부 보여 준다(건물 후기)
+- 목록은 최신순, `average` 는 소수 첫째 자리 반올림, 후기가 없으면 `average: null, count: 0`. 같은 사람이 같은 대상에 여러 번 쓸 수 있다(핀마다 따로). 수정·삭제는 없다. 대상이 없으면 `404`
 
 ### 5-9. 내 집 기록
 | 메서드 | 경로 | 요청 | 응답 |
@@ -412,3 +414,4 @@
 | 2026-11-07 | v1.5 | `GET /housing` 필터(`maxRent`·`maxDeposit`·`maxWalkMin`·`buildingId`·`bbox`)와 `minConvertedRent`·`walkMin` 추가(스펙 C3) · `nextEvent`에 오늘 포함 · 공고 `status`를 일정 날짜로 계산 · 청년안심주택은 soco 매일 수집(대상 동, 일반공급·청년) · 기숙사 id = 건물 id · 대안 비교는 더 싼 대상만 · 픽스처 `housing.json`·`announcements.json` 삭제(수집으로 대체) · 화면 참고(주택형 이름 표기, 전용면적, 비어 있는 필드, 기숙사 5동) |
 | 2026-11-08 | v1.6 | 양도 글 요청에 **`title` 필수** 추가(프론트 글쓰기 폼에 제목 칸 필요) · 양도 글 검증 규칙 · `/uploads` 는 전체 주소 응답, `photoUrls` 는 업로드 주소만 · 상태 `OPEN` 되돌리기 허용 · 현재 전환율 0.046·기준 관리비 71,000원 명시 (예시의 0.06 과 구분) · 청년안심주택·기숙사 목록·상세에 `favorited` 추가 (하트 상태, v1.5 의 "/me/favorites 로 판단" 대체) |
 | 2026-11-08 | v1.7 | 프론트 구현에 맞춤: 양도 글 `title` **2~40자** · 하트는 `GET /me/favorites` 로 판단하고 청년안심주택·기숙사 `favorited` 는 다시 뺌 · FloorPlan 확장 형식(방 종류·바닥·문 형태·열림 방향·벽 높이·가구 `fixtures`), 원점 = 벽 중심선 바운딩박스 좌상단, 서버 원본은 `fixtures/floorplans/{id}.json` |
+| 2026-11-08 | v1.8 | 후기에 `floorplanId`(핀을 찍은 방, 선택) 추가 — 같은 단지 다른 타입 방에 핀이 섞여 보이던 문제. 후기 검증·정렬·평균 규칙 명시 |
