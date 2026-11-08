@@ -1,0 +1,966 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3210" height="1735" viewBox="0 0 3210 1735" font-family="Apple SD Gothic Neo, Pretendard, sans-serif"><rect width="3210" height="1735" fill="white"/><rect x="24" y="24" width="3162" height="1695" rx="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="56" y="72" font-size="22" font-weight="700" fill="#334155" text-anchor="start">POSTGRESQL 16 · CHATATDA — 테이블 관계도</text>
+<text x="56" y="104" font-size="15" font-weight="400" fill="#64748b" text-anchor="start">테이블 29개 · FK 23개(실선) · 논리 참조 5개(점선) · 찜·후기·알림의 target_id 는 type 따라 대상이 달라 선 생략</text>
+<rect x="56" y="134" width="14" height="14" rx="3" fill="#6366f1"/>
+<text x="76" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">사용자 · 인증</text>
+<rect x="192.5" y="134" width="14" height="14" rx="3" fill="#0d9488"/>
+<text x="212.5" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">캠퍼스 · 학과</text>
+<rect x="329.0" y="134" width="14" height="14" rx="3" fill="#ea580c"/>
+<text x="349.0" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">매물 · 실거래</text>
+<rect x="465.5" y="134" width="14" height="14" rx="3" fill="#16a34a"/>
+<text x="485.5" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">청년안심주택</text>
+<rect x="603.5" y="134" width="14" height="14" rx="3" fill="#0891b2"/>
+<text x="623.5" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">기숙사</text>
+<rect x="696.5" y="134" width="14" height="14" rx="3" fill="#d97706"/>
+<text x="716.5" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">평면도 (실내 3D)</text>
+<rect x="862.5" y="134" width="14" height="14" rx="3" fill="#db2777"/>
+<text x="882.5" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">양도</text>
+<rect x="940.5" y="134" width="14" height="14" rx="3" fill="#9333ea"/>
+<text x="960.5" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">후기 · 찜</text>
+<rect x="1047.0" y="134" width="14" height="14" rx="3" fill="#2563eb"/>
+<text x="1067.0" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">내 집 기록</text>
+<rect x="1164.0" y="134" width="14" height="14" rx="3" fill="#dc2626"/>
+<text x="1184.0" y="146" font-size="15" font-weight="600" fill="#334155" text-anchor="start">알림</text>
+<path d="M2690,140 L2760,140" stroke="#475569" stroke-width="2"/>
+<path d="M2705,140 L2690,133 M2705,140 L2690,140 M2705,140 L2690,147" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2751,133 L2751,147" stroke="#475569" stroke-width="2.4" stroke-linecap="round"/>
+<text x="2774" y="146" font-size="15" font-weight="400" fill="#334155" text-anchor="start">N : 1 (FK)</text>
+<path d="M2890,140 L2960,140" stroke="#94a3b8" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="2974" y="146" font-size="15" font-weight="400" fill="#334155" text-anchor="start">논리 참조 (FK 없음)</text>
+<rect x="62" y="253" width="330" height="350" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="60" y="250" width="330" height="350" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M60,259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#2563eb"/>
+<text x="74" y="275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">my_homes</text>
+<rect x="340" y="260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="359" y="274" font-size="12" font-weight="700" fill="#2563eb" text-anchor="middle">V10</text>
+<text x="74" y="307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="352" y="294" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="365.0" y="307" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="322" y="294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="335.0" y="307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="312" y="307" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<rect x="61" y="315" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="332" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">address</text>
+<text x="372" y="332" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(300)</text>
+<text x="74" y="357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">dong</text>
+<text x="372" y="357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(50)</text>
+<rect x="61" y="365" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="382" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lat</text>
+<text x="372" y="382" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="74" y="407" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lng</text>
+<text x="372" y="407" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="61" y="415" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="432" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">deposit</text>
+<text x="372" y="432" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="74" y="457" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">rent</text>
+<text x="372" y="457" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="61" y="465" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="482" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">mgmt_fee</text>
+<text x="372" y="482" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="74" y="507" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">area_m2</text>
+<text x="372" y="507" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="61" y="515" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="532" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">contract_start</text>
+<text x="372" y="532" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">date</text>
+<text x="74" y="557" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">contract_end</text>
+<text x="372" y="557" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">date</text>
+<rect x="61" y="565" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="582" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">updated_at</text>
+<text x="372" y="582" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="62" y="633" width="330" height="150" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="60" y="630" width="330" height="150" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M60,639 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#2563eb"/>
+<text x="74" y="655" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">home_payments</text>
+<rect x="340" y="640" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="359" y="654" font-size="12" font-weight="700" fill="#2563eb" text-anchor="middle">V10</text>
+<text x="74" y="687" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="352" y="674" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="365.0" y="687" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="322" y="674" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="335.0" y="687" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="312" y="687" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<rect x="61" y="695" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="712" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">month</text>
+<rect x="352" y="699" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="365.0" y="712" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="342" y="712" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">char(7)</text>
+<text x="74" y="737" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">amount</text>
+<text x="372" y="737" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="61" y="745" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="762" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">paid_at</text>
+<text x="372" y="762" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">date</text>
+<rect x="62" y="813" width="330" height="200" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="60" y="810" width="330" height="200" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M60,819 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#2563eb"/>
+<text x="74" y="835" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">home_utilities</text>
+<rect x="340" y="820" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="359" y="834" font-size="12" font-weight="700" fill="#2563eb" text-anchor="middle">V10</text>
+<text x="74" y="867" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="352" y="854" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="365.0" y="867" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="322" y="854" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="335.0" y="867" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="312" y="867" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<rect x="61" y="875" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="892" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">month</text>
+<rect x="352" y="879" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="365.0" y="892" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="342" y="892" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">char(7)</text>
+<text x="74" y="917" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">electricity</text>
+<text x="372" y="917" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="61" y="925" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="942" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">gas</text>
+<text x="372" y="942" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="74" y="967" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">water</text>
+<text x="372" y="967" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="61" y="975" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="992" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">internet</text>
+<text x="372" y="992" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="62" y="1043" width="330" height="150" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="60" y="1040" width="330" height="150" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M60,1049 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#2563eb"/>
+<text x="74" y="1065" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">home_alerts</text>
+<rect x="340" y="1050" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="359" y="1064" font-size="12" font-weight="700" fill="#2563eb" text-anchor="middle">V10</text>
+<text x="74" y="1097" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="352" y="1084" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="365.0" y="1097" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="342" y="1097" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="61" y="1105" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1122" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="352" y="1109" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="365.0" y="1122" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="342" y="1122" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<text x="74" y="1147" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">days_before</text>
+<text x="372" y="1147" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="61" y="1155" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1172" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">enabled</text>
+<text x="372" y="1172" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">boolean</text>
+<rect x="62" y="1223" width="330" height="300" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="60" y="1220" width="330" height="300" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M60,1229 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#dc2626"/>
+<text x="74" y="1245" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">notifications</text>
+<rect x="340" y="1230" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="359" y="1244" font-size="12" font-weight="700" fill="#dc2626" text-anchor="middle">V10</text>
+<text x="74" y="1277" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="352" y="1264" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="365.0" y="1277" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="342" y="1277" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="61" y="1285" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1302" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="352" y="1289" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="365.0" y="1302" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<rect x="322" y="1289" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="335.0" y="1302" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="312" y="1302" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<text x="74" y="1327" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">type</text>
+<text x="372" y="1327" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(30)</text>
+<rect x="61" y="1335" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1352" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">title</text>
+<text x="372" y="1352" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(200)</text>
+<text x="74" y="1377" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">body</text>
+<text x="372" y="1377" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<rect x="61" y="1385" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1402" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">target_type</text>
+<text x="372" y="1402" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<text x="74" y="1427" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">target_id</text>
+<rect x="344" y="1414" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="361.0" y="1427" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<text x="334" y="1427" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ type별 대상</text>
+<rect x="61" y="1435" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1452" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">dedupe_key</text>
+<rect x="352" y="1439" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="365.0" y="1452" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="342" y="1452" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(200)</text>
+<text x="74" y="1477" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">created_at</text>
+<text x="372" y="1477" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="61" y="1485" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1502" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">read</text>
+<text x="372" y="1502" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">boolean</text>
+<rect x="62" y="1553" width="330" height="125" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="60" y="1550" width="330" height="125" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M60,1559 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#6366f1"/>
+<text x="74" y="1575" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_buildings</text>
+<rect x="340" y="1560" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="359" y="1574" font-size="12" font-weight="700" fill="#6366f1" text-anchor="middle">V2</text>
+<text x="74" y="1607" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="352" y="1594" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="365.0" y="1607" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="322" y="1594" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="335.0" y="1607" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="312" y="1607" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<rect x="61" y="1615" width="328" height="25" fill="#f8fafc"/>
+<text x="74" y="1632" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">position</text>
+<rect x="352" y="1619" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="365.0" y="1632" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="342" y="1632" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="74" y="1657" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">building_id</text>
+<rect x="352" y="1644" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="365.0" y="1657" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="342" y="1657" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ buildings</text>
+<rect x="522" y="253" width="330" height="225" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="520" y="250" width="330" height="225" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M520,259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#6366f1"/>
+<text x="534" y="275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">users</text>
+<rect x="800" y="260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="819" y="274" font-size="12" font-weight="700" fill="#6366f1" text-anchor="middle">V1</text>
+<text x="534" y="307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="812" y="294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="825.0" y="307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="802" y="307" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="521" y="315" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="332" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">email</text>
+<rect x="812" y="319" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="825.0" y="332" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="802" y="332" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(255)</text>
+<text x="534" y="357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">nickname</text>
+<rect x="812" y="344" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="825.0" y="357" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="802" y="357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(30)</text>
+<rect x="521" y="365" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="382" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">created_at</text>
+<text x="832" y="382" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<text x="534" y="407" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">department_id</text>
+<rect x="812" y="394" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="825.0" y="407" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="802" y="407" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ departments</text>
+<text x="657.7" y="407" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">+V2</text>
+<rect x="521" y="415" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="432" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">rent_cap</text>
+<text x="832" y="432" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="613.2" y="432" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">+V2</text>
+<text x="534" y="457" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">deposit_cap</text>
+<text x="832" y="457" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="639.9" y="457" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">+V2</text>
+<rect x="522" y="508" width="330" height="125" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="520" y="505" width="330" height="125" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M520,514 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#0d9488"/>
+<text x="534" y="530" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">departments</text>
+<rect x="800" y="515" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="819" y="529" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">V2</text>
+<text x="534" y="562" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="812" y="549" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="825.0" y="562" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="802" y="562" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="521" y="570" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="587" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">name</text>
+<text x="832" y="587" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<text x="534" y="612" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">college</text>
+<text x="832" y="612" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<rect x="522" y="663" width="330" height="125" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="520" y="660" width="330" height="125" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M520,669 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#0d9488"/>
+<text x="534" y="685" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">department_buildings</text>
+<rect x="800" y="670" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="819" y="684" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">V2</text>
+<text x="534" y="717" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">department_id</text>
+<rect x="812" y="704" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="825.0" y="717" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="782" y="704" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="795.0" y="717" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="772" y="717" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ departments</text>
+<rect x="521" y="725" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="742" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">position</text>
+<rect x="812" y="729" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="825.0" y="742" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="802" y="742" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="534" y="767" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">building_id</text>
+<rect x="812" y="754" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="825.0" y="767" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="802" y="767" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ buildings</text>
+<rect x="522" y="818" width="330" height="175" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="520" y="815" width="330" height="175" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M520,824 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#0d9488"/>
+<text x="534" y="840" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">buildings</text>
+<rect x="800" y="825" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="819" y="839" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">V2</text>
+<text x="534" y="872" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="812" y="859" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="825.0" y="872" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="802" y="872" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="521" y="880" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="897" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">name</text>
+<text x="832" y="897" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<text x="534" y="922" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">type</text>
+<text x="832" y="922" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(10)</text>
+<rect x="521" y="930" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="947" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lat</text>
+<text x="832" y="947" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="534" y="972" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lng</text>
+<text x="832" y="972" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="522" y="1023" width="330" height="200" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="520" y="1020" width="330" height="200" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M520,1029 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#0d9488"/>
+<text x="534" y="1045" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">walk_cache</text>
+<rect x="800" y="1030" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="819" y="1044" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">V5</text>
+<text x="534" y="1077" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lat4</text>
+<rect x="812" y="1064" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="825.0" y="1077" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="802" y="1077" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="521" y="1085" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="1102" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lng4</text>
+<rect x="812" y="1089" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="825.0" y="1102" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="802" y="1102" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="534" y="1127" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">building_id</text>
+<rect x="804" y="1114" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="821.0" y="1127" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<rect x="774" y="1114" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="787.0" y="1127" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="764" y="1127" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ buildings</text>
+<rect x="521" y="1135" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="1152" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">minutes</text>
+<text x="832" y="1152" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="534" y="1177" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">distance_m</text>
+<text x="832" y="1177" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="521" y="1185" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="1202" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">fetched_at</text>
+<text x="832" y="1202" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="522" y="1253" width="330" height="175" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="520" y="1250" width="330" height="175" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M520,1259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#6366f1"/>
+<text x="534" y="1275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">email_codes</text>
+<rect x="800" y="1260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="819" y="1274" font-size="12" font-weight="700" fill="#6366f1" text-anchor="middle">V1</text>
+<text x="534" y="1307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">email</text>
+<rect x="812" y="1294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="825.0" y="1307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="802" y="1307" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(255)</text>
+<rect x="521" y="1315" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="1332" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">code_hash</text>
+<text x="832" y="1332" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(64)</text>
+<text x="534" y="1357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">expires_at</text>
+<text x="832" y="1357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="521" y="1365" width="328" height="25" fill="#f8fafc"/>
+<text x="534" y="1382" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">attempts</text>
+<text x="832" y="1382" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="534" y="1407" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">sent_at</text>
+<text x="832" y="1407" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="982" y="253" width="330" height="450" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="980" y="250" width="330" height="450" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M980,259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#9333ea"/>
+<text x="994" y="275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">reviews</text>
+<rect x="1260" y="260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="1279" y="274" font-size="12" font-weight="700" fill="#9333ea" text-anchor="middle">V10</text>
+<text x="994" y="307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="1272" y="294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1285.0" y="307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1262" y="307" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="981" y="315" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="332" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="1272" y="319" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="1285.0" y="332" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="1262" y="332" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<text x="994" y="357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">target_type</text>
+<text x="1292" y="357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<rect x="981" y="365" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="382" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">target_id</text>
+<rect x="1264" y="369" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="1281.0" y="382" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<text x="1254" y="382" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ type별 대상</text>
+<text x="994" y="407" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">rating</text>
+<text x="1292" y="407" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="981" y="415" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="432" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">noise</text>
+<text x="1292" y="432" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="994" y="457" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">light</text>
+<text x="1292" y="457" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="981" y="465" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="482" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">bugs</text>
+<text x="1292" y="482" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="994" y="507" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">landlord</text>
+<text x="1292" y="507" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="981" y="515" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="532" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">deposit_return</text>
+<text x="1292" y="532" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="994" y="557" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">text</text>
+<text x="1292" y="557" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<rect x="981" y="565" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="582" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">pin_x</text>
+<text x="1292" y="582" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="994" y="607" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">pin_y</text>
+<text x="1292" y="607" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="981" y="615" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="632" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">pin_z</text>
+<text x="1292" y="632" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="994" y="657" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">created_at</text>
+<text x="1292" y="657" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="981" y="665" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="682" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floorplan_id</text>
+<rect x="1264" y="669" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="1281.0" y="682" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<text x="1254" y="682" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ floorplans</text>
+<text x="1108.8" y="682" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">+V11</text>
+<rect x="982" y="733" width="330" height="175" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="980" y="730" width="330" height="175" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M980,739 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#9333ea"/>
+<text x="994" y="755" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">favorites</text>
+<rect x="1260" y="740" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="1279" y="754" font-size="12" font-weight="700" fill="#9333ea" text-anchor="middle">V7</text>
+<text x="994" y="787" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="1272" y="774" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1285.0" y="787" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1262" y="787" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="981" y="795" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="812" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="1272" y="799" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="1285.0" y="812" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<rect x="1242" y="799" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="1255.0" y="812" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="1232" y="812" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<text x="994" y="837" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">type</text>
+<rect x="1272" y="824" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="1285.0" y="837" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="1262" y="837" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<rect x="981" y="845" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="862" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">target_id</text>
+<rect x="1264" y="849" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="1281.0" y="862" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<rect x="1234" y="849" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="1247.0" y="862" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="1224" y="862" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ type별 대상</text>
+<text x="994" y="887" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">created_at</text>
+<text x="1292" y="887" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="982" y="938" width="330" height="125" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="980" y="935" width="330" height="125" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M980,944 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#16a34a"/>
+<text x="994" y="960" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing_subscriptions</text>
+<rect x="1260" y="945" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="1279" y="959" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle">V6</text>
+<text x="994" y="992" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">user_id</text>
+<rect x="1272" y="979" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="1285.0" y="992" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="1242" y="979" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1255.0" y="992" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1232" y="992" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<rect x="981" y="1000" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1017" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing_id</text>
+<rect x="1272" y="1004" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="1285.0" y="1017" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="1242" y="1004" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1255.0" y="1017" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1232" y="1017" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ housing</text>
+<text x="994" y="1042" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">created_at</text>
+<text x="1292" y="1042" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="982" y="1093" width="330" height="575" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="980" y="1090" width="330" height="575" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M980,1099 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#db2777"/>
+<text x="994" y="1115" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">transfers</text>
+<rect x="1260" y="1100" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="1279" y="1114" font-size="12" font-weight="700" fill="#db2777" text-anchor="middle">V9</text>
+<text x="994" y="1147" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="1272" y="1134" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1285.0" y="1147" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1262" y="1147" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="981" y="1155" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1172" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">author_id</text>
+<rect x="1272" y="1159" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="1285.0" y="1172" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="1262" y="1172" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ users</text>
+<text x="994" y="1197" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">title</text>
+<text x="1292" y="1197" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(50)</text>
+<rect x="981" y="1205" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1222" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">address</text>
+<text x="1292" y="1222" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(300)</text>
+<text x="994" y="1247" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">dong</text>
+<text x="1292" y="1247" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(50)</text>
+<rect x="981" y="1255" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1272" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lat</text>
+<text x="1292" y="1272" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="994" y="1297" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lng</text>
+<text x="1292" y="1297" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="981" y="1305" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1322" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">deposit</text>
+<text x="1292" y="1322" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="994" y="1347" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">rent</text>
+<text x="1292" y="1347" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="981" y="1355" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1372" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">mgmt_fee</text>
+<text x="1292" y="1372" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="994" y="1397" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">area_m2</text>
+<text x="1292" y="1397" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="981" y="1405" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1422" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floor</text>
+<text x="1292" y="1422" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="994" y="1447" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">room_type</text>
+<text x="1292" y="1447" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<rect x="981" y="1455" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1472" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">remaining_months</text>
+<text x="1292" y="1472" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="994" y="1497" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">available_from</text>
+<text x="1292" y="1497" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">date</text>
+<rect x="981" y="1505" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1522" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">description</text>
+<text x="1292" y="1522" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(2000)</text>
+<text x="994" y="1547" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">status</text>
+<text x="1292" y="1547" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(10)</text>
+<rect x="981" y="1555" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1572" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">converted_rent</text>
+<text x="1292" y="1572" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="994" y="1597" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">grade</text>
+<text x="1292" y="1597" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<rect x="981" y="1605" width="328" height="25" fill="#f8fafc"/>
+<text x="994" y="1622" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">created_at</text>
+<text x="1292" y="1622" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<text x="994" y="1647" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">updated_at</text>
+<text x="1292" y="1647" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="1442" y="253" width="330" height="325" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="1440" y="250" width="330" height="325" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M1440,259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#16a34a"/>
+<text x="1454" y="275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing</text>
+<rect x="1720" y="260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="1739" y="274" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle">V6</text>
+<text x="1454" y="307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="1732" y="294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1745.0" y="307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1722" y="307" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="1441" y="315" width="328" height="25" fill="#f8fafc"/>
+<text x="1454" y="332" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">soco_home_code</text>
+<rect x="1732" y="319" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="1745.0" y="332" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="1722" y="332" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<text x="1454" y="357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">name</text>
+<text x="1752" y="357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(200)</text>
+<rect x="1441" y="365" width="328" height="25" fill="#f8fafc"/>
+<text x="1454" y="382" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">address</text>
+<text x="1752" y="382" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(300)</text>
+<text x="1454" y="407" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">dong</text>
+<text x="1752" y="407" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(50)</text>
+<rect x="1441" y="415" width="328" height="25" fill="#f8fafc"/>
+<text x="1454" y="432" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lat</text>
+<text x="1752" y="432" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="1454" y="457" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lng</text>
+<text x="1752" y="457" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="1441" y="465" width="328" height="25" fill="#f8fafc"/>
+<text x="1454" y="482" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">contact</text>
+<text x="1752" y="482" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<text x="1454" y="507" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">homepage_url</text>
+<text x="1752" y="507" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<rect x="1441" y="515" width="328" height="25" fill="#f8fafc"/>
+<text x="1454" y="532" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floor_layout_image_url</text>
+<text x="1752" y="532" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<text x="1454" y="557" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">updated_at</text>
+<text x="1752" y="557" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="1442" y="1093" width="330" height="125" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="1440" y="1090" width="330" height="125" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M1440,1099 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#db2777"/>
+<text x="1454" y="1115" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">transfer_photos</text>
+<rect x="1720" y="1100" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="1739" y="1114" font-size="12" font-weight="700" fill="#db2777" text-anchor="middle">V9</text>
+<text x="1454" y="1147" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">transfer_id</text>
+<rect x="1732" y="1134" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="1745.0" y="1147" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="1702" y="1134" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1715.0" y="1147" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1692" y="1147" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ transfers</text>
+<rect x="1441" y="1155" width="328" height="25" fill="#f8fafc"/>
+<text x="1454" y="1172" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">position</text>
+<rect x="1732" y="1159" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="1745.0" y="1172" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="1722" y="1172" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="1454" y="1197" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">url</text>
+<text x="1752" y="1197" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<rect x="1902" y="253" width="330" height="275" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="1900" y="250" width="330" height="275" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M1900,259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#16a34a"/>
+<text x="1914" y="275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing_unit_types</text>
+<rect x="2180" y="260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="2199" y="274" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle">V6</text>
+<text x="1914" y="307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="2192" y="294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="2205.0" y="307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="2182" y="307" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="1901" y="315" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="332" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing_id</text>
+<rect x="2192" y="319" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="2205.0" y="332" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<rect x="2162" y="319" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="2175.0" y="332" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="2152" y="332" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ housing</text>
+<text x="1914" y="357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">name</text>
+<rect x="2192" y="344" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="2205.0" y="357" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="2182" y="357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<rect x="1901" y="365" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="382" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">room_kind</text>
+<text x="2212" y="382" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(30)</text>
+<text x="1914" y="407" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">exclusive_area_m2</text>
+<text x="2212" y="407" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="1901" y="415" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="432" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">deposit</text>
+<text x="2212" y="432" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="1914" y="457" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">rent</text>
+<text x="2212" y="457" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="1901" y="465" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="482" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">mgmt_fee</text>
+<text x="2212" y="482" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="1914" y="507" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floorplan_id</text>
+<rect x="2184" y="494" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="2201.0" y="507" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<text x="2174" y="507" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ floorplans</text>
+<rect x="1902" y="558" width="330" height="200" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="1900" y="555" width="330" height="200" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M1900,564 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#16a34a"/>
+<text x="1914" y="580" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing_floorplan_images</text>
+<rect x="2180" y="565" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="2199" y="579" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle">V6</text>
+<text x="1914" y="612" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="2192" y="599" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="2205.0" y="612" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="2182" y="612" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="1901" y="620" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="637" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing_id</text>
+<rect x="2192" y="624" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="2205.0" y="637" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="2182" y="637" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ housing</text>
+<text x="1914" y="662" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">position</text>
+<text x="2212" y="662" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="1901" y="670" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="687" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">url</text>
+<rect x="2192" y="674" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="2205.0" y="687" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="2182" y="687" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<text x="1914" y="712" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">sha256</text>
+<text x="2212" y="712" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(64)</text>
+<rect x="1901" y="720" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="737" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">unit_type_name</text>
+<text x="2212" y="737" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<rect x="1902" y="788" width="330" height="200" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="1900" y="785" width="330" height="200" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M1900,794 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#16a34a"/>
+<text x="1914" y="810" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">announcements</text>
+<rect x="2180" y="795" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="2199" y="809" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle">V6</text>
+<text x="1914" y="842" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="2192" y="829" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="2205.0" y="842" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="2182" y="842" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="1901" y="850" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="867" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">soco_board_id</text>
+<rect x="2192" y="854" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="2205.0" y="867" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="2182" y="867" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="1914" y="892" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">housing_id</text>
+<rect x="2192" y="879" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="2205.0" y="892" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="2182" y="892" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ housing</text>
+<rect x="1901" y="900" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="917" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">title</text>
+<text x="2212" y="917" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(300)</text>
+<text x="1914" y="942" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">additional</text>
+<text x="2212" y="942" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">boolean</text>
+<rect x="1901" y="950" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="967" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">posted_on</text>
+<text x="2212" y="967" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">date</text>
+<rect x="1902" y="1018" width="330" height="150" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="1900" y="1015" width="330" height="150" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M1900,1024 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#16a34a"/>
+<text x="1914" y="1040" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">announcement_events</text>
+<rect x="2180" y="1025" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="2199" y="1039" font-size="12" font-weight="700" fill="#16a34a" text-anchor="middle">V6</text>
+<text x="1914" y="1072" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="2192" y="1059" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="2205.0" y="1072" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="2182" y="1072" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="1901" y="1080" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="1097" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">announcement_id</text>
+<rect x="2192" y="1084" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="2205.0" y="1097" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<rect x="2162" y="1084" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="2175.0" y="1097" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="2152" y="1097" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ announcements</text>
+<text x="1914" y="1122" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">type</text>
+<rect x="2192" y="1109" width="26" height="17" rx="4" fill="#dcfce7"/>
+<text x="2205.0" y="1122" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">UQ</text>
+<text x="2182" y="1122" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<rect x="1901" y="1130" width="328" height="25" fill="#f8fafc"/>
+<text x="1914" y="1147" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">event_date</text>
+<text x="2212" y="1147" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">date</text>
+<rect x="2362" y="253" width="330" height="175" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="2360" y="250" width="330" height="175" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M2360,259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#d97706"/>
+<text x="2374" y="275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">floorplans</text>
+<rect x="2640" y="260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="2659" y="274" font-size="12" font-weight="700" fill="#d97706" text-anchor="middle">V8</text>
+<text x="2374" y="307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="2652" y="294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="2665.0" y="307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="2642" y="307" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2361" y="315" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="332" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">name</text>
+<text x="2672" y="332" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<text x="2374" y="357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">area_m2</text>
+<text x="2672" y="357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="2361" y="365" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="382" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">data</text>
+<text x="2672" y="382" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">jsonb</text>
+<text x="2374" y="407" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">updated_at</text>
+<text x="2672" y="407" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="2362" y="458" width="330" height="525" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="2360" y="455" width="330" height="525" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M2360,464 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#ea580c"/>
+<text x="2374" y="480" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">listings</text>
+<rect x="2640" y="465" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="2659" y="479" font-size="12" font-weight="700" fill="#ea580c" text-anchor="middle">V4</text>
+<text x="2374" y="512" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="2652" y="499" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="2665.0" y="512" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="2642" y="512" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="2361" y="520" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="537" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">title</text>
+<text x="2672" y="537" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(200)</text>
+<text x="2374" y="562" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">address</text>
+<text x="2672" y="562" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(300)</text>
+<rect x="2361" y="570" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="587" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">dong</text>
+<text x="2672" y="587" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(50)</text>
+<text x="2374" y="612" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lat</text>
+<text x="2672" y="612" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="2361" y="620" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="637" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lng</text>
+<text x="2672" y="637" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="2374" y="662" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">deposit</text>
+<text x="2672" y="662" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2361" y="670" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="687" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">rent</text>
+<text x="2672" y="687" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="2374" y="712" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">mgmt_fee</text>
+<text x="2672" y="712" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2361" y="720" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="737" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">area_m2</text>
+<text x="2672" y="737" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<text x="2374" y="762" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floor</text>
+<text x="2672" y="762" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="2361" y="770" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="787" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">room_type</text>
+<text x="2672" y="787" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<text x="2374" y="812" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">thumbnail_url</text>
+<text x="2672" y="812" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<rect x="2361" y="820" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="837" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floorplan_id</text>
+<rect x="2644" y="824" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="2661.0" y="837" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<text x="2634" y="837" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ floorplans</text>
+<text x="2374" y="862" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">built_year</text>
+<text x="2672" y="862" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="2361" y="870" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="887" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">description</text>
+<text x="2672" y="887" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(2000)</text>
+<text x="2374" y="912" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">converted_rent</text>
+<text x="2672" y="912" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2361" y="920" width="328" height="25" fill="#f8fafc"/>
+<text x="2374" y="937" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">grade</text>
+<text x="2672" y="937" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(20)</text>
+<text x="2374" y="962" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">graded_at</text>
+<text x="2672" y="962" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<rect x="2822" y="253" width="330" height="125" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="2820" y="250" width="330" height="125" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M2820,259 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#ea580c"/>
+<text x="2834" y="275" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">listing_options</text>
+<rect x="3100" y="260" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="3119" y="274" font-size="12" font-weight="700" fill="#ea580c" text-anchor="middle">V4</text>
+<text x="2834" y="307" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">listing_id</text>
+<rect x="3112" y="294" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="3125.0" y="307" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="3082" y="294" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="3095.0" y="307" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="3072" y="307" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ listings</text>
+<rect x="2821" y="315" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="332" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">position</text>
+<rect x="3112" y="319" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="3125.0" y="332" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="3102" y="332" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="2834" y="357" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">option_name</text>
+<text x="3132" y="357" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<rect x="2822" y="408" width="330" height="125" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="2820" y="405" width="330" height="125" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M2820,414 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#ea580c"/>
+<text x="2834" y="430" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">listing_photos</text>
+<rect x="3100" y="415" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="3119" y="429" font-size="12" font-weight="700" fill="#ea580c" text-anchor="middle">V4</text>
+<text x="2834" y="462" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">listing_id</text>
+<rect x="3112" y="449" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="3125.0" y="462" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<rect x="3082" y="449" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="3095.0" y="462" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="3072" y="462" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ listings</text>
+<rect x="2821" y="470" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="487" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">position</text>
+<rect x="3112" y="474" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="3125.0" y="487" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="3102" y="487" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="2834" y="512" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">url</text>
+<text x="3132" y="512" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(500)</text>
+<rect x="2822" y="563" width="330" height="250" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="2820" y="560" width="330" height="250" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M2820,569 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#0891b2"/>
+<text x="2834" y="585" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">dorm_room_types</text>
+<rect x="3100" y="570" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="3119" y="584" font-size="12" font-weight="700" fill="#0891b2" text-anchor="middle">V6</text>
+<text x="2834" y="617" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="3112" y="604" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="3125.0" y="617" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="3102" y="617" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2821" y="625" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="642" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">dorm_id</text>
+<rect x="3112" y="629" width="26" height="17" rx="4" fill="#dbeafe"/>
+<text x="3125.0" y="642" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">FK</text>
+<text x="3102" y="642" font-size="13" font-weight="400" fill="#1d4ed8" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ dorms</text>
+<text x="2834" y="667" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">name</text>
+<text x="3132" y="667" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<rect x="2821" y="675" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="692" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">capacity</text>
+<text x="3132" y="692" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="2834" y="717" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">semester_fee</text>
+<text x="3132" y="717" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2821" y="725" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="742" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">semester_months</text>
+<text x="3132" y="742" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="2834" y="767" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">meal_included</text>
+<text x="3132" y="767" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">boolean</text>
+<rect x="2821" y="775" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="792" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floorplan_id</text>
+<rect x="3104" y="779" width="34" height="17" rx="4" fill="#f1f5f9"/>
+<text x="3121.0" y="792" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">REF</text>
+<text x="3094" y="792" font-size="13" font-weight="400" fill="#64748b" text-anchor="end" font-family="SF Mono, Menlo, monospace">→ floorplans</text>
+<rect x="2822" y="843" width="330" height="150" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="2820" y="840" width="330" height="150" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M2820,849 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#0891b2"/>
+<text x="2834" y="865" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">dorms</text>
+<rect x="3100" y="850" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="3119" y="864" font-size="12" font-weight="700" fill="#0891b2" text-anchor="middle">V6</text>
+<text x="2834" y="897" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="3112" y="884" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="3125.0" y="897" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="3102" y="897" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2821" y="905" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="922" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">name</text>
+<text x="3132" y="922" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(100)</text>
+<text x="2834" y="947" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lat</text>
+<text x="3132" y="947" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="2821" y="955" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="972" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lng</text>
+<text x="3132" y="972" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="2822" y="1023" width="330" height="350" rx="9" fill="#0f172a" opacity="0.06"/>
+<rect x="2820" y="1020" width="330" height="350" rx="9" fill="white" stroke="#e2e8f0"/>
+<path d="M2820,1029 a9,9 0 0 1 9,-9 h312 a9,9 0 0 1 9,9 v29 h-330 z" fill="#ea580c"/>
+<text x="2834" y="1045" font-size="17" font-weight="700" fill="white" text-anchor="start" font-family="SF Mono, Menlo, monospace">real_deals</text>
+<rect x="3100" y="1030" width="38" height="19" rx="9.5" fill="white" opacity="0.9"/>
+<text x="3119" y="1044" font-size="12" font-weight="700" fill="#ea580c" text-anchor="middle">V3</text>
+<text x="2834" y="1077" font-size="14.5" font-weight="700" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">id</text>
+<rect x="3112" y="1064" width="26" height="17" rx="4" fill="#fef3c7"/>
+<text x="3125.0" y="1077" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">PK</text>
+<text x="3102" y="1077" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigserial</text>
+<rect x="2821" y="1085" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="1102" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">lawd_cd</text>
+<text x="3132" y="1102" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(5)</text>
+<text x="2834" y="1127" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">building_type</text>
+<text x="3132" y="1127" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(10)</text>
+<rect x="2821" y="1135" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="1152" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">dong</text>
+<text x="3132" y="1152" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(50)</text>
+<text x="2834" y="1177" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">area_m2</text>
+<text x="3132" y="1177" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">double</text>
+<rect x="2821" y="1185" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="1202" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">deposit</text>
+<text x="3132" y="1202" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<text x="2834" y="1227" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">rent</text>
+<text x="3132" y="1227" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">bigint</text>
+<rect x="2821" y="1235" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="1252" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">contract_ym</text>
+<text x="3132" y="1252" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="2834" y="1277" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">floor</text>
+<text x="3132" y="1277" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<rect x="2821" y="1285" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="1302" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">built_year</text>
+<text x="3132" y="1302" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">int</text>
+<text x="2834" y="1327" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">contract_type</text>
+<text x="3132" y="1327" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">varchar(10)</text>
+<rect x="2821" y="1335" width="328" height="25" fill="#f8fafc"/>
+<text x="2834" y="1352" font-size="14.5" font-weight="400" fill="#0f172a" text-anchor="start" font-family="SF Mono, Menlo, monospace">ingested_at</text>
+<text x="3132" y="1352" font-size="13" font-weight="400" fill="#94a3b8" text-anchor="end" font-family="SF Mono, Menlo, monospace">timestamptz</text>
+<path d="M850.0,402.5 L873.5,402.5 Q882.5,402.5 882.5,411.5 L882.5,548.5 Q882.5,557.5 873.5,557.5 L850.0,557.5" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M865,402.5 L850,395.5 M865,402.5 L850,402.5 M865,402.5 L850,409.5" stroke="#6366f1" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,550.5 L859,564.5" stroke="#6366f1" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M850.0,712.5 L886.5,712.5 Q895.5,712.5 895.5,703.5 L895.5,566.5 Q895.5,557.5 886.5,557.5 L850.0,557.5" fill="none" stroke="#0d9488" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M865,712.5 L850,705.5 M865,712.5 L850,712.5 M865,712.5 L850,719.5" stroke="#0d9488" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,550.5 L859,564.5" stroke="#0d9488" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M850.0,762.5 L899.5,762.5 Q908.5,762.5 908.5,771.5 L908.5,858.5 Q908.5,867.5 899.5,867.5 L850.0,867.5" fill="none" stroke="#0d9488" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M865,762.5 L850,755.5 M865,762.5 L850,762.5 M865,762.5 L850,769.5" stroke="#0d9488" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,860.5 L859,874.5" stroke="#0d9488" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M390.0,1602.5 L472.0,1602.5 Q481.0,1602.5 481.0,1593.5 L481.0,311.5 Q481.0,302.5 490.0,302.5 L520.0,302.5" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M405,1602.5 L390,1595.5 M405,1602.5 L390,1602.5 M405,1602.5 L390,1609.5" stroke="#6366f1" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M511,295.5 L511,309.5" stroke="#6366f1" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M390.0,1652.5 L485.0,1652.5 Q494.0,1652.5 494.0,1643.5 L494.0,876.5 Q494.0,867.5 503.0,867.5 L520.0,867.5" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M405,1652.5 L390,1645.5 M405,1652.5 L390,1652.5 M405,1652.5 L390,1659.5" stroke="#6366f1" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M511,860.5 L511,874.5" stroke="#6366f1" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M2690.0,832.5 L2746.0,832.5 Q2755.0,832.5 2755.0,823.5 L2755.0,311.5 Q2755.0,302.5 2746.0,302.5 L2690.0,302.5" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linejoin="round" opacity="0.9" stroke-dasharray="8 6"/>
+<path d="M2705,832.5 L2690,825.5 M2705,832.5 L2690,832.5 M2705,832.5 L2690,839.5" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2699,295.5 L2699,309.5" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M2820.0,302.5 L2738.0,302.5 Q2729.0,302.5 2729.0,311.5 L2729.0,498.5 Q2729.0,507.5 2720.0,507.5 L2690.0,507.5" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M2805,302.5 L2820,295.5 M2805,302.5 L2820,302.5 M2805,302.5 L2820,309.5" stroke="#ea580c" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2699,500.5 L2699,514.5" stroke="#ea580c" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M2820.0,457.5 L2751.0,457.5 Q2742.0,457.5 2742.0,466.5 L2742.0,498.5 Q2742.0,507.5 2733.0,507.5 L2690.0,507.5" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M2805,457.5 L2820,450.5 M2805,457.5 L2820,457.5 M2805,457.5 L2820,464.5" stroke="#ea580c" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2699,500.5 L2699,514.5" stroke="#ea580c" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M850.0,1122.5 L951.5,1122.5 Q960.5,1122.5 960.5,1113.5 L960.5,876.5 Q960.5,867.5 951.5,867.5 L850.0,867.5" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linejoin="round" opacity="0.9" stroke-dasharray="8 6"/>
+<path d="M865,1122.5 L850,1115.5 M865,1122.5 L850,1122.5 M865,1122.5 L850,1129.5" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,860.5 L859,874.5" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M1900.0,327.5 L1857.0,327.5 Q1848.0,327.5 1848.0,318.5 L1848.0,311.5 Q1848.0,302.5 1839.0,302.5 L1770.0,302.5" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M1885,327.5 L1900,320.5 M1885,327.5 L1900,327.5 M1885,327.5 L1900,334.5" stroke="#16a34a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M1779,295.5 L1779,309.5" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M2230.0,502.5 L2286.0,502.5 Q2295.0,502.5 2295.0,493.5 L2295.0,311.5 Q2295.0,302.5 2304.0,302.5 L2360.0,302.5" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linejoin="round" opacity="0.9" stroke-dasharray="8 6"/>
+<path d="M2245,502.5 L2230,495.5 M2245,502.5 L2230,502.5 M2245,502.5 L2230,509.5" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2351,295.5 L2351,309.5" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M1900.0,887.5 L1831.0,887.5 Q1822.0,887.5 1822.0,878.5 L1822.0,311.5 Q1822.0,302.5 1813.0,302.5 L1770.0,302.5" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M1885,887.5 L1900,880.5 M1885,887.5 L1900,887.5 M1885,887.5 L1900,894.5" stroke="#16a34a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M1779,295.5 L1779,309.5" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M2230.0,1092.5 L2299.0,1092.5 Q2308.0,1092.5 2308.0,1083.5 L2308.0,846.5 Q2308.0,837.5 2299.0,837.5 L2230.0,837.5" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M2245,1092.5 L2230,1085.5 M2245,1092.5 L2230,1092.5 M2245,1092.5 L2230,1099.5" stroke="#16a34a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2239,830.5 L2239,844.5" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M980.0,987.5 L943.5,987.5 Q934.5,987.5 934.5,978.5 L934.5,311.5 Q934.5,302.5 925.5,302.5 L850.0,302.5" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M965,987.5 L980,980.5 M965,987.5 L980,987.5 M965,987.5 L980,994.5" stroke="#16a34a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,295.5 L859,309.5" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M1310.0,1012.5 L1366.0,1012.5 Q1375.0,1012.5 1375.0,1003.5 L1375.0,311.5 Q1375.0,302.5 1384.0,302.5 L1440.0,302.5" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M1325,1012.5 L1310,1005.5 M1325,1012.5 L1310,1012.5 M1325,1012.5 L1310,1019.5" stroke="#16a34a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M1431,295.5 L1431,309.5" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M1900.0,632.5 L1844.0,632.5 Q1835.0,632.5 1835.0,623.5 L1835.0,311.5 Q1835.0,302.5 1826.0,302.5 L1770.0,302.5" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M1885,632.5 L1900,625.5 M1885,632.5 L1900,632.5 M1885,632.5 L1900,639.5" stroke="#16a34a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M1779,295.5 L1779,309.5" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M2820.0,637.5 L2790.0,637.5 Q2781.0,637.5 2781.0,646.5 L2781.0,883.5 Q2781.0,892.5 2790.0,892.5 L2820.0,892.5" fill="none" stroke="#0891b2" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M2805,637.5 L2820,630.5 M2805,637.5 L2820,637.5 M2805,637.5 L2820,644.5" stroke="#0891b2" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2811,885.5 L2811,899.5" stroke="#0891b2" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M2820.0,787.5 L2777.0,787.5 Q2768.0,787.5 2768.0,778.5 L2768.0,311.5 Q2768.0,302.5 2759.0,302.5 L2690.0,302.5" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linejoin="round" opacity="0.9" stroke-dasharray="8 6"/>
+<path d="M2805,787.5 L2820,780.5 M2805,787.5 L2820,787.5 M2805,787.5 L2820,794.5" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2699,295.5 L2699,309.5" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M980.0,807.5 L956.5,807.5 Q947.5,807.5 947.5,798.5 L947.5,311.5 Q947.5,302.5 938.5,302.5 L850.0,302.5" fill="none" stroke="#9333ea" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M965,807.5 L980,800.5 M965,807.5 L980,807.5 M965,807.5 L980,814.5" stroke="#9333ea" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,295.5 L859,309.5" stroke="#9333ea" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M980.0,1167.5 L930.5,1167.5 Q921.5,1167.5 921.5,1158.5 L921.5,311.5 Q921.5,302.5 912.5,302.5 L850.0,302.5" fill="none" stroke="#db2777" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M965,1167.5 L980,1160.5 M965,1167.5 L980,1167.5 M965,1167.5 L980,1174.5" stroke="#db2777" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,295.5 L859,309.5" stroke="#db2777" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M1440.0,1142.5 L1397.0,1142.5 Q1388.0,1142.5 1379.0,1142.5 L1310.0,1142.5" fill="none" stroke="#db2777" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M1425,1142.5 L1440,1135.5 M1425,1142.5 L1440,1142.5 M1425,1142.5 L1440,1149.5" stroke="#db2777" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M1319,1135.5 L1319,1149.5" stroke="#db2777" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M980.0,327.5 L878.5,327.5 Q869.5,327.5 869.5,318.5 L869.5,311.5 Q869.5,302.5 860.5,302.5 L850.0,302.5" fill="none" stroke="#9333ea" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M965,327.5 L980,320.5 M965,327.5 L980,327.5 M965,327.5 L980,334.5" stroke="#9333ea" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M859,295.5 L859,309.5" stroke="#9333ea" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M1310.0,677.5 L1353.0,677.5 Q1362.0,677.5 1362.0,668.5 L1362.0,211.0 Q1362.0,202.0 1371.0,202.0 L2273.0,202.0 Q2282.0,202.0 2282.0,211.0 L2282.0,293.5 Q2282.0,302.5 2291.0,302.5 L2360.0,302.5" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linejoin="round" opacity="0.9" stroke-dasharray="8 6"/>
+<path d="M1325,677.5 L1310,670.5 M1325,677.5 L1310,677.5 M1325,677.5 L1310,684.5" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M2351,295.5 L2351,309.5" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M390.0,302.5 L407.0,302.5 Q416.0,302.5 425.0,302.5 L520.0,302.5" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M405,302.5 L390,295.5 M405,302.5 L390,302.5 M405,302.5 L390,309.5" stroke="#2563eb" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M511,295.5 L511,309.5" stroke="#2563eb" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M390.0,682.5 L420.0,682.5 Q429.0,682.5 429.0,673.5 L429.0,311.5 Q429.0,302.5 438.0,302.5 L520.0,302.5" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M405,682.5 L390,675.5 M405,682.5 L390,682.5 M405,682.5 L390,689.5" stroke="#2563eb" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M511,295.5 L511,309.5" stroke="#2563eb" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M390.0,862.5 L433.0,862.5 Q442.0,862.5 442.0,853.5 L442.0,311.5 Q442.0,302.5 451.0,302.5 L520.0,302.5" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M405,862.5 L390,855.5 M405,862.5 L390,862.5 M405,862.5 L390,869.5" stroke="#2563eb" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M511,295.5 L511,309.5" stroke="#2563eb" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M390.0,1117.5 L446.0,1117.5 Q455.0,1117.5 455.0,1108.5 L455.0,311.5 Q455.0,302.5 464.0,302.5 L520.0,302.5" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M405,1117.5 L390,1110.5 M405,1117.5 L390,1117.5 M405,1117.5 L390,1124.5" stroke="#2563eb" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M511,295.5 L511,309.5" stroke="#2563eb" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M390.0,1297.5 L459.0,1297.5 Q468.0,1297.5 468.0,1288.5 L468.0,311.5 Q468.0,302.5 477.0,302.5 L520.0,302.5" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linejoin="round" opacity="0.9"/>
+<path d="M405,1297.5 L390,1290.5 M405,1297.5 L390,1297.5 M405,1297.5 L390,1304.5" stroke="#dc2626" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M511,295.5 L511,309.5" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round"/></svg>

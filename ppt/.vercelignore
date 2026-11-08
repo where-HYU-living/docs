@@ -1,0 +1,5 @@
+# 로그인 세션(JWT·구글 쿠키)은 절대 올리지 않는다
+capture/.auth
+capture/.profile
+.env*
+.vercel

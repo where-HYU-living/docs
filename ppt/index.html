@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>어디서사냥 발표</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reset.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&display=swap">
+<link rel="stylesheet" href="assets/deck.css">
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1 표지 -->
+<section data-step="0">
+  <div class="cover">
+    <div class="left">
+      <p class="theme">Summit 트랙 주제<b>「찾았다. 내 돈을 다 써버린 놈!」</b></p>
+      <h1>어디서사냥</h1>
+      <p class="sub">한양대 신입생을 위한 3D 첫 집 찾기 서비스</p>
+      <p class="team"><b>팀원</b> 김준형(프론트엔드·3D), 장시현(백엔드)</p>
+    </div>
+    <div class="right"><img src="assets/shots/cover-aerial.jpg" alt="어디서사냥 3D 캠퍼스: 사자상과 역사관, 애지문"></div>
+  </div>
+  <aside class="notes">안녕하세요. 저희는 「찾았다. 내 돈을 다 써버린 놈!」이라는 주제를 받고 대학생 돈을 가장 많이 가져가는 '놈'을 월세로 봤습니다. 그 답으로 만든 서비스가 한양대 신입생을 위한 3D 첫 집 찾기 서비스, 어디서사냥입니다.</aside>
+</section>
+
+<!-- 2 목차 -->
+<section data-step="0">
+  <div class="frame">
+    <div class="head"><div><h2>목차</h2></div></div>
+    <ol class="toc">
+      <li><span class="no">01</span><div><h3>문제</h3><p>대학생 돈을 가장 많이 가져가는 건 월세입니다</p></div></li>
+      <li><span class="no">04</span><div><h3>핵심 기능</h3><p>가격 판결, 룸투어, 캠퍼스·동네 투어, 한양대생 후기</p></div></li>
+      <li><span class="no">02</span><div><h3>왜 한양대 신입생인가</h3><p>비싼 동네에서, 정보 없이 첫 계약을 합니다</p></div></li>
+      <li><span class="no">05</span><div><h3>기술 구조</h3><p>아키텍처, ERD, 기능 명세, API</p></div></li>
+      <li><span class="no">03</span><div><h3>해결 방안</h3><p>네 가지 장벽에 기능 하나씩</p></div></li>
+      <li><span class="no">06</span><div><h3>기대 효과와 계획</h3><p>신입생 집 구하기 시즌에 맞춘 출시와 확장</p></div></li>
+    </ol>
+  </div>
+  <aside class="notes">발표는 여섯 부분입니다. 문제를 정의하고 왜 하필 한양대 신입생인지 숫자로 보여 드린 뒤, 해결 방안과 핵심 기능 네 가지, 기술 구조, 기대 효과 순서로 말씀드리겠습니다.</aside>
+</section>
+
+<!-- 3 문제: 놈은 월세 (예전 3+4장) -->
+<section data-step="1">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">01</span>문제</p><h2>내 돈을 다 써버린 놈은 월세입니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="rent">
+        <div class="rent-vs">
+          <div><p class="big">70.9<small>만 원</small></p><p class="what">서울 10개 대학가 원룸 월세 + 관리비</p><p class="who">다방, 2026년 7월</p><div class="vs-bar" style="width:100%"></div></div>
+          <div><p class="big">68.1<small>만 원</small></p><p class="what">대학생 한 달 평균 지출</p><p class="who">대학내일20대연구소, 2025년</p><div class="vs-bar is-gray" style="width:96%"></div></div>
+          <p class="punch">방 한 칸 값이 한 달 지출보다 큽니다.</p>
+        </div>
+        <div class="rent-gap">
+          <h4>같은 동네, 같은 크기 방도 <em>2.2배</em> 차이 납니다</h4>
+          <div class="chart" id="ch-histo"></div>
+          <p class="cap">한양대 주변 6개 동, 전용 15~25㎡ 월세 거래 <b>1,315건</b>의 환산 월세 분포</p>
+          <p class="rent-calc">상위 10% 방을 고르면 중앙값보다 월 <b>35.0만</b>, 2년이면 <b class="hi">840만 원</b>을 더 냅니다.</p>
+        </div>
+      </div>
+    </div>
+    <p class="src">출처: 다방 서울 주요 10개 대학 인근 원룸 시세(2026.7, 보증금 1천만 원·전용 33㎡ 이하, 국민일보 인용) · 대학내일20대연구소 소비지출 정기조사 2025. 두 수치는 조사 기준이 달라 크기만 견줬습니다. 자체 분석: 국토부 실거래 1,315건(2025.11~2026.10, 행당·사근·도선·하왕십리·상왕십리·홍익동), 환산 월세 = 월세 + 보증금 × 4.6% ÷ 12.</p>
+  </div>
+  <aside class="notes">서울 대학가 원룸 한 칸의 월세와 관리비가 70만 9천 원으로 대학생 한 달 평균 지출 68만 1천 원보다 많습니다. 1인 가구는 지출의 20% 넘게 주거비로 쓰고, 2030세대 40%가 가장 부담되는 지출로 주거비를 꼽았습니다. 그래서 주제의 '놈'을 월세로 정했습니다. 저희가 모은 국토부 실거래로 한양대 주변 같은 크기 방을 보면 하위 10%는 44만 원, 상위 10%는 99만 원입니다. 비싼 방인 줄 모르고 계약하면 2년에 840만 원을 더 냅니다.</aside>
+</section>
+
+<!-- 4 한양대 (예전 5+6장) -->
+<section data-step="2">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">02</span>왜 한양대 신입생인가</p><h2>한양대 앞은 서울에서도 비싸고, 빠르게 오릅니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="duo">
+        <div>
+          <h4>서울 25개 구 원룸 월세 <span>성동구 <b>4위</b>, 82만 원</span></h4>
+          <div class="chart" id="ch-gu"></div>
+        </div>
+        <div>
+          <h4>서울 주요 10개 대학가 원룸 월세 <span>한양대 <b>5위</b>, 64.2만 원</span></h4>
+          <div class="chart" id="ch-univ"></div>
+        </div>
+      </div>
+      <div class="duo-foot">
+        <p><b class="big">+31%</b><span>한양대 앞 원룸 월세, 3년 사이 49.0만 원에서 64.2만 원으로 올랐습니다. 2026년 상승률은 10곳 중 두 번째입니다.</span></p>
+        <p><b class="big">2~4위</b><span>성동구는 2025년 3월부터 2026년 9월까지 서울 25개 구 가운데 늘 이 자리였습니다.</span></p>
+      </div>
+    </div>
+    <p class="src">출처: 다방여지도 2026.9(국토부 실거래 연립·다세대 원룸, 전용 33㎡ 이하, 보증금 1천만 원 환산, 인사이트·아이뉴스24 인용, 서울 평균을 넘는 11개 구만 공개) · 다방 서울 주요 10개 대학 인근 원룸 시세 2026.1(세계일보 2026.2.24 인용) · 2023.1 아시아경제 인용. 순위 추이: 뉴스스페이스·뉴스핌·벤처스퀘어·머니투데이 인용.</p>
+  </div>
+  <aside class="notes">한양대가 있는 성동구는 원룸 월세가 82만 원으로 서울 25개 구 가운데 4위이고, 1년 반 동안 2위에서 4위 사이를 오갔습니다. 대학가끼리 견줘도 한양대 앞은 10곳 중 5위로 평균보다 비쌉니다. 더 눈여겨볼 건 속도입니다. 3년 사이 49만 원에서 64만 원으로 31% 올랐습니다.</aside>
+</section>
+
+<!-- 5 신입생 (예전 7+8장) -->
+<section data-step="2">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">02</span>왜 한양대 신입생인가</p><h2>지방에서 온 신입생은 사진만 보고 방을 고릅니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="fresh">
+        <div class="fresh-facts">
+          <div><p class="big">30.8%</p><h4>서울 고등학교 출신 신입생</h4><p>나머지 69%는 서울 밖에서 옵니다. 지방 출신은 동네도 시세도 모른 채 첫 방을 구합니다.</p></div>
+          <div><p class="big">11.2%</p><h4>한양대 기숙사 수용률</h4><p>서울 주요 10개 대학 가운데 가장 낮습니다. 10명 중 9명은 기숙사에 들어가지 못합니다.</p></div>
+        </div>
+        <div class="gap">
+          <div class="gap-side">
+            <p class="gap-tag">지방에서 보는 방</p>
+            <div class="logos"><img src="assets/img/dabang.png" alt="다방"><img src="assets/img/zigbang.png" alt="직방"></div>
+            <h4>앱 속 사진과 2D 정보</h4>
+            <p>멀리서는 사진과 평수, 옵션 목록만 보고 고릅니다. 그 사진은 보정할 수 있습니다.</p>
+            <figure class="retouch">
+              <img class="kmong" src="assets/img/kmong-title.png" alt="크몽: 직방 다방 광고용 매물 사진 리터칭">
+              <div class="ba2">
+                <div><img src="assets/img/retouch-before.png" alt="보정 전 욕실 사진"><span>보정 전</span></div>
+                <div><img src="assets/img/retouch-after.png" alt="보정 후 욕실 사진"><span>보정 후</span></div>
+              </div>
+            </figure>
+          </div>
+          <p class="gap-to" aria-hidden="true">→</p>
+          <div class="gap-side is-real">
+            <p class="gap-tag">서울에 와서 보는 방</p>
+            <p class="gap-big">허위 매물,<br>보정이 빠진 실물</p>
+            <p><b class="num">321 / 1,100건</b> 대학가 원룸 온라인 광고 가운데 위법 의심. 면적 부풀리기, 없는 옵션 표시, 근저당 숨김이 많았고 점검 지역에 사근동이 들어 있었습니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="voices">
+        <p><span>지방 출신 신입생</span>"이 방이 비싼 건지 싼 건지 모르겠어요."</p>
+        <p><span>멀리 사는 부모님</span>"사진 말고 실제로 어떤 방인지 보고 싶어요."</p>
+      </div>
+    </div>
+    <p class="src">출처: 종로학원의 대학알리미 분석, 2026학년도(파이낸셜뉴스 2026.11.8) · 대학알리미 2024 기준(한국경제 2025.3.12) · 국토교통부 대학가 온라인 부동산 광고 점검 2025.7~8(헤럴드경제 2025.10.9). 서울 밖 출신에는 경기·인천도 들어갑니다. 국토부 점검은 특정 앱이 아니라 대학가 온라인 광고 전체가 대상입니다. 다방·직방 로고는 각 회사의 상표입니다. 보정 전후 사진은 크몽의 매물 사진 리터칭 서비스 페이지 캡처입니다. 아래 두 문장은 가상 페르소나입니다.</p>
+  </div>
+  <aside class="notes">한양대 신입생 가운데 서울 고등학교 출신은 31%뿐이고 기숙사 수용률은 11%로 주요 대학 중 가장 낮습니다. 그래서 대부분은 지방에서 다방이나 직방 같은 앱의 사진과 2D 정보만 보고 방을 고릅니다. 그 사진은 보정할 수 있고, 크몽에는 직방·다방 광고용 매물 사진을 보정해 주는 서비스까지 있습니다. 그런데 서울에 올라와서 보면 사진과 다른 방이 나옵니다. 국토부가 대학가 원룸 광고 1,100건을 점검했더니 321건이 위법 의심이었고 한양대 바로 옆 사근동도 점검 지역이었습니다. 신입생은 이 방이 비싼지 알 길이 없고, 보증금을 내는 부모님은 멀리 있어서 방을 직접 볼 수 없습니다.</aside>
+</section>
+
+<!-- 6 문제 정의 + 해결 방안 (예전 9+10장) -->
+<section data-step="3">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">03</span>해결 방안</p><h2>네 가지 장벽을 기능 하나씩으로 풉니다</h2></div>
+    </div>
+    <div class="body">
+      <p class="define small">한양대 신입생은 서울에서 손꼽히게 비싼 동네에서, <em>시세도 방 안도 동네도 모른 채</em> 2월에 첫 계약을 합니다.</p>
+      <table class="map">
+        <thead><tr><th>장벽</th><th></th><th>어디서사냥 기능</th><th>무엇이 달라지나요</th></tr></thead>
+        <tbody>
+          <tr><td>시세를 모릅니다<small>같은 크기 방이 2배 넘게 차이 나도 견줄 기준이 없습니다.</small></td><td class="to">→</td><td class="fx">가격 판결 + AI 적정가</td><td>같은 동네 실거래와 비교해 월·2년 초과액과 등급을 바로 보여 줍니다.</td></tr>
+          <tr><td>방 안을 못 봅니다<small>광고 사진은 고를 수 있고 지방에서는 가 보기 어렵습니다.</small></td><td class="to">→</td><td class="fx">룸투어</td><td>평면도로 만든 실내 3D를 계약 전에 직접 걸어 봅니다.</td></tr>
+          <tr><td>동네를 모릅니다<small>과 건물까지 몇 분인지, 밤길이 어떤지 알 수 없습니다.</small></td><td class="to">→</td><td class="fx">캠퍼스 투어 · 동네 투어</td><td>캠퍼스와 집 주변 700m를 걸어 보고 과 건물까지 도보 시간을 확인합니다.</td></tr>
+          <tr><td>믿을 말이 없습니다<small>들을 수 있는 건 중개인과 집주인의 말뿐입니다.</small></td><td class="to">→</td><td class="fx">한양대생 후기</td><td>한양대 계정으로만 쓰는 후기로 방음, 채광, 보증금 반환까지 확인합니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">정리하면, 비싼 동네에서 정보 없이 첫 계약을 하는 게 문제입니다. 막히는 지점은 시세, 방 안, 동네, 믿을 만한 말 네 가지입니다. 그래서 장벽마다 기능을 하나씩 붙였습니다. 시세는 가격 판결로, 방 안은 룸투어로, 동네는 캠퍼스·동네 투어로, 믿을 말은 한양대생 후기로 풉니다.</aside>
+</section>
+
+<!-- 11 서비스 소개 -->
+<section data-step="3">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">03</span>해결 방안</p><h2>계약 전에, 시세보다 비싼 방을 알려 줍니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="intro">
+        <div>
+          <p class="name">어디서사냥</p>
+          <p class="one">3D 한양대 캠퍼스에서 집을 고르고 들어가 보고 시세와 견줘 보는 서비스입니다.</p>
+          <ol>
+            <li><div>가격 판결 + AI 적정가<span>이 방이 시세보다 얼마나 비싼지</span></div></li>
+            <li><div>룸투어<span>평면도로 만든 실내 3D</span></div></li>
+            <li><div>캠퍼스 투어 · 동네 투어<span>캠퍼스 건물 84곳, 동네 12곳</span></div></li>
+            <li><div>한양대생 후기<span>한양대 계정 인증, 실내 핀 후기</span></div></li>
+          </ol>
+        </div>
+        <div>
+          <div class="formula">
+            <div class="eq"><b>환산 월세</b><span>월세 + 관리비 + 보증금 × 연 4.6% ÷ 12</span></div>
+            <div class="eq"><b>적정가</b><span>같은 동, 면적 ±30%, 최근 12개월 실거래의 ㎡당 중앙값 × 면적</span></div>
+            <div class="eq"><b>초과액</b><span>(환산 월세 − 적정가) × 계약 개월 수(기본 24개월)</span></div>
+          </div>
+          <div class="ruler">
+            <div class="bands"><i style="background:var(--g-fair)"></i><i style="background:var(--g-slight)"></i><i style="background:var(--g-high)"></i><i style="background:var(--g-culprit)"></i></div>
+            <div class="ticks"><span style="left:12.5%">+10%</span><span style="left:31.4%">+25%</span><span style="left:62.8%">+50%</span></div>
+            <div class="names">
+              <span style="color:var(--gi-fair)">적정<small>10% 미만</small></span>
+              <span style="color:var(--gi-slight)">조금 비쌈<small>10~25%</small></span>
+              <span style="color:var(--gi-high)">비쌈<small>25~50%</small></span>
+              <span style="color:var(--gi-culprit)">범인<small>50% 이상</small></span>
+            </div>
+            <p class="pend"><i></i>판정 보류: 비교할 거래가 모자라면 등급을 매기지 않습니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="src">기준: 기능 명세서의 가격 판결 카드. 등급 이름과 색은 앱 화면 그대로입니다.</p>
+  </div>
+  <aside class="notes">어디서사냥은 3D 캠퍼스에서 집을 고르고 들어가 보고 시세와 견주는 서비스입니다. 판결은 간단한 공식으로 합니다. 보증금까지 월세로 바꾼 환산 월세를 같은 동네 실거래 중앙값과 비교해서 초과율에 따라 적정, 조금 비쌈, 비쌈, 범인으로 나눕니다.</aside>
+</section>
+
+<!-- 12 기능 01 가격 판결 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">04</span>핵심 기능 01</p><h2>가격 판결: 이 방이 얼마나 비싼지 숫자로 보여 줍니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="feat">
+        <div class="steps-col" style="display:flex;flex-direction:column;height:100%">
+          <ol class="steps">
+            <li>매물 찾기에서 등급으로 거르기<small>적정·조금 비쌈·비쌈·범인 필터</small></li>
+            <li class="fragment">매물을 누르면 판결 카드<small>"적정가보다 월 54만 비싸요", 2년 초과액</small></li>
+            <li class="fragment">실거래 적정가와 AI 적정가를 한 눈금에<small>이 집, 실거래, AI 범위를 나란히</small></li>
+            <li class="fragment last">3D 지도 위 말풍선도 등급 색<small>걸어 다니며 비싼 집을 알아봅니다</small></li>
+          </ol>
+          <p class="solve">비싼 방을 고른 줄도 모르고 내던 돈을, 계약 전에 숫자로 확인합니다.</p>
+        </div>
+        <div class="media">
+          <img class="shot" src="assets/shots/ref-verdict-3d.jpg" alt="판결 카드와 3D 화면" style="left:0;top:0;width:100%;height:auto">
+          <span class="callout fragment" style="left:22%;top:32%"><i>2</i>월·2년 초과액과 등급 도장</span>
+          <span class="callout fragment" style="left:22%;top:48%"><i>3</i>이 집 · 실거래 · AI 범위</span>
+          <span class="callout fragment" style="left:62%;top:22%"><i>4</i>3D 말풍선 500/95</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">첫 번째 기능은 가격 판결입니다. 매물을 누르면 "적정가보다 월 54만 원 비싸요, 2년이면 1,296만 원을 더 내요"처럼 바로 숫자로 나옵니다. 화면 속 금액은 서비스에 등록된 예시 매물이고, 시장 통계가 아닙니다. 3D 지도에 뜨는 말풍선도 같은 등급 색이라 걸으면서 비싼 집을 알아볼 수 있습니다.</aside>
+</section>
+
+<!-- 13 기능 01 두 기준 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">04</span>핵심 기능 01</p><h2>기준은 두 가지, 실거래 적정가와 AI 적정가입니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="two" style="grid-template-columns:340px 560px 1fr;gap:64px">
+        <figure style="margin:0"><img class="shot tall" src="assets/shots/listings-cards.png" alt="매물 목록과 등급" style="width:340px;height:560px"><p class="cap"><b>매물 목록</b> 카드마다 등급과 환산 월세</p></figure>
+        <figure style="margin:0"><img class="shot" src="assets/shots/verdict-card.png" alt="판결 카드" style="width:500px;height:auto"><p class="cap"><b>판결 카드</b> 이 집과 두 적정가를 한 눈금에</p></figure>
+        <div class="side">
+          <h4>실거래 적정가</h4>
+          <p>국토부 실거래에서 같은 동, 면적 ±30%, 최근 12개월 거래를 골라 ㎡당 중앙값을 냅니다. 거래가 10건이 안 되면 이웃 동까지 넓히고, 그래도 모자라면 판정을 보류합니다.</p>
+          <h4 style="margin-top:40px">AI 적정가</h4>
+          <p>실거래와 동 단위 정보(사자상·지하철·버스까지 거리)로 학습한 GBM 분위 회귀가 적정 월세와 25~75% 범위를 냅니다.</p>
+          <p style="margin-top:40px;font-weight:700;color:var(--ink)">두 기준이 같은 쪽을 가리키면 더 믿고 판단할 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+    <p class="src">API <code>GET /listings/{id}/price-check</code>, AI <code>POST /v1/rent/estimate</code>. 화면의 금액은 서비스에 등록된 예시 매물입니다.</p>
+  </div>
+  <aside class="notes">판결은 두 기준으로 합니다. 하나는 국토부 실거래 중앙값이고, 다른 하나는 저희가 학습시킨 AI 모델의 적정가 범위입니다. 표본이 부족하면 억지로 판결하지 않고 판정 보류로 둡니다.</aside>
+</section>
+
+<!-- 14 기능 02 룸투어 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">04</span>핵심 기능 02</p><h2>룸투어: 평면도 한 장으로 방 안을 걸어 봅니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="feat">
+        <div class="steps-col" style="display:flex;flex-direction:column;height:100%">
+          <ol class="steps">
+            <li>평면도 이미지, 또는 면적과 방 수<small>청년안심주택은 매일 06시 자동 수집</small></li>
+            <li class="fragment">AI가 벽·문·창과 방 이름을 읽어 냅니다<small>CubiCasa5K 분할 + PaddleOCR → FloorPlan JSON</small></li>
+            <li class="fragment">실내 3D로 1인칭 투어<small>방 바로가기 칩, 평면도 미니맵, 면적 라벨</small></li>
+            <li class="fragment last">가구 빼기, 시간대, 친구 초대<small>빈방 크기와 밤 채광까지 확인</small></li>
+          </ol>
+          <p class="solve">사진으로는 숨길 수 있는 방 안을, 계약 전에 직접 걸어 봅니다.</p>
+        </div>
+        <div class="media">
+          <video class="shot" src="assets/clips/room-walk.webm" poster="assets/clips/room-walk.jpg" autoplay muted loop playsinline style="left:0;top:0;width:100%;height:auto"></video>
+          <span class="callout fragment" style="left:30%;top:84%"><i>3</i>방 바로가기</span>
+          <span class="callout fragment" style="left:74%;top:66%"><i>3</i>평면도 미니맵</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">두 번째는 룸투어입니다. 평면도 이미지를 넣으면 AI가 벽과 문, 창, 방 이름을 읽어서 3D 방을 만듭니다. 평면도가 없으면 면적과 방 수로 만듭니다. 영상처럼 방 안을 걸어 다니고 아래 칩으로 방을 옮겨 다닐 수 있습니다.</aside>
+</section>
+
+<!-- 15 기능 02 네 종류 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">04</span>핵심 기능 02</p><h2>자취방, 청년안심주택, 기숙사, 양도 매물까지</h2></div>
+    </div>
+    <div class="body">
+      <div class="types">
+        <figure><img class="shot" src="assets/shots/room-listing.jpg" alt="자취방 실내" style="object-position:55% 50%"><figcaption><b>자취방 매물</b><span>동네 3D에서 집 앞까지 걸어가 "실내 보기"로 들어갑니다.</span></figcaption></figure>
+        <figure><img class="shot" src="assets/shots/ref-roomtour-housing.jpg" alt="청년안심주택 실내" style="object-position:48% 50%"><figcaption><b>청년안심주택</b><span>주택형별 평면도로 만든 실내입니다. 청량리역 퀸즈W 35B.</span></figcaption></figure>
+        <figure><img class="shot" src="assets/shots/room-dorm.jpg" alt="기숙사 실내" style="object-position:30% 50%"><figcaption><b>기숙사</b><span>호실 종류마다 침대, 책상 배치까지 들어가 봅니다.</span></figcaption></figure>
+        <figure><img class="shot" src="assets/shots/transfer-3d.jpg" alt="양도 매물의 판결과 3D 위치" style="object-position:0% 50%"><figcaption><b>양도</b><span>남은 계약 기간과 함께 같은 판결 카드, 3D 위치를 보여 줍니다.</span></figcaption></figure>
+      </div>
+    </div>
+    <p class="src">양도 글은 아직 평면도를 받지 않아 실내 대신 판결 카드와 3D 위치로 확인합니다.</p>
+  </div>
+  <aside class="notes">룸투어는 집 종류를 가리지 않습니다. 자취방, 청년안심주택, 기숙사 모두 같은 방식으로 들어가 볼 수 있습니다. 양도 매물은 지금은 평면도 대신 판결 카드와 3D 위치까지 보여 드립니다.</aside>
+</section>
+
+<!-- 16 기능 03 투어 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">04</span>핵심 기능 03</p><h2>캠퍼스 투어·동네 투어: 올라오기 전에 걸어 봅니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="feat">
+        <div class="steps-col" style="display:flex;flex-direction:column;height:100%">
+          <ol class="steps">
+            <li>건물 이름이나 번호로 찾기<small>한양대 서울캠퍼스 건물 84곳</small></li>
+            <li class="fragment">누르면 그 건물 입구 앞으로<small>WASD로 걷고, 드래그로 시점 돌리기</small></li>
+            <li class="fragment">집 주변 700m 동네 걷기<small>동네 12곳, 편의점·세탁방·정류장 표시</small></li>
+            <li class="fragment last">과 건물까지 실제 도보 길<small>TMAP 보행 경로와 걸리는 분</small></li>
+          </ol>
+          <p class="solve">서울이 처음인 신입생도 학교와 동네를 미리 익히고 방을 고릅니다.</p>
+        </div>
+        <div class="media">
+          <video class="shot" src="assets/clips/tour-jump.webm" poster="assets/clips/tour-jump.jpg" autoplay muted loop playsinline style="left:0;top:0;width:100%;height:auto"></video>
+          <img class="shot fragment" src="assets/shots/walk-route-map.jpg" alt="과 건물까지 도보 길" style="right:-24px;bottom:-12px;width:430px;height:300px;object-position:30% 30%">
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">세 번째는 캠퍼스와 동네 투어입니다. 목록에서 건물을 누르면 그 입구 앞으로 바로 갑니다. 집 상세에서는 주변 동네를 걸어 보고 내 과 건물까지 실제 보행 경로와 시간을 확인할 수 있습니다.</aside>
+</section>
+
+<!-- 17 기능 04 후기 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">04</span>핵심 기능 04</p><h2>한양대생 후기: 먼저 살아 본 사람에게 듣습니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="feat">
+        <div class="steps-col" style="display:flex;flex-direction:column;height:100%">
+          <ol class="steps">
+            <li>@hanyang.ac.kr 계정으로만 로그인<small>구글 ID 토큰을 서버가 검증합니다</small></li>
+            <li class="fragment">별점과 다섯 항목<small>방음, 채광, 벌레, 집주인, 보증금 반환</small></li>
+            <li class="fragment">실내 벽·바닥을 길게 눌러 핀 후기<small>그 자리에 남기고 미니맵에도 표시</small></li>
+            <li class="fragment last">매물 상세에서 평균과 목록 확인</li>
+          </ol>
+          <p class="solve">중개인 말 대신, 먼저 살아 본 한양대생의 경험으로 확인합니다.</p>
+        </div>
+        <div class="media">
+          <img class="shot" src="assets/shots/reviews.png" alt="매물 후기 평균과 목록" style="left:0;top:0;width:470px;height:100%;object-position:50% 100%">
+          <img class="shot" src="assets/shots/room-pin-form.jpg" alt="실내 핀 후기 작성" style="left:510px;top:60px;right:0;width:auto;height:440px;object-position:50% 60%">
+          <span class="callout fragment" style="left:540px;top:520px"><i>3</i>벽을 길게 누른 자리에 핀 후기</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">네 번째는 한양대생 후기입니다. 한양대 계정으로만 쓸 수 있어서 실제 학생 경험만 모입니다. 방음이나 보증금 반환처럼 계약 전에 알기 어려운 항목을 따로 묻고 실내 3D 벽에 직접 핀을 꽂아 "여기 곰팡이가 있어요"처럼 남길 수 있습니다.</aside>
+</section>
+
+<!-- 18 그 밖의 기능 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">04</span>핵심 기능</p><h2>그 밖의 기능</h2></div>
+    </div>
+    <div class="body">
+      <div class="extras">
+        <figure><img class="shot tall" src="assets/shots/compare.png" alt="이 돈이면 비교"><figcaption><b>"이 돈이면"</b>근처 기숙사·청년안심주택·더 싼 자취방과 2년 차이를 비교합니다.</figcaption></figure>
+        <figure><img class="shot" src="assets/shots/housing-calendar.jpg" alt="청년안심주택 공고 캘린더" style="object-position:0% 30%"><figcaption><b>청년안심주택 공고</b>접수·마감·발표 일정을 달력에 모으고 D-day 알림을 보냅니다.</figcaption></figure>
+        <figure><img class="shot" src="assets/shots/avatar.jpg" alt="캐릭터 꾸미기" style="object-position:62% 40%"><figcaption><b>같이 걷기</b>학과 잠바를 입은 캐릭터로 친구, 부모님과 같은 방을 둘러봅니다.</figcaption></figure>
+        <figure><img class="shot" src="assets/shots/m-listings.jpg" alt="모바일 화면" style="object-position:50% 100%"><figcaption><b>모바일</b>폰에서도 같은 화면입니다.</figcaption></figure>
+      </div>
+    </div>
+    <p class="src">이 밖에 내 집 기록(월세·공과금, 월간 리포트, 계약 만료 알림), 찜, 통합 검색, 2D 지도가 있습니다.</p>
+  </div>
+  <aside class="notes">핵심 네 가지 말고도 몇 가지가 더 있습니다. 같은 돈이면 기숙사나 청년안심주택은 얼마나 싼지 비교해 주고 청년안심주택 공고 일정을 알려 줍니다. 친구나 부모님을 초대해서 같은 방을 함께 둘러볼 수도 있습니다.</aside>
+</section>
+
+<!-- 19 시연 -->
+<section data-step="4">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker">시연</p><h2>직접 걸어 보세요</h2></div>
+    </div>
+    <div class="body">
+      <div class="demo">
+        <video class="shot" src="assets/clips/walk-campus.webm" poster="assets/clips/walk-campus.jpg" autoplay muted loop playsinline></video>
+        <div>
+          <dl>
+            <dt>배포 주소</dt><dd>[URL]</dd>
+            <dt>테스트 계정</dt><dd>[ID / PW]</dd>
+            <dt>권장 환경</dt><dd style="font-size:24px;font-weight:500;color:var(--ink-2)">데스크톱 크롬, 그래픽 가속 켬. 휴대폰에서도 열립니다.</dd>
+          </dl>
+          <img class="qr" src="assets/img/qr.png" alt="where-hyu-living.xyz 접속 QR 코드">
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">여기서 시연으로 넘어가겠습니다. 매물 찾기, 판결 카드, 실내 보기, 캠퍼스 투어 순서로 보여 드립니다.</aside>
+</section>
+
+<!-- 20 아키텍처 -->
+<section data-step="5">
+  <div class="frame">
+    <div class="head" style="margin-bottom:20px">
+      <div><p class="kicker"><span class="no">05</span>기술 구조</p><h2>아키텍처</h2></div>
+      <div class="stat"><p class="big">3<small>개 서버</small></p><small>Vercel 프론트, Railway 백엔드·AI</small></div>
+    </div>
+    <div class="body">
+      <div class="diagram" style="width:1230px;height:700px;margin:0 auto">
+        <img src="assets/img/04-overview.svg" alt="전체 아키텍처">
+        <div class="mark fragment" style="left:11.3%;top:20.5%;width:28%;height:10%"><i>1</i></div>
+        <div class="mark fragment" style="left:31.5%;top:40%;width:19%;height:9%"><i>2</i></div>
+        <div class="mark fragment" style="left:46.6%;top:21%;width:51%;height:42%"><i>3</i></div>
+        <div class="mark fragment" style="left:31.5%;top:57%;width:11%;height:12%"><i>4</i></div>
+      </div>
+      <div class="legend-row">
+        <span><i>1</i><b>요청</b> React → Spring Boot REST, JWT</span>
+        <span><i>2</i><b>공유 월드</b> WebSocket 10Hz, 최대 30명</span>
+        <span><i>3</i><b>AI 서버</b> 평면도 경로와 적정 월세 경로</span>
+        <span><i>4</i><b>스케줄러</b> 06시 청년안심주택 수집, 09시 알림</span>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">구조는 세 덩어리입니다. 프론트는 Vercel의 React와 three.js, 백엔드는 Railway의 Spring Boot, AI 서버는 FastAPI입니다. AI 서버에는 평면도를 3D 데이터로 바꾸는 길과 적정 월세를 내는 길 두 가지가 있습니다.</aside>
+</section>
+
+<!-- 21 ERD -->
+<section data-step="5">
+  <div class="frame">
+    <div class="head" style="margin-bottom:10px">
+      <div><p class="kicker"><span class="no">05</span>기술 구조</p><h2>ERD</h2></div>
+      <div class="stat"><p class="big">29<small>테이블</small></p><small>외래 키 23개, PostgreSQL 16</small></div>
+    </div>
+    <div class="body">
+      <div class="diagram" style="width:1332px;height:720px;margin:0 auto">
+        <img src="assets/img/06-erd-relations.svg" alt="테이블 관계도">
+        <div class="mark" style="left:73.4%;top:26.2%;width:10.5%;height:30.4%"><i>1</i></div>
+        <div class="mark" style="left:87.8%;top:58.7%;width:10.5%;height:20.4%"><i>2</i></div>
+        <div class="mark" style="left:73.4%;top:14.3%;width:10.5%;height:10.4%"><i>3</i></div>
+        <div class="mark" style="left:30.5%;top:14.3%;width:10.5%;height:26.2%"><i>4</i></div>
+      </div>
+      <div class="legend-row" style="margin-top:6px">
+        <span><i>1</i><b>listings</b> 환산 월세·등급 저장</span>
+        <span><i>2</i><b>real_deals</b> 국토부 실거래, 판결의 기준</span>
+        <span><i>3</i><b>floorplans</b> 실내 3D용 JSON</span>
+        <span><i>4</i><b>reviews</b> 별점·5개 항목·실내 핀 좌표</span>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">테이블은 29개, 외래 키는 23개입니다. 판결에 쓰는 매물과 실거래, 룸투어의 평면도, 후기 테이블을 표시했습니다. 후기에는 실내 핀 좌표와 평면도 번호가 함께 저장됩니다.</aside>
+</section>
+
+<!-- 22 기능 명세 -->
+<section data-step="5">
+  <div class="frame">
+    <div class="head" style="margin-bottom:22px">
+      <div><p class="kicker"><span class="no">05</span>기술 구조</p><h2>기능 명세</h2></div>
+      <div class="stat"><p class="big">51<small>개 기능</small></p><small>P0 11 · P1 26 · P2 14, 15개 분류</small></div>
+    </div>
+    <div class="body">
+      <table class="spec">
+        <thead><tr><th>분류</th><th>기능</th><th>P0</th><th>P1</th><th>P2</th><th>기능 ID와 이름 (파란 칸은 핵심 기능 4개에 쓰이는 것)</th></tr></thead>
+        <tbody>
+<tr><th>계정과 내 정보</th><td class="n">2</td><td class="n">1</td><td class="n">1</td><td class="n"></td><td class="items"><span class="core c4"><b>A1</b> 구글 로그인 (한양대 계정)</span><span><b>A2</b> 내 정보 설정 · 첫 로그인 안내</span></td></tr>
+<tr><th>3D 월드</th><td class="n">9</td><td class="n">2</td><td class="n">3</td><td class="n">4</td><td class="items"><span class="core c3"><b>B1</b> 3D 캠퍼스 걷기</span><span class="core c3"><b>B2</b> 동네 3D 월드</span><span><b>B3</b> 미니맵 · 순간이동</span><span><b>B4</b> 시간대 조절 (낮 ~ 밤)</span><span class="core c3"><b>B5</b> 3D 말풍선 마커</span><span><b>B6</b> 캠퍼스 표식</span><span class="core c3"><b>B7</b> 주변 시설 표시</span><span class="core c2"><b>B8</b> 문 앞 실내 진입</span><span><b>B9</b> 3D 지원 지역 밖 이동 처리</span></td></tr>
+<tr><th>검색, 지도, 길 안내</th><td class="n">4</td><td class="n">1</td><td class="n">3</td><td class="n"></td><td class="items"><span><b>C1</b> 통합 검색</span><span><b>C2</b> 2D 지도 보기</span><span class="core c3"><b>C3</b> 과 건물까지 도보 길 안내</span><span class="core c3"><b>C4</b> 캠퍼스 투어</span></td></tr>
+<tr><th>매물과 가격 판결</th><td class="n">5</td><td class="n">3</td><td class="n">1</td><td class="n">1</td><td class="items"><span class="core c1"><b>D1</b> 매물 목록 · 필터</span><span class="core c1"><b>D2</b> 매물 상세 (용의자 파일)</span><span class="core c1"><b>D3</b> 가격 판결 카드</span><span class="core c1"><b>D4</b> 수배 전단</span><span><b>D5</b> &quot;이 돈이면&quot; 비교</span></td></tr>
+<tr><th>실내 3D</th><td class="n">1</td><td class="n">1</td><td class="n"></td><td class="n"></td><td class="items"><span class="core c2"><b>E1</b> 실내 3D 방 투어</span></td></tr>
+<tr><th>후기</th><td class="n">2</td><td class="n"></td><td class="n">2</td><td class="n"></td><td class="items"><span class="core c4"><b>G1</b> 매물 후기</span><span class="core c4"><b>G2</b> 실내 핀 후기</span></td></tr>
+<tr><th>찜</th><td class="n">2</td><td class="n"></td><td class="n">2</td><td class="n"></td><td class="items"><span><b>F1</b> 찜하기</span><span><b>F2</b> 찜 목록</span></td></tr>
+<tr><th>청년안심주택</th><td class="n">4</td><td class="n">2</td><td class="n">2</td><td class="n"></td><td class="items"><span><b>I1</b> 단지 목록</span><span><b>I2</b> 단지 상세 · 주택형</span><span><b>I3</b> 공고 D-day 알림 구독</span><span><b>I4</b> 공고 캘린더</span></td></tr>
+<tr><th>기숙사</th><td class="n">1</td><td class="n"></td><td class="n">1</td><td class="n"></td><td class="items"><span><b>P1</b> 기숙사 목록 · 호실 비용</span></td></tr>
+<tr><th>양도</th><td class="n">3</td><td class="n"></td><td class="n">2</td><td class="n">1</td><td class="items"><span><b>K1</b> 양도 글 목록 · 상세</span><span><b>K2</b> 양도 글 쓰기</span><span><b>K3</b> 양도 글 수정 · 완료 처리</span></td></tr>
+<tr><th>내 집 기록</th><td class="n">5</td><td class="n"></td><td class="n">2</td><td class="n">3</td><td class="items"><span><b>H1</b> 내 집 등록</span><span><b>H2</b> 월세 납부 기록</span><span><b>H3</b> 공과금 기록</span><span><b>H4</b> 월간 리포트</span><span><b>H5</b> 계약 만료 알림 설정</span></td></tr>
+<tr><th>알림</th><td class="n">1</td><td class="n"></td><td class="n">1</td><td class="n"></td><td class="items"><span><b>Q1</b> 알림함</span></td></tr>
+<tr><th>멀티플레이</th><td class="n">4</td><td class="n"></td><td class="n">1</td><td class="n">3</td><td class="items"><span><b>M1</b> 같이 걷기</span><span><b>M2</b> 이모트 · 한 줄 채팅</span><span><b>M3</b> 초대 링크</span><span><b>M4</b> 캐릭터 꾸미기</span></td></tr>
+<tr><th>화면과 성능</th><td class="n">3</td><td class="n"></td><td class="n">1</td><td class="n">2</td><td class="items"><span><b>S1</b> 그래픽 품질 자동 조절</span><span><b>S2</b> 느린 기기 안내</span><span><b>S3</b> 반응형 상단바</span></td></tr>
+<tr><th>AI와 데이터</th><td class="n">5</td><td class="n">1</td><td class="n">4</td><td class="n"></td><td class="items"><span class="core c1"><b>X1</b> AI 적정 월세</span><span class="core c2"><b>X2</b> AI 평면도 생성</span><span><b>X3</b> 청년안심주택 자동 수집</span><span><b>X4</b> 알림 자동 생성</span><span class="core c1"><b>X5</b> 실거래 수집 · 등급 계산</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">기능은 51개입니다. 서비스 핵심인 P0가 11개이고, 오늘 소개한 핵심 기능 네 가지에 쓰이는 기능을 파란색으로 표시했습니다.</aside>
+</section>
+
+<!-- 23 API -->
+<section data-step="5">
+  <div class="frame">
+    <div class="head" style="margin-bottom:14px">
+      <div><p class="kicker"><span class="no">05</span>기술 구조</p><h2>API</h2><p class="apinote">Base URL <code>https://api-production-8811.up.railway.app/api/v1</code>, 인증은 <code>Authorization: Bearer &lt;JWT&gt;</code>. 파란 경로는 핵심 기능에 쓰입니다.</p></div>
+      <div class="stat"><p class="big">53<small>개</small></p><small>GET 28 · POST 15 · PUT 3 · PATCH 3 · DELETE 3 · WS 1</small></div>
+    </div>
+    <div class="body">
+      <div class="apis">
+<div class="apig"><h4>인증과 내 정보 <small>5</small></h4><ul><li class=hot><i class="m post">POST</i><code>/auth/google</code></li><li><i class="m get">GET</i><code>/me/profile</code></li><li><i class="m put">PUT</i><code>/me/profile</code></li><li><i class="m get">GET</i><code>/departments</code></li><li><i class="m get">GET</i><code>/buildings</code></li></ul></div>
+<div class="apig"><h4>검색과 길 안내 <small>3</small></h4><ul><li><i class="m get">GET</i><code>/search</code></li><li><i class="m get">GET</i><code>/geo/address</code></li><li class=hot><i class="m get">GET</i><code>/walk</code></li></ul></div>
+<div class="apig"><h4>매물과 판결 <small>5</small></h4><ul><li class=hot><i class="m get">GET</i><code>/listings</code></li><li><i class="m get">GET</i><code>/listings/{id}</code></li><li class=hot><i class="m get">GET</i><code>/listings/{id}/price-check</code></li><li><i class="m get">GET</i><code>/listings/{id}/alternatives</code></li><li class=hot><i class="m get">GET</i><code>/listings/{id}/nearby</code></li></ul></div>
+<div class="apig"><h4>평면도와 후기 <small>4</small></h4><ul><li class=hot><i class="m get">GET</i><code>/floorplans/{id}</code></li><li class=hot><i class="m post">POST</i><code>/floorplans/estimate</code></li><li class=hot><i class="m get">GET</i><code>/reviews</code></li><li class=hot><i class="m post">POST</i><code>/reviews</code></li></ul></div>
+<div class="apig"><h4>찜 <small>3</small></h4><ul><li><i class="m get">GET</i><code>/me/favorites</code></li><li><i class="m post">POST</i><code>/me/favorites</code></li><li><i class="m delete">DELETE</i><code>/me/favorites/{type}/{targetId}</code></li></ul></div>
+<div class="apig"><h4>청년안심주택 <small>5</small></h4><ul><li><i class="m get">GET</i><code>/housing</code></li><li><i class="m get">GET</i><code>/housing/{id}</code></li><li><i class="m get">GET</i><code>/housing/announcements</code></li><li><i class="m post">POST</i><code>/housing/{id}/subscribe</code></li><li><i class="m delete">DELETE</i><code>/housing/{id}/subscribe</code></li></ul></div>
+<div class="apig"><h4>기숙사 <small>1</small></h4><ul><li><i class="m get">GET</i><code>/dorms</code></li></ul></div>
+<div class="apig"><h4>양도 <small>6</small></h4><ul><li><i class="m get">GET</i><code>/transfers</code></li><li><i class="m get">GET</i><code>/transfers/{id}</code></li><li><i class="m post">POST</i><code>/transfers</code></li><li><i class="m put">PUT</i><code>/transfers/{id}</code></li><li><i class="m patch">PATCH</i><code>/transfers/{id}/status</code></li><li><i class="m post">POST</i><code>/uploads</code></li></ul></div>
+<div class="apig"><h4>내 집 기록 <small>11</small></h4><ul><li><i class="m get">GET</i><code>/me/home</code></li><li><i class="m put">PUT</i><code>/me/home</code></li><li><i class="m get">GET</i><code>/me/payments</code></li><li><i class="m post">POST</i><code>/me/payments</code></li><li><i class="m get">GET</i><code>/me/utilities</code></li><li><i class="m post">POST</i><code>/me/utilities</code></li><li><i class="m get">GET</i><code>/me/report</code></li><li><i class="m get">GET</i><code>/me/home/alerts</code></li><li><i class="m post">POST</i><code>/me/home/alerts</code></li><li><i class="m patch">PATCH</i><code>/me/home/alerts/{id}</code></li><li><i class="m delete">DELETE</i><code>/me/home/alerts/{id}</code></li></ul></div>
+<div class="apig"><h4>알림 <small>2</small></h4><ul><li><i class="m get">GET</i><code>/me/notifications</code></li><li><i class="m patch">PATCH</i><code>/me/notifications/{id}/read</code></li></ul></div>
+<div class="apig"><h4>멀티플레이 <small>2</small></h4><ul><li><i class="m post">POST</i><code>/invites</code></li><li class=hot><i class="m ws">WS</i><code>/ws/world</code></li></ul></div>
+<div class="apig"><h4>운영 <small>1</small></h4><ul><li><i class="m get">GET</i><code>/health</code></li></ul></div>
+<div class="apig"><h4>AI 서버 <small>5</small></h4><ul><li class=hot><i class="m post">POST</i><code>/v1/floorplan/estimate</code></li><li class=hot><i class="m post">POST</i><code>/v1/floorplan/estimate-from-meta</code></li><li><i class="m post">POST</i><code>/v1/floorplan/validate</code></li><li class=hot><i class="m post">POST</i><code>/v1/rent/estimate</code></li><li><i class="m get">GET</i><code>/health</code></li></ul></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">API는 53개입니다. 판결은 price-check, 룸투어는 floorplans, 후기는 reviews, 공유 월드는 WebSocket 하나로 돌아갑니다. AI 서버 API는 백엔드만 부릅니다.</aside>
+</section>
+
+<!-- 24 기대 효과 -->
+<section data-step="6">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">06</span>기대 효과와 계획</p><h2>기대 효과</h2></div>
+    </div>
+    <div class="body">
+      <div class="effects">
+        <div>
+          <h3>신입생과 부모님</h3>
+          <ul>
+            <li><b>더 내는 돈을 계약 전에 압니다</b><span>같은 크기 방의 차이가 월 35만 원, 2년 840만 원까지 벌어지는 동네에서 판결로 걸러 냅니다.</span></li>
+            <li><b>서울에 오기 전에 고릅니다</b><span>방 안, 동네, 학교까지 길을 3D로 먼저 보고 2월의 짧은 일정을 줄입니다.</span></li>
+            <li><b>멀리서도 같이 봅니다</b><span>부모님을 초대해 같은 방을 함께 둘러보고 결정합니다.</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>서비스</h3>
+          <ul>
+            <li><b>한양대생 후기가 쌓입니다</b><span>계정 인증 후기가 쌓일수록 다음 신입생의 판단 근거가 됩니다.</span></li>
+            <li><b>다른 대학가로 옮길 수 있습니다</b><span>실거래 수집 지역과 3D 월드만 바꾸면 같은 판결과 투어를 씁니다.</span></li>
+            <li><b>공공 주거 정보로 이어 줍니다</b><span>"이 돈이면" 비교로 기숙사와 청년안심주택을 함께 보여 줍니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">신입생과 부모님에게는 계약 전에 더 내는 돈을 알려 주고 서울에 오기 전에 방을 고르게 해 줍니다. 서비스는 후기가 쌓일수록 좋아지고, 다른 대학가로도 옮길 수 있습니다.</aside>
+</section>
+
+<!-- 25 출시와 확장 + 역할 -->
+<section data-step="6">
+  <div class="frame">
+    <div class="head">
+      <div><p class="kicker"><span class="no">06</span>기대 효과와 계획</p><h2>1~2월 신입생 집 구하기 시즌에 맞춰 엽니다</h2></div>
+    </div>
+    <div class="body">
+      <div class="plan">
+        <div>
+          <ol class="timeline">
+            <li><b>지금</b><div><strong>운영 서버 배포 중</strong>where-hyu-living.xyz에서 한양대 계정으로 쓸 수 있습니다</div></li>
+            <li><b>1~2월</b><div><strong>신입생 집 구하기 시즌에 출시</strong>정시 발표 직후 방 계약이 몰리는 때에 맞춥니다</div></li>
+            <li><b>그다음</b><div><strong>다른 대학가로 확장</strong>실거래 수집 지역과 동네 3D를 넓힙니다</div></li>
+          </ol>
+          <div class="roles">
+            <div><b>김준형</b><span>프론트엔드, 3D</span></div>
+            <div><b>장시현</b><span>백엔드</span></div>
+          </div>
+        </div>
+        <ol class="grid22">
+          <li><span class="no">1</span><h4>대학가 넓히기</h4><p>국토부 실거래 수집 구를 늘리고 대학별 3D 월드를 만듭니다.</p></li>
+          <li><span class="no">2</span><h4>평면도 정확도</h4><p>AI 평면도 결과를 사람이 고친 기록으로 다시 학습합니다.</p></li>
+          <li><span class="no">3</span><h4>후기 신뢰도</h4><p>실제 거주 여부를 확인한 후기에 표시를 붙입니다.</p></li>
+          <li><span class="no">4</span><h4>계약 전 점검</h4><p>등기·보증보험처럼 계약 직전에 볼 항목을 판결 옆에 둡니다.</p></li>
+        </ol>
+      </div>
+    </div>
+    <p class="src">확장과 고도화 항목은 앞으로의 계획입니다.</p>
+  </div>
+  <aside class="notes">지금 운영 서버에 배포돼 있고 신입생이 방을 구하는 1월과 2월에 맞춰 출시합니다. 이후에는 실거래 수집 지역을 넓혀 다른 대학가로 확장하려고 합니다. 팀은 두 명이고, 김준형이 프론트엔드와 3D를, 장시현이 백엔드를 맡았습니다.</aside>
+</section>
+
+<!-- 26 감사합니다 -->
+<section data-step="0">
+  <div class="end">
+    <div class="l">
+      <h2>감사합니다</h2>
+      <p>어디서사냥<br><span class="url-inline">https://where-hyu-living.xyz/</span></p>
+      <img class="qr" src="assets/img/qr.png" alt="where-hyu-living.xyz 접속 QR 코드">
+    </div>
+    <div class="r"><img src="assets/shots/ref-roomtour-housing.jpg" alt="실내 3D 룸투어"></div>
+  </div>
+  <aside class="notes">들어 주셔서 감사합니다. 질문 받겠습니다.</aside>
+</section>
+
+<!-- 부록 -->
+<section data-step="0"><div class="divider"><h2>Appendix</h2></div></section>
+
+<section data-step="0">
+  <div class="frame">
+    <div class="head"><div><p class="kicker">Appendix</p><h2>AI 적정 월세 모델</h2></div></div>
+    <div class="body"><div class="diagram"><img src="assets/img/03-rent-model.png" alt="AI 적정 월세 모델 구조"></div></div>
+  </div>
+  <aside class="notes">적정 월세 모델은 국토부 실거래에 동 단위 피처를 붙여 GBM 분위 회귀로 학습했습니다. 25, 50, 75% 세 분위를 내서 범위를 보여 줍니다.</aside>
+</section>
+
+<section data-step="0">
+  <div class="frame">
+    <div class="head"><div><p class="kicker">Appendix</p><h2>AI 평면도 파이프라인</h2></div></div>
+    <div class="body"><div class="diagram"><img src="assets/img/02-floorplan-pipeline.png" alt="AI 평면도 파이프라인"></div></div>
+  </div>
+  <aside class="notes">평면도 이미지는 루트 A로 분할과 글자 인식을 거치고, 이미지가 없으면 루트 B로 면적과 방 수에 맞는 템플릿을 고릅니다. 마지막에 검수를 거쳐 FloorPlan JSON이 됩니다.</aside>
+</section>
+
+<section data-step="0">
+  <div class="frame">
+    <div class="head"><div><p class="kicker">Appendix</p><h2>이슈 및 해결: 도보 시간 요청이 몰리면 API 전체가 멈췄습니다</h2></div></div>
+    <div class="body">
+      <div class="issue">
+        <div>
+          <h4>문제 상황</h4>
+          <p>캐시에 없는 도보 시간 요청 14개가 동시에 들어오자 DB 연결이 바닥났습니다. 읽기 트랜잭션이 연결을 쥔 채 TMAP 응답(최대 3초)을 기다렸고, 캐시 저장이 연결을 하나 더 빌리면서 서로 막혔습니다. 그동안 다른 API도 모두 멈췄습니다.</p>
+          <h4 style="margin-top:32px">해결 방안</h4>
+          <p>목록 조회와 도보 계산을 나눠 연결을 먼저 돌려주고, 캐시 저장은 별도 스레드로 옮겼습니다. 같은 자리·같은 건물 요청은 TMAP을 한 번만 부르도록 합쳤습니다.</p>
+        </div>
+        <div>
+          <h4>개선 전후 (동시 요청 14~15개)</h4>
+          <div class="ba">
+            <div><p class="big before">30.3<small>초</small></p><span>전: 4개 500 오류, 다른 API도 멈춤</span></div>
+            <p class="to">→</p>
+            <div><p class="big after">1.8<small>초</small></p><span>후: 15개 모두 200, 다른 API 10~24ms</span></div>
+          </div>
+          <div class="ba" style="margin-top:56px">
+            <div><p class="big" style="font-size:80px">606<small>KB</small></p><span>첫 화면을 막는 CSS</span></div>
+            <p class="to">→</p>
+            <div><p class="big" style="font-size:80px;color:var(--gi-fair)">134<small>KB</small></p><span>gzip 196KB → 30KB</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="src">출처: docs/harness/final-review-2026-11.md (P0 #1, 5장 전후 수치). 회귀 테스트 FinalQaFixesTest.sameWalkKey_atOnce_callsTmapOnce.</p>
+  </div>
+  <aside class="notes">개발 중 가장 큰 문제는 도보 시간 계산이었습니다. 요청이 몰리면 30초 동안 API 전체가 멈췄는데, 트랜잭션과 외부 호출을 분리해서 1.8초로 줄였습니다.</aside>
+</section>
+
+<section data-step="0">
+  <div class="frame">
+    <div class="head"><div><p class="kicker">Appendix</p><h2>출처</h2></div></div>
+    <div class="body">
+      <ul class="sources">
+        <li><b>대학가 원룸 월세+관리비 70.9만 원(2026.7)</b> 다방, 국민일보 인용 kmib.co.kr/article/view.asp?arcid=9000002388</li>
+        <li><b>대학생 월평균 지출 68.1만 원</b> 대학내일20대연구소 소비지출 정기조사 2025, openads.co.kr/content/contentDetail?contsId=20343</li>
+        <li><b>1인 가구 주거비 비중 20.2%</b> 한국은행, 이투데이 인용 etoday.co.kr/news/view/2428375</li>
+        <li><b>2030 주거비 부담 40.2%</b> 다방 설문(2024.4), 아주경제 인용 ajunews.com/view/20240425091123317</li>
+        <li><b>성동구 82만 원·4위(2026.9)</b> 다방여지도, 인사이트 insight.co.kr/news/578877, 아이뉴스24 m.inews24.com/v/2018016</li>
+        <li><b>성동구 순위 추이</b> 뉴스스페이스 newsspace.kr/news/article.html?no=6764, 뉴스핌 newspim.com/news/view/20260326000556, 벤처스퀘어 venturesquare.net/1077831, 머니투데이 mt.co.kr/estate/2026/07/28/2026072808575932587</li>
+        <li><b>10개 대학가 월세(2026.1)</b> 다방, 세계일보 v.daum.net/v/20260224190250832, 한국경제 hankyung.com/article/2026022499466</li>
+        <li><b>한양대 인근 월세 추이</b> 아시아경제 asiae.co.kr/article/2024020710060484953, 한국경제 hankyung.com/article/2025081247876</li>
+        <li><b>서울 고교 출신 30.8%</b> 종로학원(대학알리미 분석), 파이낸셜뉴스 fnnews.com/news/202611081129100180</li>
+        <li><b>기숙사 수용률 11.2%</b> 대학알리미, 한국경제 hankyung.com/article/202503115919i</li>
+        <li><b>대학가 광고 321/1,100건 위법 의심</b> 국토교통부, 헤럴드경제 heraldk.com/article/2025100918100024797</li>
+        <li><b>합격생 인터뷰</b> 데일리안 dailian.co.kr/news/view/1324185</li>
+        <li><b>자체 분석</b> 서비스 DB real_deals(국토부 실거래 27,718건, 2025.11~2026.10) 중 한양대 주변 6개 동, 전용 15~25㎡ 월세 1,315건</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js"></script>
+<script src="assets/charts.js"></script>
+<script>
+  // 본문 장 오른쪽 위에 이야기 위치를 붙인다 (data-step 1~6)
+  const STEPS = ['문제', '한양대 신입생', '해결 방안', '핵심 기능', '기술 구조', '계획'];
+  document.querySelectorAll('.slides > section[data-step]').forEach((s) => {
+    const n = Number(s.dataset.step);
+    const head = s.querySelector('.head');
+    if (!n || !head || head.querySelector('.stat')) return;
+    const t = document.createElement('div');
+    t.className = 'track'; t.setAttribute('aria-hidden', 'true');
+    t.innerHTML = STEPS.map((x, i) => `<span class="${i + 1 === n ? 'on' : ''}">${x}</span>`).join('');
+    head.appendChild(t);
+  });
+  window.drawCharts();
+  Reveal.initialize({
+    width: 1920, height: 1080, margin: 0, center: false, hash: true,
+    slideNumber: 'c/t', transition: 'fade', backgroundTransition: 'none',
+    controls: false, progress: true, pdfSeparateFragments: false,
+    plugins: [RevealNotes],
+  });
+</script>
+</body>
+</html>
