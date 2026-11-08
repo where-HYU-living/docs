@@ -355,15 +355,17 @@
 | `move` | `p`, `r`, `a` | 최대 10Hz로 전송 |
 | `emote` | `e`: `"wave" \| "heart" \| "clap"` | |
 | `chat` | `m` (40자 이하) | 넘으면 서버가 잘라서 중계 |
+| `look` | `look: { jacket, hair, skin }` | 접속 직후 1회 + 꾸밀 때마다. `jacket` 은 `^[A-Za-z0-9-]{1,16}$`, `hair`·`skin` 은 `#rrggbb`. 잘못된 필드는 기본값(`school1`, `#2a1d16`, `#f2c9a5`), 객체가 아니면 버림 |
 | `ping` | | 15초마다 |
 
 **서버 → 클라이언트**
 | t | 필드 | 설명 |
 |---|---|---|
-| `welcome` | `selfId`, `spawn: { p, r }`, `players: [{ id, nickname, p, r, a }]` | 접속 직후 1회 |
-| `join` | `player: { id, nickname, p, r, a }` | 누가 들어옴 |
-| `leave` | `id` | 누가 나감 (끊김 포함, 30초 무응답 시) |
-| `state` | `players: [{ id, p, r, a }]` | 10Hz, **움직인 사람만** |
+| `welcome` | `selfId`, `spawn: { p, r }`, `invited`, `players: [{ id, nickname, look?, p, r, a }]` | 접속 직후 1회. `invited` 는 초대 토큰이 유효해 초대한 사람 옆에 놓였을 때 true |
+| `join` | `player: { id, nickname, look?, p, r, a }` | 누가 들어옴 |
+| `leave` | `id` | 누가 나감 (끊김 포함, 60초 무응답 시. 서버가 20초마다 WebSocket ping 을 보내 pong 으로도 생존을 확인) |
+| `state` | `players: [{ id, p, r, a }]` | 10Hz, **움직인 사람만, 본인 제외**. 좌표는 소수 2자리 |
+| `look` | `id`, `look` | 외형이 바뀜. 본인 제외, 최대 10Hz 로 모아서 중계 (`state` 에는 안 넣음) |
 | `emote` | `id`, `e` | |
 | `chat` | `id`, `m` | |
 | `pong` | | |
@@ -371,9 +373,9 @@
 
 **스폰 규칙**
 - `invite` 없음 → 기본 스폰 `p: [0, 0, 0]` (ORIGIN = 사자상, 정문 앞)
-- `invite` 유효 + 초대한 사람이 접속 중 → 초대한 사람 위치에서 **x + 1.5m**
+- `invite` 유효 + 초대한 사람이 접속 중 → 초대한 사람 위치에서 **반경 1.5m 안 임의 방향** (여러 명이 겹치지 않게)
 - `invite` 만료·무효·초대자 오프라인 → 기본 스폰 (에러 아님)
-- 동시 접속 상한: 서버 설정 `world.maxPlayers` (기본 50). 넘으면 `error: WORLD_FULL` 후 연결 종료
+- 동시 접속 상한: 서버 설정 `world.max-players` (기본 **30**), 같은 IP 동시 접속 `world.max-per-client` (기본 30 = 사실상 제한 없음, 학교 와이파이 시연용). 넘으면 `error: WORLD_FULL` 후 연결 종료(클라이언트는 재접속하지 않음)
 
 ## 7. 공유 픽스처 (목 데이터)
 

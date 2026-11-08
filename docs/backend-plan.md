@@ -46,13 +46,15 @@
 | 9 찜 | 구현 완료 | `FavoriteApiTest` 12 | 매물·양도 글 `favorited` 실제 값. 하트는 프론트가 `GET /me/favorites` 한 곳에서 읽음 (계약 v1.7) |
 | 10 양도 게시판·업로드 | 구현 완료 + **실서버 확인** | `TransferApiTest` 15 | 제목 필수 2~40자(계약 v1.7, 프론트와 같음), 남은 개월 기준 판정, 업로드는 전체 주소 응답·첫 바이트로 jpg/png 확인, 데모 양도 글 3건 |
 | 15 멀티플레이 | **구현 완료 (프론트 담당이 진행)** | `WorldServiceTest`·`SessionOutboxTest`·`WorldSocketIT`·`WorldLoadIT` | `/ws/world` 공유 월드(최대 30명, 10Hz), `POST /invites`. 계획과 다른 점은 아래 Task 15 참고 |
-| 14 통합 검색·평면도 | **구현 완료 (프론트 담당)** — 평면도 `06edeff`, 통합 검색 `27c14ef` | `FloorPlanApiTest`·`FloorPlanSeederTest`·`FloorPlanValidatorTest`·`FloorPlanLinkerTest`·`FloorplanLabelTest` | `GET /floorplans/{id}`, 평면도 33개(청년안심주택 20·매물 7·기숙사 6), V8 |
+| 14 통합 검색·평면도 | **구현 완료 (프론트 담당)** — 평면도 `06edeff`, 통합 검색 `27c14ef` | `FloorPlanApiTest`·`FloorPlanSeederTest`·`FloorPlanValidatorTest`·`FloorPlanLinkerTest`·`FloorplanLabelTest`, `CommunityApiTest` | `GET /floorplans/{id}`, 평면도 33개(청년안심주택 20·매물 7·기숙사 6), V8. 검색은 DB 우선 + 주소 보충 |
 | 11 후기 | 구현 완료 (두 사람이 각각 만들어 **프론트 담당 구현으로 합침**) | `ReviewApiTest` 14, `CommunityApiTest` | 프론트 담당 `ReviewController`(V10) + 백엔드 담당이 핀 방 번호 `floorplanId`(V11, 계약 v1.8)·데모 후기 10건·테스트 14개를 옮겨 붙임 |
-| 12 내 집 기록·리포트·만료 알림 | **구현 완료 (프론트 담당 `27c14ef`)**, 계획 대비 점검 전 | `CommunityApiTest` | `HomeController`·`HomeService`, V10 |
-| 13 알림 생성·알림함 | **구현 완료 (프론트 담당 `27c14ef`)**, 계획 대비 점검 전 | `CommunityApiTest` | `NotificationController`·`NotificationJob`, V10 |
+| 12 내 집 기록·리포트·만료 알림 | **구현 완료 (프론트 담당 `27c14ef`)** | `CommunityApiTest` | `HomeController`·`HomeService`. 계약 5-9 그대로, 새 테이블은 JdbcTemplate(엔티티 없음) |
+| 13 알림 생성·알림함 | **구현 완료 (프론트 담당 `27c14ef`)** | `CommunityApiTest` | `NotificationController`·`NotificationJob` (매일 09:00 KST + 기동 시), `dedupe_key` unique 로 중복 방지 |
 | 16 배포 | 대기 | | |
 
-전체 테스트 302개 통과 (2026-11-08 기준, 프론트 담당의 멀티플레이·평면도 테스트 포함).
+**마이그레이션 번호 (실제):** V8 평면도 · V9 양도 게시판 · **V10 후기·내 집·알림 (한 파일)** · **V11 후기 `floorplan_id`** · 다음 새 마이그레이션은 **V12**. 아래 Task 12·13 본문에 적힌 V11·V12 파일명은 쓰지 않는다.
+
+전체 테스트 307개 통과 (2026-11-08 기준, 프론트 담당의 멀티플레이·평면도·검색·내 집·알림 테스트 포함).
 
 **판정 기준값 (현재)** — 모두 `application.yml` 의 `pricing.*` 설정값, 테스트는 별도 고정값(전환율 0.06, 기준 관리비 71,000) 사용
 | 값 | 현재 | 출처·근거 |
@@ -733,6 +735,7 @@ void grade_boundaries(double rate, Grade expected) { assertThat(policy.of(rate,f
   - 매물 7건(4·6·10·17·18·19·20번)에 101~107, 기숙사 호실 6종에 201~206 연결
   - 남은 일: 청아진 1·2번은 목업에서 옮긴 임시본(이미지로 다시 작성 필요), 한영스테이 면적 미상, **통합 검색**(이 Task 의 나머지)
   - 마이그레이션 번호: 평면도가 V8 을 먼저 써서 양도 게시판은 V9, 이후 후기 V10·내 집 V11·알림 V12
+  - **2026-11-08 변경**: 후기·내 집·알림을 한 번에 구현하면서 `V10__reviews_home_notifications.sql` 하나에 담았다. 다음 마이그레이션은 **V11** 부터
 
 ### Task 15: 멀티플레이 WebSocket · 초대
 
